@@ -21,9 +21,10 @@ const footerNavigation = {
     { name: 'Data Strategy', href: '/solutions' },
   ],
   sectors: [
-    { name: 'Healthcare', href: '/industries/healthcare' },
-    { name: 'Manufacturing', href: '/industries/manufacturing' },
-    { name: 'Finance', href: '/industries/finance' },
+    { name: 'Healthcare', href: '/sectors/healthcare' },
+    { name: 'Manufacturing', href: '/sectors/manufacturing' },
+    { name: 'Finance', href: '/sectors/finance' },
+    { name: 'Retail', href: '/sectors/retail' },
   ],
   company: [
     { name: 'About Us', href: '/about-us' },
@@ -299,17 +300,17 @@ const FooterContent = styled.div`
   flex-wrap: wrap;
   gap: 6rem;
 
-  ${media('<=desktop')} {
+  ${media.desktop`
     gap: 4rem;
-  }
+  `}
 `;
 
 const CompanySection = styled.div`
   flex: 0 0 30%;
 
-  ${media('<=desktop')} {
+  ${media.desktop`
     flex: 0 0 100%;
-  }
+  `}
 `;
 
 const NavSection = styled.div`
@@ -319,9 +320,9 @@ const NavSection = styled.div`
   justify-content: space-around;
   gap: 2rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     flex-direction: column;
-  }
+  `}
 `;
 
 const LogoSection = styled.div`
@@ -337,9 +338,9 @@ const CompanyName = styled.h3`
   display: flex;
   gap: 0.5rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 2rem;
-  }
+  `}
 `;
 
 const AccentText = styled.span`
@@ -421,9 +422,9 @@ const SocialIconHoverEffect = styled(motion.div)`
 const NavColumn = styled.div`
   min-width: 16rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     margin-bottom: 2rem;
-  }
+  `}
 `;
 
 const CategoryTitle = styled(motion.h4)`
@@ -554,10 +555,10 @@ const BottomBar = styled.div`
   border-top: 1px solid rgba(var(--text), 0.1);
   font-size: 1.4rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     flex-direction: column;
     gap: 1.5rem;
-  }
+  `}
 `;
 
 const Copyright = styled.div`
@@ -603,12 +604,12 @@ const BackToTopButton = styled(motion.button)`
     background: rgba(var(--accent), 0.2);
   }
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     right: 2rem;
     bottom: 2rem;
     width: 4.5rem;
     height: 4.5rem;
-  }
+  `}
 `;
 
 const ArrowIcon = styled.svg`

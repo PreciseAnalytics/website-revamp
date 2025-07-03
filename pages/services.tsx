@@ -1,7 +1,6 @@
 import Head from 'next/head';
 import styled from 'styled-components';
 import { EnvVars } from 'env';
-
 import AnimatedHeader from 'components/AnimatedHeader';
 import AnimatedFooter from 'components/AnimatedFooter';
 import Hero from 'views/ServicesPage/Hero';

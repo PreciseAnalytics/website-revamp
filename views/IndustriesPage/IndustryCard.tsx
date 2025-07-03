@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { media } from 'utils/media';
-import NextLink from 'next/link';
-import Button from 'components/Button';
+import Image from 'next/image';
 
 interface IndustryCardProps {
   title: string;
@@ -34,7 +33,13 @@ export default function IndustryCard({
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
       <CardImageWrapper>
-        <CardImage src={imageUrl} alt={title} />
+        <Image 
+          src={imageUrl} 
+          alt={title} 
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          style={{ objectFit: 'cover' }}
+        />
         <ImageOverlay />
       </CardImageWrapper>
       <CardContent>
@@ -49,7 +54,7 @@ export default function IndustryCard({
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
         <BenefitsList>
-          {benefits.map((benefit, i) => (
+          {benefits.slice(0, 3).map((benefit, i) => (
             <BenefitItem 
               key={i}
               initial={{ opacity: 0, x: -20 }}
@@ -61,15 +66,17 @@ export default function IndustryCard({
               {benefit}
             </BenefitItem>
           ))}
+          {benefits.length > 3 && (
+            <MoreBenefitsText>+{benefits.length - 3} more benefits</MoreBenefitsText>
+          )}
         </BenefitsList>
         <ButtonContainer>
           <LearnMoreButton
             onClick={(e) => {
               e.preventDefault();
-              e.stopPropagation();
-              console.log('Learn More clicked for:', title);
               onLearnMore();
             }}
+            aria-label={`Learn more about ${title}`}
           >
             Learn More
           </LearnMoreButton>
@@ -79,12 +86,12 @@ export default function IndustryCard({
   );
 }
 
-const CardWrapper = styled(motion.div)`
-  background: rgba(var(--cardBackground), 0.7);
+const CardWrapper = styled(motion.article)`
+  background: rgba(var(--cardBackground-rgb), 0.7);
   border-radius: 1.5rem;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(var(--primary), 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.1);
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   height: 100%;
@@ -93,8 +100,12 @@ const CardWrapper = styled(motion.div)`
   width: 100%;
   
   &:hover {
-    box-shadow: 0 30px 60px rgba(var(--accent), 0.15);
-    border-color: rgba(var(--accent), 0.3);
+    box-shadow: 0 30px 60px rgba(var(--accent-rgb), 0.15);
+    border-color: rgba(var(--accent-rgb), 0.3);
+  }
+
+  ${media('<=tablet')} {
+    border-radius: 1rem;
   }
 `;
 
@@ -102,16 +113,9 @@ const CardImageWrapper = styled.div`
   position: relative;
   height: 20rem;
   overflow: hidden;
-`;
 
-const CardImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s ease;
-  
-  ${CardWrapper}:hover & {
-    transform: scale(1.05);
+  ${media('<=tablet')} {
+    height: 16rem;
   }
 `;
 
@@ -122,6 +126,7 @@ const ImageOverlay = styled.div`
   right: 0;
   bottom: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
+  z-index: 1;
 `;
 
 const CardContent = styled.div`
@@ -129,6 +134,10 @@ const CardContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+
+  ${media('<=tablet')} {
+    padding: 1.8rem;
+  }
 `;
 
 const IconWrapper = styled.div`
@@ -139,47 +148,83 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--accent), 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   border-radius: 1rem;
-  color: rgb(var(--accent));
+  color: rgb(var(--accent-rgb));
+
+  ${media('<=tablet')} {
+    font-size: 3rem;
+    height: 4.5rem;
+    width: 4.5rem;
+    margin-bottom: 1.5rem;
+  }
 `;
 
 const CardTitle = styled.h3`
   font-size: 2.4rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  background: linear-gradient(90deg, rgb(var(--text)) 0%, rgba(var(--primary), 0.8) 100%);
+  background: linear-gradient(90deg, rgb(var(--text-rgb)) 0%, rgba(var(--primary-rgb), 0.8) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  line-height: 1.3;
+
+  ${media('<=tablet')} {
+    font-size: 2rem;
+  }
 `;
 
 const CardDescription = styled.p`
   font-size: 1.6rem;
   line-height: 1.6;
   margin-bottom: 2rem;
-  color: rgb(var(--text));
+  color: rgb(var(--text-rgb));
   opacity: 0.8;
   flex-grow: 1;
+
+  ${media('<=tablet')} {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 `;
 
 const BenefitsList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0 0 2.5rem;
+
+  ${media('<=tablet')} {
+    margin-bottom: 2rem;
+  }
 `;
 
 const BenefitItem = styled(motion.li)`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: rgb(var(--text));
+  color: rgb(var(--text-rgb));
+  line-height: 1.4;
+
+  ${media('<=tablet')} {
+    font-size: 1.4rem;
+  }
 `;
 
 const BenefitIcon = styled.span`
-  color: rgb(var(--accent));
+  color: rgb(var(--accent-rgb));
   margin-right: 1rem;
   font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+`;
+
+const MoreBenefitsText = styled.span`
+  display: inline-block;
+  font-size: 1.4rem;
+  color: rgb(var(--accent-rgb));
+  margin-top: 0.5rem;
+  opacity: 0.8;
 `;
 
 const ButtonContainer = styled.div`
@@ -188,7 +233,7 @@ const ButtonContainer = styled.div`
 
 const LearnMoreButton = styled.button`
   border: none;
-  background: rgb(var(--accent));
+  background: rgb(var(--accent-rgb));
   color: white;
   padding: 1.2rem 2.4rem;
   border-radius: 0.8rem;
@@ -199,11 +244,16 @@ const LearnMoreButton = styled.button`
   width: 100%;
   
   &:hover {
-    background: rgba(var(--accent), 0.8);
+    background: rgba(var(--accent-rgb), 0.8);
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--accent-rgb), 0.2);
   }
   
   &:active {
     transform: translateY(0);
+  }
+
+  ${media('<=tablet')} {
+    padding: 1rem 2rem;
   }
 `;

@@ -22,10 +22,10 @@ const footerItems: FooterItems = [
   {
     title: 'Industries',
     items: [
-      { title: 'Healthcare', href: '/industries#healthcare' },
-      { title: 'Manufacturing', href: '/industries#manufacturing' },
-      { title: 'Fintech', href: '/industries#fintech' },
-      { title: 'Retail', href: '/industries#retail' },
+      { title: 'Healthcare', href: '/industries?industry=healthcare' },
+      { title: 'Manufacturing', href: '/industries?industry=manufacturing' },
+      { title: 'Finance', href: '/industries?industry=fintech' },
+      { title: 'Retail', href: '/industries?industry=retail' },
     ],
   },
   {
@@ -58,22 +58,16 @@ export default function Footer() {
         </ListContainer>
         <BottomBar>
           <ShareBar>
-            <NextLink href="https://www.twitter.com/preciseanalytics" passHref>
-              <a>
-                <TwitterIcon size={50} round={true} />
-              </a>
+            <NextLink href="https://www.twitter.com/preciseanalytics">
+              <TwitterIcon size={50} round={true} />
             </NextLink>
 
-            <NextLink href="https://www.facebook.com/preciseanalytics" passHref>
-              <a>
-                <FacebookIcon size={50} round={true} />
-              </a>
+            <NextLink href="https://www.facebook.com/preciseanalytics">
+              <FacebookIcon size={50} round={true} />
             </NextLink>
 
-            <NextLink href="https://www.linkedin.com/company/precise-analytics" passHref>
-              <a>
-                <LinkedinIcon size={50} round={true} />
-              </a>
+            <NextLink href="https://www.linkedin.com/company/precise-analytics">
+              <LinkedinIcon size={50} round={true} />
             </NextLink>
           </ShareBar>
           <Copyright>&copy; Copyright 2025 Precise Analytics</Copyright>
@@ -97,9 +91,7 @@ function FooterList({ title, items }: SingleFooterList) {
 function ListItem({ title, href }: SingleFooterListItem) {
   return (
     <ListItemWrapper>
-      <NextLink href={href} passHref>
-        <a>{title}</a>
-      </NextLink>
+      <NextLink href={href}>{title}</NextLink>
     </ListItemWrapper>
   );
 }
@@ -134,15 +126,15 @@ const ListWrapper = styled.div`
     margin-top: 1rem;
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     flex: 0 40%;
     margin-right: 1.5rem;
-  }
+  `}
 
-  ${media('<=phone')} {
+  ${media.phone`
     flex: 0 100%;
     margin-right: 0rem;
-  }
+  `}
 `;
 
 const ListItemWrapper = styled.p`
@@ -171,7 +163,7 @@ const BottomBar = styled.div`
   justify-content: space-between;
   align-items: center;
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     flex-direction: column;
-  }
+  `}
 `;

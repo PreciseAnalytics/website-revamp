@@ -74,15 +74,15 @@ export default function IndustryModal({ isOpen, onClose, industry }: IndustryMod
     <CustomOverlay>
       <Container>
         <ModalCard>
-          <CloseIconContainer>
-            <CloseIcon onClick={onClose} />
-          </CloseIconContainer>
-          
+          <CloseButton onClick={onClose} aria-label="Close modal">
+            <CloseIcon />
+          </CloseButton>
+
           <ModalTitle>{content.title}</ModalTitle>
-          
+
           <ModalContent>
             <p>{content.content}</p>
-            
+
             <BenefitsSection>
               <BenefitsTitle>Key Benefits:</BenefitsTitle>
               <BenefitsList>
@@ -95,7 +95,7 @@ export default function IndustryModal({ isOpen, onClose, industry }: IndustryMod
               </BenefitsList>
             </BenefitsSection>
           </ModalContent>
-          
+
           <ActionContainer>
             <Button accent as="a" href="/contact">
               Get Started Today
@@ -131,19 +131,24 @@ const ModalCard = styled.div`
   position: relative;
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(var(--accent), 0.2);
-  
+
   ${media('<=tablet')} {
     padding: 3rem 2rem;
     max-width: 95%;
   }
 `;
 
-const CloseIconContainer = styled.div`
+const CloseButton = styled.button`
   position: absolute;
   top: 2rem;
   right: 2rem;
+  background: transparent;
+  border: none;
   cursor: pointer;
-  
+  padding: 0;
+  line-height: 1;
+  color: rgb(var(--text));
+
   ${media('<=tablet')} {
     top: 1.5rem;
     right: 1.5rem;
@@ -156,7 +161,7 @@ const ModalTitle = styled.h2`
   text-align: center;
   margin-bottom: 2.5rem;
   color: rgb(var(--text));
-  
+
   ${media('<=tablet')} {
     font-size: 2.4rem;
   }
@@ -167,11 +172,11 @@ const ModalContent = styled.div`
   line-height: 1.6;
   color: rgb(var(--textSecondary));
   margin-bottom: 3rem;
-  
+
   p {
     margin-bottom: 2rem;
   }
-  
+
   ${media('<=tablet')} {
     font-size: 1.4rem;
   }
@@ -200,7 +205,7 @@ const BenefitItem = styled.li`
   margin-bottom: 1rem;
   font-size: 1.6rem;
   line-height: 1.5;
-  
+
   ${media('<=tablet')} {
     font-size: 1.4rem;
   }

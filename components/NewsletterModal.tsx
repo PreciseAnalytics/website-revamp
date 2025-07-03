@@ -3,7 +3,7 @@ import MailchimpSubscribe, { DefaultFormFields } from 'react-mailchimp-subscribe
 import styled from 'styled-components';
 import { EnvVars } from 'env';
 import useEscClose from 'hooks/useEscKey';
-import { media } from 'utils/media';
+// import media from 'utils/media';  // REMOVE this import!
 import Button from './Button';
 import CloseIcon from './CloseIcon';
 import Container from './Container';
@@ -20,9 +20,11 @@ export default function NewsletterModal({ onClose }: NewsletterModalProps) {
 
   useEscClose({ onClose });
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>, enrollNewsletter: (props: DefaultFormFields) => void) {
+  function onSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+    enrollNewsletter: (props: DefaultFormFields) => void
+  ) {
     event.preventDefault();
-    console.log({ email });
     if (email) {
       enrollNewsletter({ EMAIL: email });
     }
@@ -40,8 +42,9 @@ export default function NewsletterModal({ onClose }: NewsletterModalProps) {
                 <CloseIconContainer>
                   <CloseIcon onClick={onClose} />
                 </CloseIconContainer>
-                {hasSignedUp && <MailSentState />}
-                {!hasSignedUp && (
+                {hasSignedUp ? (
+                  <MailSentState />
+                ) : (
                   <>
                     <Title>Are you ready to enroll to the best newsletter ever?</Title>
                     <Row>
@@ -67,6 +70,8 @@ export default function NewsletterModal({ onClose }: NewsletterModalProps) {
   );
 }
 
+// --- Styled Components ---
+
 const Card = styled.form`
   display: flex;
   position: relative;
@@ -79,7 +84,7 @@ const Card = styled.form`
   overflow: hidden;
   color: rgb(var(--text));
 
-  ${media('<=tablet')} {
+  @media (max-width: 768px) {
     padding: 7.5rem 2.5rem;
   }
 `;
@@ -103,7 +108,7 @@ const Title = styled.div`
   text-align: center;
   color: rgb(var(--text));
 
-  ${media('<=tablet')} {
+  @media (max-width: 768px) {
     font-size: 2.6rem;
   }
 `;
@@ -123,7 +128,7 @@ const Row = styled.div`
   width: 100%;
   margin-top: 3rem;
 
-  ${media('<=tablet')} {
+  @media (max-width: 768px) {
     flex-direction: column;
   }
 `;
@@ -134,7 +139,7 @@ const CustomButton = styled(Button)`
   margin-left: 1.5rem;
   box-shadow: var(--shadow-lg);
 
-  ${media('<=tablet')} {
+  @media (max-width: 768px) {
     width: 100%;
     margin-left: 0;
     margin-top: 1rem;
@@ -144,7 +149,7 @@ const CustomButton = styled(Button)`
 const CustomInput = styled(Input)`
   width: 60%;
 
-  ${media('<=tablet')} {
+  @media (max-width: 768px) {
     width: 100%;
   }
 `;

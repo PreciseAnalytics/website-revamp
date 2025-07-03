@@ -93,10 +93,10 @@ const ModalCard = styled.div`
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(var(--accent), 0.2);
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     padding: 3rem 2rem;
     max-width: 95%;
-  }
+  `}
 `;
 
 const CloseIconContainer = styled.div`
@@ -105,10 +105,10 @@ const CloseIconContainer = styled.div`
   right: 2rem;
   cursor: pointer;
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     top: 1.5rem;
     right: 1.5rem;
-  }
+  `}
 `;
 
 const BadgeContainer = styled.div`
@@ -135,9 +135,9 @@ const ModalTitle = styled.h2`
   margin-bottom: 2rem;
   color: rgb(var(--text));
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 2rem;
-  }
+  `}
 `;
 
 const ModalContent = styled.div`
@@ -154,9 +154,9 @@ const ModalContent = styled.div`
     }
   }
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 1.4rem;
-  }
+  `}
 `;
 
 const ActionContainer = styled.div`

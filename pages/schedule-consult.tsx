@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -10,7 +10,11 @@ import { EnvVars } from 'env';
 import { media } from 'utils/media';
 
 export default function ScheduleConsult() {
+  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
+    setIsClient(true);
+
     const script = document.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
     script.async = true;
@@ -26,11 +30,7 @@ export default function ScheduleConsult() {
   return (
     <>
       <Head>
-<<<<<<< Updated upstream
         <title>{`Schedule a Consultation - ${EnvVars.SITE_NAME}`}</title>
-=======
-        <title>{`Schedule a Consult - ${EnvVars.SITE_NAME}`}</title>
->>>>>>> Stashed changes
         <meta
           name="description"
           content="Schedule a free consultation with Precise Analytics to discover how data can drive your mission forward."
@@ -88,29 +88,31 @@ export default function ScheduleConsult() {
                 </BottomText>
               </InfoCard>
 
-              <ContactCard>
-                <CardTitle>Contact Information</CardTitle>
-                <ContactList>
-                  <ContactItem>
-                    <ContactIcon>📧</ContactIcon>
-                    <ContactDetails>
-                      <ContactLabel>Email</ContactLabel>
-                      <ContactValue>
-                        <a href={`mailto:${EnvVars.CONTACT_EMAIL}`}>{EnvVars.CONTACT_EMAIL}</a>
-                      </ContactValue>
-                    </ContactDetails>
-                  </ContactItem>
-                  <ContactItem>
-                    <ContactIcon>📞</ContactIcon>
-                    <ContactDetails>
-                      <ContactLabel>Phone</ContactLabel>
-                      <ContactValue>
-                        <a href="tel:+18043964148">+1 (804) 396-4148</a>
-                      </ContactValue>
-                    </ContactDetails>
-                  </ContactItem>
-                </ContactList>
-              </ContactCard>
+              {isClient && (
+                <ContactCard>
+                  <CardTitle>Contact Information</CardTitle>
+                  <ContactList>
+                    <ContactItem>
+                      <ContactIcon>📧</ContactIcon>
+                      <ContactDetails>
+                        <ContactLabel>Email</ContactLabel>
+                        <ContactValue>
+                          <a href={`mailto:${EnvVars.CONTACT_EMAIL}`}>{EnvVars.CONTACT_EMAIL}</a>
+                        </ContactValue>
+                      </ContactDetails>
+                    </ContactItem>
+                    <ContactItem>
+                      <ContactIcon>📞</ContactIcon>
+                      <ContactDetails>
+                        <ContactLabel>Phone</ContactLabel>
+                        <ContactValue>
+                          <a href="tel:+18043964148">+1 (804) 396-4148</a>
+                        </ContactValue>
+                      </ContactDetails>
+                    </ContactItem>
+                  </ContactList>
+                </ContactCard>
+              )}
 
               <DSBDCard>
                 <CardTitle>Data Strategy & Business Development (DSBD)</CardTitle>
@@ -145,6 +147,7 @@ export default function ScheduleConsult() {
   );
 }
 
+// Styles
 const PageWrapper = styled.div`
   min-height: 80vh;
   padding: 8rem 0 4rem;
@@ -165,9 +168,9 @@ const PageTitle = styled.h1`
   -webkit-text-fill-color: transparent;
   background-clip: text;
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 3.6rem;
-  }
+  `}
 `;
 
 const PageSubtitle = styled.p`
@@ -178,9 +181,9 @@ const PageSubtitle = styled.p`
   margin: 0 auto;
   line-height: 1.6;
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 2rem;
-  }
+  `}
 `;
 
 const ContentGrid = styled.div`
@@ -188,10 +191,10 @@ const ContentGrid = styled.div`
   grid-template-columns: 1fr 1.5fr;
   gap: 5rem;
 
-  ${media('<=desktop')} {
+  ${media.desktop`
     grid-template-columns: 1fr;
     gap: 4rem;
-  }
+  `}
 `;
 
 const ConsultationInfo = styled(motion.div)`
@@ -211,9 +214,9 @@ const InfoCard = styled.div`
   flex-direction: column;
   gap: 2rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet`
     padding: 2rem;
-  }
+  `}
 `;
 
 const AboutSection = styled.div`
@@ -256,26 +259,6 @@ const BottomText = styled.div`
   line-height: 1.7;
   color: rgb(var(--text));
   margin: 1rem 0 2rem;
-`;
-
-const ConsultButton = styled(Button)`
-  align-self: center;
-  background: rgb(255, 125, 0);
-  color: white;
-  font-weight: 600;
-  padding: 1.2rem 3rem;
-  font-size: 1.6rem;
-  border: none;
-  width: 100%;
-
-  &:hover {
-    background: rgb(255, 145, 20);
-  }
-
-  ${media('<=phone')} {
-    width: 100%;
-    margin-top: 1rem;
-  }
 `;
 
 const ContactCard = styled(InfoCard)``;

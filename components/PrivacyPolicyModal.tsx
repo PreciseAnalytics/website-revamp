@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import CloseIcon from './CloseIcon';
 import Overlay from './Overlay';
-import { media } from 'utils/media';
+import media from 'utils/media';
 
 interface PrivacyPolicyModalProps {
   isOpen: boolean;
@@ -170,9 +170,10 @@ const ModalTitle = styled.h2`
   color: rgb(var(--text));
   margin: 0;
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 2.2rem;
-  }
+  `}
+
 `;
 
 const CloseButton = styled.button`
@@ -220,22 +221,25 @@ const ModalContent = styled.div`
       text-decoration: underline;
     }
   }
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet`
     font-size: 1.5rem;
     padding: 1.5rem;
-  }
+  `}
 `;
+
 
 const SectionTitle = styled.h3`
   font-size: 1.8rem;
   font-weight: 600;
   margin: 2.5rem 0 1.5rem;
+
   color: rgb(var(--text));
   
-  ${media('<=tablet')} {
-    font-size: 1.7rem;
-  }
+  ${media.tablet`
+    font-size: 2.2rem;
+  `}
+
 `;
 
 const ModalFooter = styled.div`

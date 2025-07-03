@@ -1,16 +1,24 @@
 import styled from 'styled-components';
 import { media } from 'utils/media';
 
-const SectionTitle = styled.div`
-  font-size: 5.2rem;
-  font-weight: bold;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  text-align: center;
-
-  ${media('<=tablet')} {
-    font-size: 4.6rem;
+const ButtonGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  
+  & > *:not(:last-child) {
+    margin-right: 2rem;
   }
+  
+  ${media.tablet`
+    & > * {
+      width: 100%;
+    }
+    
+    & > *:not(:last-child) {
+      margin-bottom: 2rem;
+      margin-right: 0rem;
+    }
+  `}
 `;
 
-export default SectionTitle;
+export default ButtonGroup;

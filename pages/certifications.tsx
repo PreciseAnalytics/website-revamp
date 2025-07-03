@@ -46,7 +46,8 @@ const certifications = [
     description: 'Service Organization Control 2 Type II audit for security, availability, and confidentiality.',
     icon: '📋',
     category: 'Audit',
-    details: 'Independent verification of security controls and operational effectiveness over time.'
+    details: 'Independent verification of security controls and operational effectiveness over time.',
+    
   },
   {
     id: 6,
@@ -54,19 +55,39 @@ const certifications = [
     description: 'Capability Maturity Model Integration for process improvement and organizational development.',
     icon: '📈',
     category: 'Process',
-    details: 'Structured approach to improving processes and organizational capabilities.'
+    details: 'Structured approach to improving processes and organizational capabilities.',
+    logo: '/CMMI_LOGO.png'
   },
   {
     id: 7,
     name: 'FedRAMP',
     description: 'Federal Risk and Authorization Management Program for cloud service providers.',
+    logo: '/fedramp-logo-vert.svg',
     icon: '☁️',
     category: 'Cloud',
-    details: 'Standardized approach to security assessment and authorization for cloud services.'
+    details: ''
+  },
+  {
+    id: 8,
+    name: 'SWaM Certification',
+    description: 'Small, Women-owned, and Minority-owned Business certification from the Commonwealth of Virginia.',
+    icon: '🏅',
+    category: 'Business',
+    details: '',
+    logo: '/SWAM_LOGO.jpg'
+  },
+  {
+    id: 9,
+    name: 'SBA Certified',
+    description: 'Small Business Administration certified as a Service-Disabled Veteran-Owned Small Business (SDVOSB).',
+    icon: '🎖️',
+    category: 'Business',
+    details: 'Recognized by the U.S. government for veteran-owned small business compliance.',
+    logo: '/sba-logo.png'
   }
 ];
 
-export default function Certifications() {
+export default function CertificationsPage() {
   return (
     <>
       <Head>
@@ -81,261 +102,124 @@ export default function Certifications() {
         />
       </Head>
       <AnimatedHeader />
-      
-      <PageWrapper>
+      <MainContent>
         <Container>
-          <HeaderSection
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <PageTitle>Certifications & Compliance</PageTitle>
-            <PageSubtitle>
-              We maintain the highest standards of security, compliance, and operational excellence 
-              through industry-recognized certifications and frameworks.
-            </PageSubtitle>
-          </HeaderSection>
-
-          <CertificationGrid>
-            {certifications.map((cert, index) => (
-              <CertificationCard
-                key={cert.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                whileHover={{ y: -10, scale: 1.02 }}
-              >
-                <CertHeader>
-                  <CertIcon>{cert.icon}</CertIcon>
-                  <CertCategory>{cert.category}</CertCategory>
-                </CertHeader>
-                
-                <CertContent>
-                  <CertName>{cert.name}</CertName>
-                  <CertDescription>{cert.description}</CertDescription>
-                  <CertDetails>{cert.details}</CertDetails>
-                </CertContent>
+          <StyledPageTitle>Certifications & Compliance</StyledPageTitle>
+          <CertificationsGrid>
+            {certifications.map((cert) => (
+              <CertificationCard key={cert.id}>
+                <CertIcon>{cert.icon}</CertIcon>
+                <h3>{cert.name}</h3>
+                <p>{cert.description}</p>
+                <small>{cert.details}</small>
+                {cert.logo && (
+                  <img src={cert.logo} alt={cert.name} />
+                )}
+                {cert.download && (
+                  <LogoBelow>
+                    <a href={cert.download} download title={cert.downloadTitle}>
+                      <img src={cert.download} alt={cert.downloadAlt} />
+                    </a>
+                  </LogoBelow>
+                )}
               </CertificationCard>
             ))}
-          </CertificationGrid>
-
-          <ComplianceSection
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <ComplianceCard>
-              <ComplianceTitle>Our Commitment to Security & Compliance</ComplianceTitle>
-              <ComplianceContent>
-                <ComplianceItem>
-                  <ComplianceIcon>🔐</ComplianceIcon>
-                  <ComplianceText>
-                    <strong>Data Security:</strong> End-to-end encryption and secure data handling practices
-                  </ComplianceText>
-                </ComplianceItem>
-                <ComplianceItem>
-                  <ComplianceIcon>🏛️</ComplianceIcon>
-                  <ComplianceText>
-                    <strong>Federal Standards:</strong> Full compliance with federal regulations and security requirements
-                  </ComplianceText>
-                </ComplianceItem>
-                <ComplianceItem>
-                  <ComplianceIcon>🔄</ComplianceIcon>
-                  <ComplianceText>
-                    <strong>Continuous Monitoring:</strong> Regular audits and assessments to maintain compliance
-                  </ComplianceText>
-                </ComplianceItem>
-                <ComplianceItem>
-                  <ComplianceIcon>👥</ComplianceIcon>
-                  <ComplianceText>
-                    <strong>Staff Training:</strong> Ongoing security awareness and compliance training for all team members
-                  </ComplianceText>
-                </ComplianceItem>
-              </ComplianceContent>
-            </ComplianceCard>
-          </ComplianceSection>
+          </CertificationsGrid>
         </Container>
-      </PageWrapper>
-      
+      </MainContent>
       <AnimatedFooter />
     </>
   );
 }
 
-const PageWrapper = styled.div`
-  min-height: 80vh;
-  padding: 8rem 0 4rem;
-`;
-
-const HeaderSection = styled(motion.div)`
+const MainContent = styled.section`
+  padding: 80px 0;
   text-align: center;
-  margin-bottom: 6rem;
 `;
 
-const PageTitle = styled.h1`
+const CertificationsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 40px;
+
+  ${media('<=tablet')} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  ${media('<=phone')} {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const CertificationCard = styled.div`
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+align-items: center;
+text-align: center;
+  background: #f9fafe;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease;
+  h3 {
+    margin-bottom: 10px;
+    color: #0a2540;
+    font-size: 1.8rem;
+  }
+  p {
+    font-size: 15px;
+    color: #333;
+  }
+  small {
+    display: block;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #666;
+  }
+  img {
+    max-height: 120px;
+    width: auto;
+    margin: 20px auto 0;
+    object-fit: contain;
+    display: block;
+  }
+`;
+
+const CertIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const StyledPageTitle = styled.h1`
   font-size: 4.8rem;
   font-weight: 700;
-  color: rgb(var(--text));
-  margin-bottom: 2rem;
-  background: linear-gradient(135deg, rgb(var(--accent)), rgb(var(--secondary)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  
+  color: orange;
+  margin-bottom: 4rem;
+  text-align: center;
+
   ${media('<=tablet')} {
     font-size: 3.6rem;
   }
 `;
 
-const PageSubtitle = styled.p`
-  font-size: 2rem;
-  color: rgb(var(--text), 0.8);
-  max-width: 80rem;
-  margin: 0 auto;
-  line-height: 1.6;
-  
-  ${media('<=tablet')} {
-    font-size: 1.8rem;
+const LogoBelow = styled.div`
+  margin-top: 20px;
+  a {
+    display: block;
+    text-decoration: none;
   }
-`;
-
-const CertificationGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
-  gap: 3rem;
-  margin-bottom: 6rem;
-  
-  ${media('<=tablet')} {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  img {
+    max-width: 80px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    transition: transform 0.2s ease;
   }
-`;
-
-const CertificationCard = styled(motion.div)`
-  background: rgba(var(--cardBackground), 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 2rem;
-  padding: 3rem;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(var(--accent), 0.2);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  
-  &:hover {
-    border-color: rgba(var(--accent), 0.4);
-    box-shadow: var(--shadow-xl);
-  }
-  
-  ${media('<=tablet')} {
-    padding: 2rem;
-  }
-`;
-
-const CertHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-`;
-
-const CertIcon = styled.div`
-  font-size: 4rem;
-`;
-
-const CertCategory = styled.span`
-  background: linear-gradient(135deg, rgba(var(--accent), 0.2), rgba(var(--secondary), 0.2));
-  color: rgb(var(--text));
-  padding: 0.5rem 1.5rem;
-  border-radius: 2rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border: 1px solid rgba(var(--accent), 0.3);
-`;
-
-const CertContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const CertName = styled.h3`
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: rgb(var(--text));
-  margin: 0;
-`;
-
-const CertDescription = styled.p`
-  font-size: 1.6rem;
-  color: rgb(var(--text), 0.8);
-  line-height: 1.6;
-  margin: 0;
-`;
-
-const CertDetails = styled.p`
-  font-size: 1.4rem;
-  color: rgb(var(--text), 0.6);
-  line-height: 1.5;
-  margin: 0;
-  font-style: italic;
-`;
-
-const ComplianceSection = styled(motion.div)``;
-
-const ComplianceCard = styled.div`
-  background: rgba(var(--cardBackground), 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 2rem;
-  padding: 4rem;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(var(--accent), 0.2);
-  
-  ${media('<=tablet')} {
-    padding: 3rem 2rem;
-  }
-`;
-
-const ComplianceTitle = styled.h2`
-  font-size: 3.2rem;
-  font-weight: 600;
-  color: rgb(var(--text));
-  margin-bottom: 3rem;
-  text-align: center;
-`;
-
-const ComplianceContent = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
-  gap: 3rem;
-  
-  ${media('<=tablet')} {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-`;
-
-const ComplianceItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 2rem;
-`;
-
-const ComplianceIcon = styled.div`
-  font-size: 3rem;
-  flex-shrink: 0;
-  margin-top: 0.5rem;
-`;
-
-const ComplianceText = styled.p`
-  font-size: 1.6rem;
-  color: rgb(var(--text), 0.8);
-  line-height: 1.6;
-  margin: 0;
-  
-  strong {
-    color: rgb(var(--accent));
-    font-weight: 600;
+  img:hover {
+    transform: scale(1.05);
   }
 `;

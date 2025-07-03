@@ -90,7 +90,7 @@ export default function CookiesPolicy() {
                 For questions about this Cookies Policy or your data rights, please contact us at:
                 <br /><br />
                 📧 <a href="mailto:contact@preciseanalytics.io">contact@preciseanalytics.io</a><br />
-                📞 +1 (804) 223-0404
+                📞 +1 (804) 396-4148
               </SectionContent>
             </Section>
           </ContentWrapper>

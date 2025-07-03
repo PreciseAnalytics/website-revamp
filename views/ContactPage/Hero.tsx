@@ -15,9 +15,9 @@ export default function ContactHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <OverTitle>Get In Touch</OverTitle>
+            <Title>Get In Touch</Title>
             <Title>
-              Let's Start a <AccentText>Conversation</AccentText>
+              Let&apos;s Start a <AccentText>Conversation</AccentText>
             </Title>
             <Description>
               Whether you have a question about our solutions, need a demo, or want to explore 
@@ -35,9 +35,9 @@ const HeroWrapper = styled.div`
   padding: 15rem 0 5rem;
   overflow: hidden;
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     padding: 12rem 0 5rem;
-  }
+  `}
 `;
 
 const Content = styled.div`
@@ -55,15 +55,15 @@ const Title = styled.h1`
   margin: 1rem 0 2.5rem;
   color: rgb(var(--text));
   
-  ${media('<=desktop')} {
+  ${media.desktop`
     font-size: 4.6rem;
-  }
+  `}
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 4rem;
-  }
+  `}
   
-  ${media('<=phone')} {
+  @media (max-width: 480px) {
     font-size: 3.4rem;
   }
 `;
@@ -80,9 +80,9 @@ const Description = styled.p`
   margin: 0 auto;
   max-width: 70rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet`
     font-size: 1.8rem;
-  }
+  `}
 `;
 
 const BackgroundGlow = styled.div`

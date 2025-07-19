@@ -1,0 +1,17 @@
+
+> next-saas-starter@0.1.0 dev
+> tinacms dev -c "next dev"
+
+🦙 TinaCMS Dev Server is initializing...
+/home/ndegwaofficial/Precise_Analytics_V2/node_modules/@tinacms/cli/dist/index.js:1168
+      throw new Error(
+      ^
+
+Error: Tina Dev server is already in use. Datalayer server is busy on port 9000
+    at Server.<anonymous> (/home/ndegwaofficial/Precise_Analytics_V2/node_modules/@tinacms/cli/dist/index.js:1168:13)
+    at Object.onceWrapper (node:events:632:26)
+    at Server.emit (node:events:517:28)
+    at emitErrorNT (node:net:1844:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+Node.js v18.20.8

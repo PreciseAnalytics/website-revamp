@@ -1,0 +1,18 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": ["prettier", "plugin:react/recommended", "next/core-web-vitals"],
+  "env": {
+    "es6": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "react/prop-types": 0,
+    "react/react-in-jsx-scope": 0,
+    "react/display-name": 0,
+    "no-unused-vars": 0,
+    "sort-imports": "off",
+    "import/order": "off"
+  }
+}

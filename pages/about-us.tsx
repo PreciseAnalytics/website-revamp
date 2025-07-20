@@ -2,7 +2,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { EnvVars } from 'env';
 import AnimatedHeader from 'components/AnimatedHeader';
-import AnimatedFooter from 'components/AnimatedFooter';
+
 import Hero from 'views/AboutUsPage/Hero';
 import WhyChooseUs from 'views/AboutUsPage/WhyChooseUs';
 
@@ -26,7 +26,7 @@ export default function AboutUsPage() {
         <WhyChooseUs />
         {/* Add more components for Mission, Team, Culture, etc. */}
       </PageWrapper>
-      <AnimatedFooter />
+      
     </>
   );
 }

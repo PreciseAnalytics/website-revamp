@@ -6,7 +6,7 @@ import { media } from 'utils/media';
 import NextLink from 'next/link';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
-import AnimatedFooter from 'components/AnimatedFooter';
+
 
 const sectors = [
   {
@@ -106,7 +106,7 @@ export default function SectorsPage() {
         </CTASection>
       </PageWrapper>
 
-      <AnimatedFooter />
+      
     </>
   );
 }

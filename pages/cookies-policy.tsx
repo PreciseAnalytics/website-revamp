@@ -2,7 +2,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { EnvVars } from 'env';
 import AnimatedHeader from 'components/AnimatedHeader';
-import AnimatedFooter from 'components/AnimatedFooter';
+
 import Container from 'components/Container';
 import { media } from 'utils/media';
 import { mq } from 'utils/media';
@@ -98,7 +98,7 @@ export default function CookiesPolicy() {
           </ContentWrapper>
         </Container>
       </PageWrapper>
-      <AnimatedFooter />
+      
     </>
   );
 }

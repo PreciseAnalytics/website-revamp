@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import AnimatedHeader from 'components/AnimatedHeader';
-import AnimatedFooter from 'components/AnimatedFooter';
+
 import Container from 'components/Container';
 import Button from 'components/Button';
 import { EnvVars } from 'env';
@@ -156,7 +156,7 @@ export default function ScheduleConsult() {
         </Container>
       </PageWrapper>
 
-      <AnimatedFooter />
+      
     </>
   );
 }

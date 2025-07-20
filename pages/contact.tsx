@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef } from 'react';
 import { EnvVars } from 'env';
 import AnimatedHeader from 'components/AnimatedHeader';
-import AnimatedFooter from 'components/AnimatedFooter';
+
 import Hero from 'views/ContactPage/Hero';
 
 // Enhanced Contact Form Component
@@ -446,7 +446,7 @@ export default function ContactPage() {
           </ContactFormWrapper>
         </EnhancedContentWrapper>
       </PageWrapper>
-      <AnimatedFooter />
+      
     </>
   );
 }

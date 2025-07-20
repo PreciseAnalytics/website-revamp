@@ -19,8 +19,7 @@ function EnhancedContactForm() {
     projectType: '',
     budget: '',
     timeline: '',
-    message: '',
-    attachments: [] as File[]
+    message: ''
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -91,19 +90,9 @@ function EnhancedContactForm() {
       }
     }
 
-    // Auto-advance for first/last name when reasonable length
-    if ((name === 'firstName' && value.length >= 2 && nextRef?.current) ||
-        (name === 'lastName' && value.length >= 2 && nextRef?.current)) {
-      setTimeout(() => nextRef.current?.focus(), 100); 
-    }
+    // Auto-advance is only used for phone numbers, not names
 
     setFormData(prev => ({ ...prev, [name]: processedValue }));
-  };
-
-  // Handle file uploads
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
-    const files = Array.from(e.target.files || []);
-    setFormData(prev => ({ ...prev, attachments: files }));
   };
 
   // Handle form submission
@@ -125,15 +114,53 @@ function EnhancedContactForm() {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        // Simulate form submission
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setSubmitSuccess(true);
-        setFormData({
-          firstName: '', lastName: '', email: '', phone: '', company: '',
-          jobTitle: '', projectType: '', budget: '', timeline: '', message: '', attachments: []
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: formData.firstName.trim(),
+            lastName: formData.lastName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim(),
+            company: formData.company.trim(),
+            jobTitle: formData.jobTitle.trim(),
+            projectType: formData.projectType,
+            budget: formData.budget,
+            timeline: formData.timeline,
+            message: formData.message.trim()
+          })
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setSubmitSuccess(true);
+          setFormData({
+            firstName: '', lastName: '', email: '', phone: '', company: '',
+            jobTitle: '', projectType: '', budget: '', timeline: '', message: ''
+          });
+          setErrors({});
+        } else {
+          // Handle API errors
+          if (result.errors && Array.isArray(result.errors)) {
+            const apiErrors: { [key: string]: string } = {};
+            result.errors.forEach((error: string) => {
+              if (error.includes('First name')) apiErrors.firstName = error;
+              else if (error.includes('Last name')) apiErrors.lastName = error;
+              else if (error.includes('Email') || error.includes('email')) apiErrors.email = error;
+              else if (error.includes('Phone') || error.includes('phone')) apiErrors.phone = error;
+              else if (error.includes('Message')) apiErrors.message = error;
+            });
+            setErrors(apiErrors);
+          } else {
+            setErrors({ general: result.message || 'Failed to send message. Please try again.' });
+          }
+        }
       } catch (error) {
         console.error('Form submission error:', error);
+        setErrors({ general: 'Network error. Please check your connection and try again.' });
       }
     }
 
@@ -151,7 +178,7 @@ function EnhancedContactForm() {
         <SuccessIcon>✨</SuccessIcon>
         <SuccessTitle>Thank You!</SuccessTitle>
         <SuccessText>
-          Your message has been sent successfully. We&apos;ll get back to you within 24 hours.
+          🎉 Fantastic! Your detailed project information is on its way to our team! We're excited to dive deep into your requirements and will reach out within 24 hours with a comprehensive plan tailored just for you. Get ready for some amazing analytics transformation! ✨
         </SuccessText>
         <ResetButton onClick={() => setSubmitSuccess(false)}>
           Send Another Message
@@ -337,28 +364,12 @@ function EnhancedContactForm() {
           </FormGroup>
         </FormSection>
 
-        {/* File Upload Section */}
-        <FormSection>
-          <SectionTitle>Attachments (Optional)</SectionTitle>
-          <FileUploadGroup>
-            <FileUploadLabel htmlFor="file-upload">
-              <FileUploadIcon>📎</FileUploadIcon>
-              <FileUploadText>
-                {formData.attachments.length > 0 ? 
-                  `${formData.attachments.length} file(s) selected` : 
-                  'Click to attach files or drag and drop'
-                }
-              </FileUploadText>
-            </FileUploadLabel>
-            <FileUploadInput
-              id="file-upload"
-              type="file"
-              multiple
-              onChange={handleFileChange}
-              accept=".pdf,.doc,.docx,.txt,.jpg,.png,.xlsx,.csv"
-            />
-          </FileUploadGroup>
-        </FormSection>
+        {/* General Error Display */}
+        {errors.general && (
+          <GeneralErrorMessage>
+            {errors.general}
+          </GeneralErrorMessage>
+        )}
 
         {/* Submit Button */}
         <SubmitButton type="submit" disabled={isSubmitting}>
@@ -404,13 +415,13 @@ export default function ContactPage() {
             >
               <FormIntroTitle>Prefer to Send a Message?</FormIntroTitle>
               <FormIntroText>
-                Use the form below if you have documents to share, detailed questions, or simply prefer 
+                Use the form below if you have detailed questions or simply prefer 
                 written communication. We&apos;ll respond within 24 hours.
               </FormIntroText>
               <FormBenefits>
                 <BenefitItem>
-                  <BenefitIcon>📎</BenefitIcon>
-                  <BenefitText>Attach files, documents, or project details</BenefitText>
+                  <BenefitIcon>📋</BenefitIcon>
+                  <BenefitText>Detailed project requirements and specifications</BenefitText>
                 </BenefitItem>
                 <BenefitItem>
                   <BenefitIcon>💬</BenefitIcon>
@@ -820,46 +831,22 @@ const FormTextarea = styled.textarea<{ $hasError?: boolean }>`
   }
 `;
 
-const FileUploadGroup = styled.div`
-  position: relative;
-`;
-
-const FileUploadLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem;
-  border: 2px dashed rgba(255, 125, 0, 0.3);
-  border-radius: 1rem;
-  background: rgba(var(--cardBackground), 0.5);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    border-color: rgb(255, 125, 0);
-    background: rgba(255, 125, 0, 0.05);
-  }
-`;
-
-const FileUploadIcon = styled.div`
-  font-size: 2rem;
-`;
-
-const FileUploadText = styled.span`
-  font-size: 1.4rem;
-  color: rgb(var(--text));
-`;
-
-const FileUploadInput = styled.input`
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-`;
-
 const ErrorMessage = styled.span`
   color: rgb(220, 38, 38);
   font-size: 1.2rem;
   font-weight: 500;
+`;
+
+const GeneralErrorMessage = styled.div`
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: rgb(220, 38, 38);
+  padding: 1.5rem;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-align: center;
+  margin: 2rem 0;
 `;
 
 const SubmitButton = styled.button`

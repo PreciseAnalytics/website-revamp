@@ -35,15 +35,69 @@ export default function ContactForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
+  // Validate email
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Validate phone number
+  const validatePhone = (phone: string) => {
+    if (!phone.trim()) return true; // Phone is optional in this form
+    const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
+    return phoneRegex.test(phone);
+  };
+
+  // Format phone number as (XXX) XXX-XXXX
+  const formatPhoneNumber = (value: string) => {
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    let processedValue = value;
+    
+    // Phone number formatting
+    if (name === 'phone') {
+      processedValue = formatPhoneNumber(value);
+      
+      // Validate phone if it has content
+      if (processedValue.length > 0 && processedValue.length === 14) {
+        if (!validatePhone(processedValue)) {
+          setErrors(prev => ({ ...prev, phone: 'Invalid phone number format' }));
+        } else {
+          setErrors(prev => ({ ...prev, phone: '' }));
+        }
+      } else {
+        setErrors(prev => ({ ...prev, phone: '' }));
+      }
+    }
+
+    // Email validation
+    if (name === 'email') {
+      if (value && !validateEmail(value)) {
+        setErrors(prev => ({ ...prev, email: 'Invalid email format' }));
+      } else {
+        setErrors(prev => ({ ...prev, email: '' }));
+      }
+    }
+
     setFormState((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: processedValue,
     }));
   };
 
@@ -73,54 +127,89 @@ export default function ContactForm() {
     setIsSubmitting(true);
     setSubmitResult(null);
 
-    try {
-      const formData = new FormData();
-      Object.entries(formState).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+    // Validation
+    const newErrors: { [key: string]: string } = {};
+    if (!formState.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formState.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formState.email.trim()) newErrors.email = 'Email is required';
+    if (!validateEmail(formState.email)) newErrors.email = 'Invalid email format';
+    if (!formState.message.trim()) newErrors.message = 'Message is required';
+    if (formState.phone.trim() && !validatePhone(formState.phone)) {
+      newErrors.phone = 'Invalid phone number format';
+    }
 
-      if (selectedFile) {
-        formData.append('file', selectedFile);
-      }
+    setErrors(newErrors);
 
-      const response = await fetch('/api/sendEmail', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubmitResult({
-          success: true,
-          message: "Your message has been sent! We'll get back to you shortly.",
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: formState.firstName.trim(),
+            lastName: formState.lastName.trim(),
+            email: formState.email.trim(),
+            phone: formState.phone.trim() || '', // Convert empty to empty string
+            company: formState.company.trim(),
+            jobTitle: '', // Not collected in this form
+            projectType: '', // Not collected in this form
+            budget: '', // Not collected in this form
+            timeline: '', // Not collected in this form
+            message: formState.message.trim()
+          })
         });
-        setFormState({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          company: '',
-          message: '',
-        });
-        setSelectedFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+
+        const result = await response.json();
+
+        if (result.success) {
+          setSubmitResult({
+            success: true,
+            message: "Your message has been sent! We'll get back to you within 24 hours.",
+          });
+          setFormState({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            company: '',
+            message: '',
+          });
+          setSelectedFile(null);
+          setErrors({});
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        } else {
+          // Handle API errors
+          if (result.errors && Array.isArray(result.errors)) {
+            const apiErrors: { [key: string]: string } = {};
+            result.errors.forEach((error: string) => {
+              if (error.includes('First name')) apiErrors.firstName = error;
+              else if (error.includes('Last name')) apiErrors.lastName = error;
+              else if (error.includes('Email') || error.includes('email')) apiErrors.email = error;
+              else if (error.includes('Phone') || error.includes('phone')) apiErrors.phone = error;
+              else if (error.includes('Message')) apiErrors.message = error;
+            });
+            setErrors(apiErrors);
+          } else {
+            setSubmitResult({
+              success: false,
+              message: result.message || 'Failed to send message. Please try again.',
+            });
+          }
         }
-      } else {
+      } catch (error) {
+        console.error('Form submission error:', error);
         setSubmitResult({
           success: false,
-          message: data.error || 'Something went wrong. Please try again.',
+          message: 'Network error. Please check your connection and try again.',
         });
       }
-    } catch (error) {
-      setSubmitResult({
-        success: false,
-        message: 'Network error. Please check your connection and try again.',
-      });
-    } finally {
-      setIsSubmitting(false);
     }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -141,7 +230,7 @@ export default function ContactForm() {
             <StyledForm onSubmit={handleSubmit}>
               <FormRow>
                 <InputContainer>
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">First Name *</Label>
                   <StyledInput
                     id="firstName"
                     name="firstName"
@@ -150,10 +239,12 @@ export default function ContactForm() {
                     onChange={handleInputChange}
                     required
                     aria-required="true"
+                    $hasError={!!errors.firstName}
                   />
+                  {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
                 </InputContainer>
                 <InputContainer>
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">Last Name *</Label>
                   <StyledInput
                     id="lastName"
                     name="lastName"
@@ -162,13 +253,15 @@ export default function ContactForm() {
                     onChange={handleInputChange}
                     required
                     aria-required="true"
+                    $hasError={!!errors.lastName}
                   />
+                  {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
                 </InputContainer>
               </FormRow>
 
               <FormRow>
                 <InputContainer>
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">Email Address *</Label>
                   <StyledInput
                     id="email"
                     name="email"
@@ -178,7 +271,9 @@ export default function ContactForm() {
                     onChange={handleInputChange}
                     required
                     aria-required="true"
+                    $hasError={!!errors.email}
                   />
+                  {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
                 </InputContainer>
                 <InputContainer>
                   <Label htmlFor="phone">Phone Number (Optional)</Label>
@@ -186,10 +281,13 @@ export default function ContactForm() {
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="Phone Number (Optional)"
+                    placeholder="(555) 123-4567"
                     value={formState.phone}
                     onChange={handleInputChange}
+                    maxLength={14}
+                    $hasError={!!errors.phone}
                   />
+                  {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
                 </InputContainer>
               </FormRow>
 
@@ -205,7 +303,7 @@ export default function ContactForm() {
               </InputContainer>
 
               <MessageContainer>
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">Message *</Label>
                 <MessageInput
                   id="message"
                   name="message"
@@ -215,7 +313,9 @@ export default function ContactForm() {
                   onChange={handleInputChange}
                   required
                   aria-required="true"
+                  $hasError={!!errors.message}
                 />
+                {errors.message && <ErrorMessage>{errors.message}</ErrorMessage>}
               </MessageContainer>
 
               <FileUploadContainer>
@@ -377,17 +477,17 @@ const Label = styled.label`
   margin-bottom: 0.5rem;
 `;
 
-const StyledInput = styled(Input)`
+const StyledInput = styled(Input)<{ $hasError?: boolean }>`
   width: 100%;
   background: rgba(var(--inputBackground), 0.7);
-  border: 1px solid rgba(var(--text), 0.1);
+  border: 1px solid ${props => props.$hasError ? 'rgb(220, 38, 38)' : 'rgba(var(--text), 0.1)'};
   backdrop-filter: blur(5px);
   font-size: 1.6rem;
   padding: 1.2rem 1.5rem;
   border-radius: 0.8rem;
 
   &:focus {
-    border-color: rgb(var(--accent));
+    border-color: ${props => props.$hasError ? 'rgb(220, 38, 38)' : 'rgb(var(--accent))'};
     outline: none;
   }
 `;
@@ -396,10 +496,10 @@ const MessageContainer = styled.div`
   width: 100%;
 `;
 
-const MessageInput = styled.textarea`
+const MessageInput = styled.textarea<{ $hasError?: boolean }>`
   width: 100%;
   background: rgba(var(--inputBackground), 0.7);
-  border: 1px solid rgba(var(--text), 0.1);
+  border: 1px solid ${props => props.$hasError ? 'rgb(220, 38, 38)' : 'rgba(var(--text), 0.1)'};
   backdrop-filter: blur(5px);
   font-size: 1.6rem;
   padding: 1.2rem 1.5rem;
@@ -410,9 +510,17 @@ const MessageInput = styled.textarea`
   color: rgb(var(--text));
 
   &:focus {
-    border-color: rgb(var(--accent));
+    border-color: ${props => props.$hasError ? 'rgb(220, 38, 38)' : 'rgb(var(--accent))'};
     outline: none;
   }
+`;
+
+const ErrorMessage = styled.span`
+  color: rgb(220, 38, 38);
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: block;
 `;
 
 const FileUploadContainer = styled.div`

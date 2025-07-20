@@ -90,6 +90,7 @@ interface ContactFormData {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
   company: string;
   service: string;
   message: string;
@@ -99,6 +100,7 @@ const initialFormData: ContactFormData = {
   firstName: '',
   lastName: '',
   email: '',
+  phone: '',
   company: '',
   service: '',
   message: '',
@@ -125,17 +127,40 @@ export default function HomePage() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       errors.email = 'Please enter a valid email address';
     }
+    if (!data.phone.trim()) errors.phone = 'Phone number is required';
+    else if (!/^\(\d{3}\) \d{3}-\d{4}$/.test(data.phone)) {
+      errors.phone = 'Please enter phone as (555) 123-4567';
+    }
     if (!data.company.trim()) errors.company = 'Company/Organization is required';
     return errors;
   }, []);
 
+  const formatPhoneNumber = useCallback((value: string) => {
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    const phoneNumberLength = phoneNumber.length;
+
+    if (phoneNumberLength < 4) return phoneNumber;
+    if (phoneNumberLength < 7) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  }, []);
+
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setContactData(prev => ({ ...prev, [name]: value }));
+    
+    let processedValue = value;
+    
+    // Phone number formatting
+    if (name === 'phone') {
+      processedValue = formatPhoneNumber(value);
+    }
+    
+    setContactData(prev => ({ ...prev, [name]: processedValue }));
     if (formErrors[name as keyof ContactFormData]) {
       setFormErrors(prev => ({ ...prev, [name]: undefined }));
     }
-  }, [formErrors]);
+  }, [formErrors, formatPhoneNumber]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,10 +175,46 @@ export default function HomePage() {
     setFormErrors({});
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Submitted:', contactData);
-      setSubmitSuccess(`Thank you! We'll be in touch within 24 hours to discuss your project.`);
-      setContactData(initialFormData);
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: contactData.firstName.trim(),
+          lastName: contactData.lastName.trim(),
+          email: contactData.email.trim(),
+          phone: contactData.phone.trim(),
+          company: contactData.company.trim(),
+          jobTitle: '', // Not collected on homepage
+          projectType: contactData.service, // Map service to projectType
+          budget: '', // Not collected on homepage
+          timeline: '', // Not collected on homepage
+          message: contactData.message.trim()
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitSuccess(`🎉 Fantastic! Your message is on its way to our team! We're excited to learn about your project and will reach out within 24 hours with ideas on how we can help transform your data strategy. Get ready for some amazing analytics insights! ✨`);
+        setContactData(initialFormData);
+      } else {
+        // Handle API errors
+        if (result.errors && Array.isArray(result.errors)) {
+          const apiErrors: Partial<ContactFormData> = {};
+          result.errors.forEach((error: string) => {
+            if (error.includes('First name')) apiErrors.firstName = error;
+            else if (error.includes('Last name')) apiErrors.lastName = error;
+            else if (error.includes('Email') || error.includes('email')) apiErrors.email = error;
+            else if (error.includes('Phone') || error.includes('phone')) apiErrors.phone = error;
+            else if (error.includes('Company') || error.includes('company')) apiErrors.company = error;
+          });
+          setFormErrors(apiErrors);
+        } else {
+          setSubmitSuccess('Sorry, there was an error sending your message. Please try again or contact us directly.');
+        }
+      }
     } catch (error) {
       console.error('Submission error:', error);
       setSubmitSuccess('Sorry, there was an error sending your message. Please try again or contact us directly.');
@@ -343,7 +404,12 @@ export default function HomePage() {
               <FormSubtitle>Ready to transform your data? Let&apos;s discuss your specific needs and goals.</FormSubtitle>
               
               {submitSuccess && (
-                <StatusMessage success={submitSuccess.includes('Thank you')}>
+                <StatusMessage 
+                  success={submitSuccess.includes('Fantastic')}
+                  initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
+                >
                   {submitSuccess}
                 </StatusMessage>
               )}
@@ -404,6 +470,27 @@ export default function HomePage() {
                   </FormField>
 
                   <FormField>
+                    <label htmlFor="phone">Phone Number *</label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={contactData.phone}
+                      onChange={handleChange}
+                      placeholder="(555) 123-4567"
+                      maxLength={14}
+                      required
+                      aria-invalid={!!formErrors.phone}
+                      aria-describedby={formErrors.phone ? "phone-error" : undefined}
+                    />
+                    {formErrors.phone && (
+                      <ErrorMessage id="phone-error">{formErrors.phone}</ErrorMessage>
+                    )}
+                  </FormField>
+                </FormGrid>
+
+                <FormGrid>
+                  <FormField>
                     <label htmlFor="company">Company/Organization *</label>
                     <input
                       type="text"
@@ -419,29 +506,29 @@ export default function HomePage() {
                       <ErrorMessage id="company-error">{formErrors.company}</ErrorMessage>
                     )}
                   </FormField>
-                </FormGrid>
 
-                <FormField>
-                  <label htmlFor="service">Service of Interest</label>
-                  <select
-                    id="service"
-                    name="service"
-                    value={contactData.service}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select a service...</option>
-                    {services.map((service) => (
-                      <option key={service.title} value={service.title}>
-                        {service.title}
-                      </option>
-                    ))}
-                    <option value="Hardware Solutions">Hardware Solutions</option>
-                    <option value="Consulting Services">Consulting Services</option>
-                    <option value="General Inquiry">General Inquiry</option>
-                    <option value="Partnership">Partnership Opportunity</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </FormField>
+                  <FormField>
+                    <label htmlFor="service">Service of Interest</label>
+                    <select
+                      id="service"
+                      name="service"
+                      value={contactData.service}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select a service...</option>
+                      {services.map((service) => (
+                        <option key={service.title} value={service.title}>
+                          {service.title}
+                        </option>
+                      ))}
+                      <option value="Hardware Solutions">Hardware Solutions</option>
+                      <option value="Consulting Services">Consulting Services</option>
+                      <option value="General Inquiry">General Inquiry</option>
+                      <option value="Partnership">Partnership Opportunity</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </FormField>
+                </FormGrid>
 
                 <FormField>
                   <label htmlFor="message">Project Details & Requirements</label>
@@ -989,6 +1076,7 @@ const Form = styled.form`
 
   input[type='text'],
   input[type='email'],
+  input[type='tel'],
   select,
   textarea {
     padding: 1.5rem;
@@ -1063,17 +1151,45 @@ const SubmitBtn = styled.button`
   `)}
 `;
 
-const StatusMessage = styled.p<{ success: boolean }>`
-  font-size: 1.6rem;
+const StatusMessage = styled(motion.div)<{ success: boolean }>`
+  font-size: 1.8rem;
   text-align: center;
-  padding: 1rem;
-  background: ${props => props.success ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)'};
-  border: 1px solid ${props => props.success ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)'};
-  border-radius: 0.8rem;
-  color: ${props => props.success ? 'green' : 'red'};
+  padding: 2.5rem;
+  background: ${props => props.success 
+    ? 'linear-gradient(135deg, rgba(255, 125, 0, 0.15), rgba(255, 165, 0, 0.1))' 
+    : 'rgba(220, 38, 38, 0.1)'};
+  border: 2px solid ${props => props.success ? 'rgba(255, 125, 0, 0.4)' : 'rgba(220, 38, 38, 0.3)'};
+  border-radius: 1.5rem;
+  color: ${props => props.success ? 'rgb(255, 125, 0)' : 'rgb(220, 38, 38)'};
   margin-bottom: 2rem;
+  box-shadow: ${props => props.success 
+    ? '0 8px 25px rgba(255, 125, 0, 0.2)' 
+    : '0 8px 25px rgba(220, 38, 38, 0.1)'};
+  font-weight: 600;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: ${props => props.success 
+      ? 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)' 
+      : 'none'};
+    animation: ${props => props.success ? 'shimmer 2s ease-in-out' : 'none'};
+  }
+  
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
 
   ${media.tablet(`
-    font-size: 1.4rem;
+    font-size: 1.6rem;
+    padding: 2rem;
   `)}
 `;

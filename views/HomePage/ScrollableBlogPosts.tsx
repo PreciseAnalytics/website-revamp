@@ -82,8 +82,8 @@ const SwiperContainer = styled(Container)`
     margin-top: 4rem;
   }
 
-  ${media('<=largeDesktop')} {
+  ${media.desktop(`
     max-width: 100%;
     padding: 0;
-  }
+  `)}
 `;

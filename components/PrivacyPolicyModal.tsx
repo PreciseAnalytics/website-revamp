@@ -38,7 +38,7 @@ export default function PrivacyPolicyModal({ isOpen, onClose }: PrivacyPolicyMod
             <ModalHeader>
               <ModalTitle>Privacy Policy for Precise Analytics</ModalTitle>
               <CloseButton onClick={onClose}>
-                <CloseIcon width={24} height={24} />
+                <CloseIcon style={{ width: 24, height: 24 }} />
               </CloseButton>
             </ModalHeader>
             <ModalContent>
@@ -169,11 +169,10 @@ const ModalTitle = styled.h2`
   font-weight: 700;
   color: rgb(var(--text));
   margin: 0;
-  
-  ${media.tablet`
-    font-size: 2.2rem;
-  `}
 
+  ${media.tablet(`
+    font-size: 2.2rem;
+  `)}
 `;
 
 const CloseButton = styled.button`
@@ -186,7 +185,7 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   transition: color 0.2s;
-  
+
   &:hover {
     color: rgb(var(--primary));
   }
@@ -199,47 +198,44 @@ const ModalContent = styled.div`
   font-size: 1.6rem;
   line-height: 1.6;
   color: rgb(var(--text));
-  
+
   p {
     margin-bottom: 1.6rem;
   }
-  
+
   ul {
     padding-left: 2.5rem;
     margin-bottom: 2rem;
-    
+
     li {
       margin-bottom: 0.8rem;
     }
   }
-  
+
   a {
     color: rgb(var(--primary));
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }
   }
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.5rem;
     padding: 1.5rem;
-  `}
+  `)}
 `;
-
 
 const SectionTitle = styled.h3`
   font-size: 1.8rem;
   font-weight: 600;
   margin: 2.5rem 0 1.5rem;
-
   color: rgb(var(--text));
-  
-  ${media.tablet`
-    font-size: 2.2rem;
-  `}
 
+  ${media.tablet(`
+    font-size: 2.2rem;
+  `)}
 `;
 
 const ModalFooter = styled.div`

@@ -94,9 +94,9 @@ const Title = styled.h3`
   font-weight: 700;
   color: rgb(var(--text));
   
-  ${media('<=phone')} {
+  ${media.phone(`
     font-size: 2.2rem;
-  }
+  `)}
 `;
 
 const Description = styled.p`

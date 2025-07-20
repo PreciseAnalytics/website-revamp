@@ -26,10 +26,12 @@ export default function WaveCta() {
             <Button onClick={() => setIsModalOpened(true)}>
               Subscribe to the newsletter <span>&rarr;</span>
             </Button>
-            <NextLink href="/features" passHref>
-              <OutlinedButton transparent>
-                Features <span>&rarr;</span>
-              </OutlinedButton>
+            <NextLink href="/features" passHref legacyBehavior>
+              <a>
+                <OutlinedButton transparent>
+                  Features <span>&rarr;</span>
+                </OutlinedButton>
+              </a>
             </NextLink>
           </CustomButtonGroup>
         </Container>
@@ -43,9 +45,9 @@ const CtaWrapper = styled.div`
   margin-top: -1rem;
   padding-bottom: 16rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding-top: 8rem;
-  }
+  `)}
 `;
 
 const Title = styled(SectionTitle)`

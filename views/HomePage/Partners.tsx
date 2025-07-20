@@ -95,14 +95,14 @@ const PartnersGrid = styled.div`
   gap: 2rem;
   margin-top: 4rem;
   
-  ${media.desktop`
+  ${media.desktop(`
     grid-template-columns: repeat(3, 1fr);
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
-  `}
+  `)}
   
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
@@ -131,13 +131,13 @@ const PartnerCard = styled(motion.div)`
     border-color: rgba(var(--accent), 0.3);
   }
   
-  ${media.desktop`
+  ${media.desktop(`
     padding: 2.5rem 1.5rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 2rem 1rem;
-  `}
+  `)}
 `;
 
 const LogoWrapper = styled.div`

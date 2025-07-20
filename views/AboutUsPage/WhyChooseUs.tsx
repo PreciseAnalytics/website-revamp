@@ -127,9 +127,9 @@ const Subtitle = styled.h3`
   color: rgb(255, 125, 0);
   margin: 2rem 0;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2.4rem;
-  `}
+  `)}
 `;
 
 const Description = styled.p`
@@ -139,10 +139,10 @@ const Description = styled.p`
   max-width: 80rem;
   margin: 0 auto 5rem;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
     max-width: 100%;
-  `}
+  `)}
 `;
 
 const FeaturesTitle = styled.h4`
@@ -159,14 +159,14 @@ const FeaturesGrid = styled.div`
   max-width: 120rem;
   margin: 0 auto;
 
-  ${media.desktop`
+  ${media.desktop(`
     grid-template-columns: repeat(auto-fill, minmax(35rem, 1fr));
-  `}
+  `)}
 
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
     max-width: 55rem;
-  `}
+  `)}
 `;
 
 const FeatureCard = styled(motion.div)`

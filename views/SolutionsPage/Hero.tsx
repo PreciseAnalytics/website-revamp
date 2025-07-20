@@ -91,13 +91,13 @@ const HeroWrapper = styled.div`
   overflow: hidden;
   padding: 12rem 0 8rem;
 
-  ${media.desktop`
+  ${media.desktop(`
     padding-top: 8rem;
-  `}
+  `)}
 
-  ${media.tablet`
+  ${media.tablet(`
     min-height: auto;
-  `}
+  `)}
 `;
 
 const ContentWrapper = styled.div`
@@ -106,19 +106,19 @@ const ContentWrapper = styled.div`
   position: relative;
   z-index: 1;
 
-  ${media.desktop`
+  ${media.desktop(`
     flex-direction: column;
-  `}
+  `)}
 `;
 
 const LeftSection = styled.div`
   flex: 0 0 50%;
 
-  ${media.desktop`
+  ${media.desktop(`
     flex: 0 0 100%;
     text-align: center;
     margin-bottom: 6rem;
-  `}
+  `)}
 `;
 
 const RightSection = styled.div`
@@ -126,18 +126,18 @@ const RightSection = styled.div`
   display: flex;
   justify-content: center;
 
-  ${media.desktop`
+  ${media.desktop(`
     flex: 0 0 100%;
-  `}
+  `)}
 `;
 
 const StyledOverTitle = styled(OverTitle)`
   margin-bottom: 2rem;
 
-  ${media.desktop`
+  ${media.desktop(`
     margin-left: auto;
     margin-right: auto;
-  `}
+  `)}
 `;
 
 const Title = styled.h1`
@@ -147,17 +147,17 @@ const Title = styled.h1`
   margin-bottom: 2.5rem;
   color: rgb(var(--text));
 
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 4.6rem;
-  `}
+  `)}
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 4rem;
-  `}
+  `)}
 
-  ${media.phone`
+  ${media.phone(`
     font-size: 3.4rem;
-  `}
+  `)}
 `;
 
 const AccentText = styled.span`
@@ -172,28 +172,28 @@ const Description = styled.p`
   margin-bottom: 3.5rem;
   max-width: 50rem;
 
-  ${media.desktop`
+  ${media.desktop(`
     max-width: 60rem;
     margin-left: auto;
     margin-right: auto;
-  `}
+  `)}
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
-  `}
+  `)}
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 2rem;
 
-  ${media.desktop`
+  ${media.desktop(`
     justify-content: center;
-  `}
+  `)}
 
-  ${media.phone`
+  ${media.phone(`
     flex-direction: column;
-  `}
+  `)}
 `;
 
 const HeroImageContainer = styled.div`
@@ -207,14 +207,14 @@ const HeroImageContainer = styled.div`
   border: 1px solid rgba(var(--accent), 0.2);
   overflow: hidden;
 
-  ${media.tablet`
+  ${media.tablet(`
     padding: 2rem;
     max-width: 45rem;
-  `}
+  `)}
 
-  ${media.phone`
+  ${media.phone(`
     padding: 1.5rem;
-  `}
+  `)}
 `;
 
 const DataJourneyWrapper = styled.div`
@@ -224,9 +224,9 @@ const DataJourneyWrapper = styled.div`
   position: relative;
   z-index: 1;
 
-  ${media.tablet`
+  ${media.tablet(`
     gap: 1.5rem;
-  `}
+  `)}
 `;
 
 const JourneyStep = styled.div`
@@ -262,31 +262,31 @@ const JourneyStep = styled.div`
     margin-left: 8rem;
   }
 
-  ${media.tablet`
+  ${media.tablet(`
     padding: 1.2rem 1.5rem;
 
     &.process { margin-left: 1.5rem; }
     &.analyze { margin-left: 3rem; }
     &.visualize { margin-left: 4.5rem; }
     &.act { margin-left: 6rem; }
-  `}
+  `)}
 
-  ${media.phone`
+  ${media.phone(`
     &.process { margin-left: 1rem; }
     &.analyze { margin-left: 2rem; }
     &.visualize { margin-left: 3rem; }
     &.act { margin-left: 4rem; }
-  `}
+  `)}
 `;
 
 const StepIcon = styled.div`
   font-size: 2.4rem;
   margin-right: 1.5rem;
 
-  ${media.phone`
+  ${media.phone(`
     font-size: 2rem;
     margin-right: 1rem;
-  `}
+  `)}
 `;
 
 const StepTitle = styled.div`
@@ -294,9 +294,9 @@ const StepTitle = styled.div`
   font-weight: 600;
   color: rgb(var(--text));
 
-  ${media.phone`
+  ${media.phone(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;
 
 const JourneyArrow = styled.div`
@@ -304,13 +304,13 @@ const JourneyArrow = styled.div`
   margin-left: 4rem;
   opacity: 0.5;
 
-  ${media.tablet`
+  ${media.tablet(`
     margin-left: 3rem;
-  `}
+  `)}
 
-  ${media.phone`
+  ${media.phone(`
     margin-left: 2rem;
-  `}
+  `)}
 `;
 
 const GlowEffect = styled.div`

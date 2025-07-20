@@ -35,10 +35,10 @@ const Title = styled.h1`
   line-height: 5.6rem;
   margin-bottom: 28px;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 3.5rem;
     line-height: 4.8rem;
-  }
+  `)}
 `;
 
 const DetailsContainer = styled.div`

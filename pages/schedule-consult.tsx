@@ -182,9 +182,9 @@ const PageTitle = styled.h1`
   -webkit-text-fill-color: transparent;
   background-clip: text;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 3.6rem;
-  `}
+  `)}
 `;
 
 const PageSubtitle = styled.p`
@@ -195,9 +195,9 @@ const PageSubtitle = styled.p`
   margin: 0 auto;
   line-height: 1.6;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem;
-  `}
+  `)}
 `;
 
 const ContentGrid = styled.div`
@@ -205,10 +205,10 @@ const ContentGrid = styled.div`
   grid-template-columns: 1fr 1.5fr;
   gap: 5rem;
 
-  ${media.desktop`
+  ${media.desktop(`
     grid-template-columns: 1fr;
     gap: 4rem;
-  `}
+  `)}
 `;
 
 const ConsultationInfo = styled(motion.div)`
@@ -228,9 +228,9 @@ const InfoCard = styled.div`
   flex-direction: column;
   gap: 2rem;
 
-  ${media.tablet`
+  ${media.tablet(`
     padding: 2rem;
-  `}
+  `)}
 `;
 
 const AboutSection = styled.div`

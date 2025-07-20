@@ -57,9 +57,9 @@ const Description = styled.div`
   max-width: 60%;
   margin: auto;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     max-width: 100%;
-  }
+  `)}
 `;
 
 const ChildrenWrapper = styled.div`

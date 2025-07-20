@@ -10,8 +10,8 @@ const servicesData = [
     id: 'data-strategy',
     title: 'Data Strategy and Consulting',
     description: 'Our expert consultants work closely with your team to develop a robust data strategy aligned with your business objectives. From data collection and integration to governance and security, we guide you in making informed decisions that drive business success.',
-    icon: '📋',  // Updated to clipboard icon
-    color: '0, 120, 255', // Blue
+    icon: '📋',
+    color: '0, 120, 255',
     services: [
       'Data collection and integration strategy',
       'Data governance framework development',
@@ -26,7 +26,7 @@ const servicesData = [
     title: 'Business Intelligence and Reporting',
     description: 'Unlock the full potential of your data with our Business Intelligence (BI) and reporting solutions. We create intuitive dashboards and reports that provide real-time insights, enabling you to monitor key metrics, identify trends, and make data-driven decisions.',
     icon: '📊',
-    color: '0, 200, 83', // Green
+    color: '0, 200, 83',
     services: [
       'Real-time dashboard creation',
       'Interactive reporting solutions',
@@ -41,7 +41,7 @@ const servicesData = [
     title: 'Predictive Analytics',
     description: 'Stay ahead of the competition by leveraging the power of predictive analytics. Our advanced modeling techniques and machine learning algorithms help you forecast future trends, identify opportunities, and mitigate risks, giving you a strategic advantage in the market.',
     icon: '🔮',
-    color: '147, 51, 234', // Purple
+    color: '147, 51, 234',
     services: [
       'Future trend forecasting',
       'Machine learning model development',
@@ -56,7 +56,7 @@ const servicesData = [
     title: 'Data Visualization',
     description: 'Make complex data easily understandable with our data visualization services. We use cutting-edge tools to create visually compelling representations of your data, allowing stakeholders to grasp insights quickly and make decisions with confidence.',
     icon: '📈',
-    color: '255, 125, 0', // Orange
+    color: '255, 125, 0',
     services: [
       'Interactive data visualizations',
       'Custom chart and graph creation',
@@ -66,13 +66,12 @@ const servicesData = [
       'Multi-platform visualization deployment'
     ]
   },
-
   {
     id: 'data-warehousing',
     title: 'Data Warehousing and Integration',
     description: 'Optimize your data infrastructure with our data warehousing and integration services. We design and implement scalable solutions that ensure seamless data flow across your organization, enhancing collaboration and efficiency.',
-    icon: '🗄️',  // Updated to filing cabinet icon
-    color: '34, 197, 94', // Emerald
+    icon: '🗄️',
+    color: '34, 197, 94',
     services: [
       'Scalable data warehouse design',
       'Cross-platform data integration',
@@ -82,14 +81,12 @@ const servicesData = [
       'Performance tuning and optimization'
     ]
   },
-  // ... rest of the services ...
-
   {
     id: 'data-quality',
     title: 'Data Quality Management',
     description: 'Maintain the integrity of your data with our data quality management services. We implement processes and tools to cleanse, validate, and standardize your data, ensuring accuracy and reliability for all your analytics endeavors.',
     icon: '✅',
-    color: '16, 185, 129', // Teal
+    color: '16, 185, 129',
     services: [
       'Data cleansing and validation',
       'Standardization processes',
@@ -104,7 +101,7 @@ const servicesData = [
     title: 'Custom Analytics Solutions',
     description: 'Every business is unique, and so are its data needs. Our team specializes in creating custom analytics solutions tailored to your specific requirements. Whether it\'s developing bespoke algorithms or building custom applications, we have the expertise to deliver solutions that align with your vision.',
     icon: '⚙️',
-    color: '236, 72, 153', // Pink
+    color: '236, 72, 153',
     services: [
       'Bespoke algorithm development',
       'Custom application building',
@@ -119,7 +116,7 @@ const servicesData = [
     title: 'Training and Support',
     description: 'Empower your team with the knowledge and skills needed to harness the full potential of data analytics. We offer training programs and ongoing support to ensure your staff is proficient in using analytics tools and interpreting data effectively.',
     icon: '🎓',
-    color: '99, 102, 241', // Indigo
+    color: '99, 102, 241',
     services: [
       'Comprehensive training programs',
       'Tool-specific skill development',
@@ -192,9 +189,9 @@ const ServicesWrapper = styled.section`
   padding: 10rem 0;
   background: rgba(var(--background), 0.5);
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 8rem 0;
-  `}
+  `)}
 `;
 
 const SectionDescription = styled.p`
@@ -205,22 +202,23 @@ const SectionDescription = styled.p`
   max-width: 80rem;
   margin: 0 auto 6rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
     margin-bottom: 4rem;
-  `}
+  `)}
 `;
 
 const ServicesGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
   gap: 4rem;
   max-width: 120rem;
   margin: 0 auto;
   
-  ${media.tablet`
+  ${media.tablet(`
     gap: 3rem;
-  `}
+    grid-template-columns: 1fr;
+  `)}
 `;
 
 const ServiceCard = styled(motion.div)`
@@ -231,9 +229,9 @@ const ServiceCard = styled(motion.div)`
   border: 1px solid rgba(var(--text), 0.1);
   transition: all 0.3s ease;
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 3rem;
-  `}
+  `)}
 `;
 
 const ServiceHeader = styled.div`
@@ -246,20 +244,20 @@ const ServiceHeader = styled.div`
 const ServiceIcon = styled.div`
   font-size: 4rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 3rem;
-  `}
+  `)}
 `;
 
 const ServiceTitle = styled.h3`
-  font-size: 3rem;
+  font-size: 2.4rem;
   font-weight: 700;
   color: rgb(var(--text));
   margin: 0;
   
-  ${media.tablet`
-    font-size: 2.4rem;
-  `}
+  ${media.tablet(`
+    font-size: 2rem;
+  `)}
 `;
 
 const ServiceDescription = styled.p`
@@ -268,10 +266,10 @@ const ServiceDescription = styled.p`
   color: rgba(var(--text), 0.8);
   margin-bottom: 3rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
     margin-bottom: 2rem;
-  `}
+  `)}
 `;
 
 const ServicesList = styled.ul`

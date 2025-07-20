@@ -1,11 +1,12 @@
 import Head from 'next/head';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
 import AnimatedFooter from 'components/AnimatedFooter';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
-import { media } from 'utils/media';
+import { media, mq } from 'utils/media';
 import Link from 'next/link';
 
 const certifications = [
@@ -103,14 +104,13 @@ const certifications = [
   }
 ];
 
-// Group certifications by category
 const certificationsByCategory = certifications.reduce((acc, cert) => {
   if (!acc[cert.category]) {
     acc[cert.category] = [];
   }
   acc[cert.category].push(cert);
   return acc;
-}, {});
+}, {} as Record<string, typeof certifications>);
 
 export default function CertificationsPage() {
   return (
@@ -131,7 +131,6 @@ export default function CertificationsPage() {
       
       <PageWrapper>
         <Container>
-          {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -149,7 +148,6 @@ export default function CertificationsPage() {
             </HeroSection>
           </motion.div>
 
-          {/* Trust Indicators */}
           <TrustSection>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -182,7 +180,6 @@ export default function CertificationsPage() {
             </motion.div>
           </TrustSection>
 
-          {/* Certifications by Category */}
           {Object.entries(certificationsByCategory).map(([category, certs], categoryIndex) => (
             <CategorySection key={category}>
               <motion.div
@@ -207,7 +204,17 @@ export default function CertificationsPage() {
                           <CertIcon>{cert.icon}</CertIcon>
                           {cert.logo && (
                             <CertLogo>
-                              <img src={cert.logo} alt={cert.name} />
+                              <Image 
+                                src={cert.logo} 
+                                alt={cert.name} 
+                                width={100}
+                                height={60}
+                                style={{
+                                  objectFit: 'contain',
+                                  maxHeight: '6rem',
+                                  maxWidth: '10rem'
+                                }}
+                              />
                             </CertLogo>
                           )}
                         </CardHeader>
@@ -246,7 +253,6 @@ export default function CertificationsPage() {
             </CategorySection>
           ))}
 
-          {/* Enhanced CTA Action Bar */}
           <ActionBarWrapper>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -310,7 +316,6 @@ export default function CertificationsPage() {
                   </ActionBarRight>
                 </ActionBarContent>
                 
-                {/* Decorative Elements */}
                 <DecorativeShape1 />
                 <DecorativeShape2 />
                 <DecorativeShape3 />
@@ -325,7 +330,6 @@ export default function CertificationsPage() {
   );
 }
 
-// Styled Components
 const PageWrapper = styled.div`
   padding: 4rem 0;
 `;
@@ -347,9 +351,7 @@ const HeroTitle = styled.h1`
   background-clip: text;
   margin-bottom: 1.5rem;
 
-  ${media.tablet} {
-    font-size: 3.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 3.6rem;')}
 `;
 
 const HeroSubtitle = styled.h2`
@@ -358,9 +360,7 @@ const HeroSubtitle = styled.h2`
   color: rgb(var(--text));
   margin-bottom: 2rem;
 
-  ${media.tablet} {
-    font-size: 1.8rem;
-  }
+  ${mq('<=tablet', 'font-size: 1.8rem;')}
 `;
 
 const HeroDescription = styled.p`
@@ -370,9 +370,7 @@ const HeroDescription = styled.p`
   max-width: 70rem;
   margin: 0 auto;
 
-  ${media.tablet} {
-    font-size: 1.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 1.6rem;')}
 `;
 
 const TrustSection = styled.section`
@@ -385,13 +383,9 @@ const TrustGrid = styled.div`
   gap: 2rem;
   margin-bottom: 4rem;
 
-  ${media.tablet} {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  ${mq('<=tablet', 'grid-template-columns: repeat(2, 1fr);')}
 
-  ${media.mobile} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=phone', 'grid-template-columns: 1fr;')}
 `;
 
 const TrustItem = styled.div`
@@ -449,9 +443,7 @@ const CertificationsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(40rem, 1fr));
   gap: 3rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const CertificationCard = styled.div`
@@ -487,12 +479,6 @@ const CertLogo = styled.div`
   height: 6rem;
   display: flex;
   align-items: center;
-  
-  img {
-    max-height: 6rem;
-    max-width: 10rem;
-    object-fit: contain;
-  }
 `;
 
 const CardContent = styled.div`
@@ -571,14 +557,11 @@ const VerificationLink = styled.a`
   }
 `;
 
-// Enhanced Action Bar Styles
 const ActionBarWrapper = styled.section`
   margin-top: 8rem;
   padding: 0 2rem;
 
-  ${media.tablet} {
-    padding: 0 1rem;
-  }
+  ${mq('<=tablet', 'padding: 0 1rem;')}
 `;
 
 const ActionBarContainer = styled.div`
@@ -593,15 +576,15 @@ const ActionBarContainer = styled.div`
     0 0 0 1px rgba(255, 255, 255, 0.05) inset,
     0 0 100px rgba(255, 125, 0, 0.1);
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     padding: 3rem 2rem;
     border-radius: 2rem;
-  }
+  `)}
 
-  ${media.mobile} {
+  ${mq('<=phone', `
     padding: 2.5rem 1.5rem;
     border-radius: 1.6rem;
-  }
+  `)}
 `;
 
 const ActionBarBackground = styled.div`
@@ -624,11 +607,11 @@ const ActionBarContent = styled.div`
   gap: 4rem;
   align-items: center;
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     grid-template-columns: 1fr;
     gap: 3rem;
     text-align: center;
-  }
+  `)}
 `;
 
 const ActionBarLeft = styled.div`
@@ -636,10 +619,10 @@ const ActionBarLeft = styled.div`
   align-items: center;
   gap: 2rem;
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     flex-direction: column;
     text-align: center;
-  }
+  `)}
 `;
 
 const ActionIcon = styled.div`
@@ -647,9 +630,7 @@ const ActionIcon = styled.div`
   flex-shrink: 0;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 
-  ${media.tablet} {
-    font-size: 4rem;
-  }
+  ${mq('<=tablet', 'font-size: 4rem;')}
 `;
 
 const ActionTextSection = styled.div`
@@ -663,13 +644,9 @@ const ActionTitle = styled.h2`
   margin-bottom: 0.5rem;
   line-height: 1.2;
 
-  ${media.tablet} {
-    font-size: 2.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 2.6rem;')}
 
-  ${media.mobile} {
-    font-size: 2.2rem;
-  }
+  ${mq('<=phone', 'font-size: 2.2rem;')}
 `;
 
 const ActionSubtitle = styled.div`
@@ -680,9 +657,7 @@ const ActionSubtitle = styled.div`
   text-transform: uppercase;
   letter-spacing: 1px;
 
-  ${media.mobile} {
-    font-size: 1.2rem;
-  }
+  ${mq('<=phone', 'font-size: 1.2rem;')}
 `;
 
 const ActionDescription = styled.p`
@@ -691,13 +666,9 @@ const ActionDescription = styled.p`
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
 
-  ${media.tablet} {
-    font-size: 1.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 1.6rem;')}
 
-  ${media.mobile} {
-    font-size: 1.4rem;
-  }
+  ${mq('<=phone', 'font-size: 1.4rem;')}
 `;
 
 const ActionBarRight = styled.div`
@@ -706,10 +677,10 @@ const ActionBarRight = styled.div`
   gap: 2rem;
   align-items: flex-end;
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     align-items: center;
     width: 100%;
-  }
+  `)}
 `;
 
 const ActionStats = styled.div`
@@ -717,9 +688,7 @@ const ActionStats = styled.div`
   gap: 3rem;
   margin-bottom: 1rem;
 
-  ${media.mobile} {
-    gap: 2rem;
-  }
+  ${mq('<=phone', 'gap: 2rem;')}
 `;
 
 const StatItem = styled.div`
@@ -732,9 +701,7 @@ const StatNumber = styled.div`
   color: rgba(255, 125, 0, 1);
   line-height: 1;
 
-  ${media.mobile} {
-    font-size: 2.4rem;
-  }
+  ${mq('<=phone', 'font-size: 2.4rem;')}
 `;
 
 const StatLabel = styled.div`
@@ -749,102 +716,15 @@ const ActionButtons = styled.div`
   gap: 1.5rem;
   align-items: center;
 
-  ${media.mobile} {
+  ${mq('<=phone', `
     flex-direction: column;
     width: 100%;
     gap: 1rem;
-  }
-`;
-
-const PrimaryActionButton = styled(motion.a)`
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  background: linear-gradient(135deg, #ff7d00 0%, #ffa500 100%);
-  color: white;
-  padding: 1.8rem 3.6rem;
-  border-radius: 1.2rem;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 
-    0 10px 25px rgba(255, 125, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-
-  &:hover {
-    background: linear-gradient(135deg, #e66a00 0%, #ff9500 100%);
-    box-shadow: 
-      0 15px 35px rgba(255, 125, 0, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.2) inset;
-    transform: translateY(-2px);
-  }
-
-  ${media.mobile} {
-    width: 100%;
-    justify-content: center;
-    padding: 1.6rem 2rem;
-    font-size: 1.6rem;
-  }
-`;
-
-const SecondaryActionButton = styled(motion.a)`
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  padding: 1.8rem 3rem;
-  border-radius: 1.2rem;
-  font-size: 1.6rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-1px);
-  }
-
-  ${media.mobile} {
-    width: 100%;
-    justify-content: center;
-    padding: 1.6rem 2rem;
-    font-size: 1.4rem;
-  }
+  `)}
 `;
 
 const ButtonIcon = styled.span`
   font-size: 1.6rem;
-`;
-
-
-// Decorative Elements
-const DecorativeShape1 = styled.div`
-  position: absolute;
-  top: -5rem;
-  right: -3rem;
-  width: 15rem;
-  height: 15rem;
-  background: linear-gradient(135deg, rgba(255, 125, 0, 0.2) 0%, rgba(255, 165, 0, 0.1) 100%);
-  border-radius: 50%;
-  filter: blur(20px);
-  z-index: 1;
-`;
-
-const DecorativeShape2 = styled.div`
-  position: absolute;
-  bottom: -4rem;
-  left: -2rem;
-  width: 12rem;
-  height: 12rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%);
-  border-radius: 50%;
-  filter: blur(15px);
-  z-index: 1;
 `;
 
 const MotionButton = styled(motion.div)<{ $primary?: boolean }>`
@@ -889,13 +769,36 @@ const MotionButton = styled(motion.div)<{ $primary?: boolean }>`
     }
   `}
 
-  ${media.mobile} {
+  ${mq('<=phone', `
     width: 100%;
     padding: 1.6rem 2rem;
     font-size: 1.6rem;
-  }
+  `)}
 `;
 
+const DecorativeShape1 = styled.div`
+  position: absolute;
+  top: -5rem;
+  right: -3rem;
+  width: 15rem;
+  height: 15rem;
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.2) 0%, rgba(255, 165, 0, 0.1) 100%);
+  border-radius: 50%;
+  filter: blur(20px);
+  z-index: 1;
+`;
+
+const DecorativeShape2 = styled.div`
+  position: absolute;
+  bottom: -4rem;
+  left: -2rem;
+  width: 12rem;
+  height: 12rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(147, 197, 253, 0.1) 100%);
+  border-radius: 50%;
+  filter: blur(15px);
+  z-index: 1;
+`;
 
 const DecorativeShape3 = styled.div`
   position: absolute;

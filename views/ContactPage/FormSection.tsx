@@ -101,13 +101,13 @@ const InputGroup = styled.div`
     flex: 1;
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     flex-direction: column;
     & > *:first-child {
       margin-right: 0rem;
       margin-bottom: 2rem;
     }
-  }
+  `)}
 `;
 
 const InputStack = styled.div`

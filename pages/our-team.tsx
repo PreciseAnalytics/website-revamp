@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
@@ -59,7 +60,17 @@ export default function OurTeamPage() {
             {teamMembers.map((member, index) => (
               <TeamCard key={index}>
                 <ImageWrapper>
-                  <img src={member.image} alt={member.name} />
+                  <Image 
+                    src={member.image} 
+                    alt={member.name}
+                    width={120}
+                    height={120}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
                 </ImageWrapper>
                 <Name>{member.name}</Name>
                 <Title>{member.title}</Title>
@@ -124,12 +135,6 @@ const ImageWrapper = styled.div`
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid rgb(0, 153, 255);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 `;
 
 const Name = styled.h3`

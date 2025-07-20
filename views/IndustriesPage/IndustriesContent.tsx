@@ -185,9 +185,9 @@ const Title = styled.div`
   text-align: center;
   margin-bottom: 5rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     margin-bottom: 3rem;
-  }
+  `)}
 `;
 
 const TitleDescription = styled.p`
@@ -198,10 +198,10 @@ const TitleDescription = styled.p`
   margin: 1.5rem auto 0;
   line-height: 1.4;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.6rem;
     padding: 0 2rem;
-  }
+  `)}
 `;
 
 const SectorIntro = styled.p`
@@ -212,11 +212,11 @@ const SectorIntro = styled.p`
   margin: 0 auto 5rem;
   color: rgb(var(--text-rgb), 0.8);
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.5rem;
     padding: 0 2rem;
     margin-bottom: 3rem;
-  }
+  `)}
 `;
 
 const IndustriesGrid = styled.div`
@@ -225,20 +225,20 @@ const IndustriesGrid = styled.div`
   gap: 3rem;
   margin-bottom: 8rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     gap: 2rem;
     padding: 0 2rem;
     margin-bottom: 5rem;
-  }
+  `)}
 `;
 
 const ApproachSection = styled.section`
   margin-top: 8rem;
   text-align: center;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     margin-top: 5rem;
-  }
+  `)}
 `;
 
 const ApproachDescription = styled.p`
@@ -249,11 +249,11 @@ const ApproachDescription = styled.p`
   margin: 1.5rem auto 5rem;
   line-height: 1.5;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.6rem;
     padding: 0 2rem;
     margin-bottom: 3rem;
-  }
+  `)}
 `;
 
 const ApproachCards = styled.div`
@@ -262,10 +262,10 @@ const ApproachCards = styled.div`
   gap: 3rem;
   margin-top: 4rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 0 2rem;
     gap: 2rem;
-  }
+  `)}
 `;
 
 const ApproachCard = styled(motion.article)`
@@ -282,10 +282,10 @@ const ApproachCard = styled(motion.article)`
   flex-direction: column;
   justify-content: center;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     min-height: auto;
     padding: 2rem 1.5rem;
-  }
+  `)}
 `;
 
 const ApproachIcon = styled.span`
@@ -298,10 +298,10 @@ const ApproachIcon = styled.span`
     transform: scale(1.1);
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 3.5rem;
     margin-bottom: 1.5rem;
-  }
+  `)}
 `;
 
 const ApproachTitle = styled.h3`
@@ -310,10 +310,10 @@ const ApproachTitle = styled.h3`
   margin-bottom: 1.5rem;
   color: rgb(var(--accent-rgb));
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.8rem;
     margin-bottom: 1rem;
-  }
+  `)}
 `;
 
 const ApproachItemDescription = styled.p`
@@ -322,7 +322,7 @@ const ApproachItemDescription = styled.p`
   color: rgb(var(--text-rgb));
   opacity: 0.8;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.5rem;
-  }
+  `)}
 `;

@@ -84,9 +84,9 @@ const CtaWrapper = styled.section`
     rgba(var(--background-rgb), 1)
   );
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 6rem 0;
-  }
+  `)}
 `;
 
 const Card = styled.article`
@@ -100,14 +100,14 @@ const Card = styled.article`
   backdrop-filter: blur(10px);
   box-shadow: 0 30px 60px -15px rgba(var(--accent-rgb), 0.15);
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 4rem 2.5rem;
     border-radius: 1.5rem;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     padding: 3rem 1.8rem;
-  }
+  `)}
 `;
 
 const ContentWrapper = styled.div`
@@ -124,14 +124,14 @@ const CtaTitle = styled.h2`
   -webkit-text-fill-color: transparent;
   line-height: 1.3;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 2.6rem;
     margin-bottom: 1.5rem;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     font-size: 2.2rem;
-  }
+  `)}
 `;
 
 const CtaDescription = styled.p`
@@ -142,16 +142,16 @@ const CtaDescription = styled.p`
   opacity: 0.8;
   line-height: 1.6;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.6rem;
     margin-bottom: 3rem;
     padding: 0 1rem;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     font-size: 1.5rem;
     margin-bottom: 2.5rem;
-  }
+  `)}
 `;
 
 const ButtonGroup = styled.div`
@@ -159,11 +159,11 @@ const ButtonGroup = styled.div`
   gap: 2rem;
   justify-content: center;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-  }
+  `)}
 `;
 
 const BackgroundGradient = styled.div`
@@ -187,17 +187,17 @@ const BadgesWrapper = styled.div`
   gap: 4rem;
   margin-top: 4rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     gap: 3rem;
     margin-top: 3rem;
-  }
+  `)}
   
-  ${media('<=phone')} {
+  ${media.phone(`
     flex-direction: column;
     align-items: center;
     gap: 2rem;
     margin-top: 2.5rem;
-  }
+  `)}
 `;
 
 const Badge = styled(motion.div)`
@@ -215,11 +215,11 @@ const Badge = styled(motion.div)`
     background: rgba(var(--cardBackground-rgb), 0.8);
   }
 
-  ${media('<=phone')} {
+  ${media.phone(`
     width: 100%;
     max-width: 22rem;
     justify-content: center;
-  }
+  `)}
 `;
 
 const BadgeIcon = styled.div`
@@ -230,9 +230,9 @@ const BadgeIcon = styled.div`
     transform: scale(1.1);
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 2.2rem;
-  }
+  `)}
 `;
 
 const BadgeText = styled.span`
@@ -241,7 +241,7 @@ const BadgeText = styled.span`
   color: rgb(var(--text-rgb));
   white-space: nowrap;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.5rem;
-  }
+  `)}
 `;

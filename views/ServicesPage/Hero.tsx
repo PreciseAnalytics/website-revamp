@@ -40,9 +40,9 @@ const HeroWrapper = styled.section`
   position: relative;
   text-align: center;
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 12rem 0 6rem;
-  `}
+  `)}
 `;
 
 const ContentWrapper = styled.div`
@@ -58,9 +58,9 @@ const TagLine = styled.h2`
   letter-spacing: 2px;
   margin-bottom: 2rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;
 
 const Heading = styled.h1`
@@ -70,13 +70,13 @@ const Heading = styled.h1`
   color: rgb(var(--text));
   margin-bottom: 3rem;
   
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 5rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 3.8rem;
-  `}
+  `)}
 `;
 
 const Description = styled.p`
@@ -86,7 +86,7 @@ const Description = styled.p`
   max-width: 80rem;
   margin: 0 auto;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
-  `}
+  `)}
 `;

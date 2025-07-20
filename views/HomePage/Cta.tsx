@@ -99,14 +99,14 @@ const Stack = styled.div`
     margin-top: 4rem;
   }
 
-  ${media.tablet`
+  @media (max-width: 768px) {
     text-align: center;
 
     & > *:not(:first-child) {
       max-width: 100%;
       margin-top: 2rem;
     }
-  `}
+  }
 `;
 
 const OutlinedButton = styled(Button)`
@@ -140,12 +140,12 @@ const TrustSignals = styled.div`
   justify-content: center;
   margin-top: 4rem;
   
-  ${media.tablet`
+  @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
     margin-top: 3rem;
-  `}
+  }
 `;
 
 const TrustBadge = styled(motion.div)`
@@ -164,10 +164,10 @@ const TrustBadge = styled(motion.div)`
     margin-left: 0.8rem;
   }
   
-  ${media.tablet`
+  @media (max-width: 768px) {
     font-size: 1.3rem;
     padding: 0.8rem 1.8rem;
-  `}
+  }
 `;
 
 const CheckmarkIcon = styled.svg`

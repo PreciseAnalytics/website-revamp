@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -110,8 +111,6 @@ export default function HomePage() {
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Partial<ContactFormData>>({});
   const [isMounted, setIsMounted] = useState(false);
-  
-  // Use ref for contact form to avoid DOM queries during SSR
   const contactFormRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -120,7 +119,6 @@ export default function HomePage() {
 
   const validateForm = useCallback((data: ContactFormData): Partial<ContactFormData> => {
     const errors: Partial<ContactFormData> = {};
-    
     if (!data.firstName.trim()) errors.firstName = 'First name is required';
     if (!data.lastName.trim()) errors.lastName = 'Last name is required';
     if (!data.email.trim()) errors.email = 'Email is required';
@@ -128,15 +126,12 @@ export default function HomePage() {
       errors.email = 'Please enter a valid email address';
     }
     if (!data.company.trim()) errors.company = 'Company/Organization is required';
-    
     return errors;
   }, []);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setContactData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear error when user starts typing
     if (formErrors[name as keyof ContactFormData]) {
       setFormErrors(prev => ({ ...prev, [name]: undefined }));
     }
@@ -144,7 +139,6 @@ export default function HomePage() {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const errors = validateForm(contactData);
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -156,11 +150,9 @@ export default function HomePage() {
     setFormErrors({});
 
     try {
-      // Simulate async submission - replace with actual API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
       console.log('Submitted:', contactData);
-      setSubmitSuccess(`Thank you! We&apos;ll be in touch within 24 hours to discuss your project.`);
+      setSubmitSuccess(`Thank you! We'll be in touch within 24 hours to discuss your project.`);
       setContactData(initialFormData);
     } catch (error) {
       console.error('Submission error:', error);
@@ -172,8 +164,6 @@ export default function HomePage() {
 
   const handleGetStartedClick = useCallback((serviceTitle: string) => {
     setContactData(prev => ({ ...prev, service: serviceTitle }));
-    
-    // Use ref and check if mounted to avoid SSR issues
     if (isMounted && contactFormRef.current) {
       contactFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -183,7 +173,6 @@ export default function HomePage() {
     router.push('/about-us');
   }, [router]);
 
-  // Clear success message after 5 seconds
   useEffect(() => {
     if (submitSuccess) {
       const timer = setTimeout(() => setSubmitSuccess(null), 5000);
@@ -199,10 +188,6 @@ export default function HomePage() {
         <meta
           name="description"
           content="Veteran-owned data analytics company providing comprehensive solutions for government and commercial clients. VOSB and SWaM certified."
-        />
-        <meta
-          name="keywords"
-          content="data analytics, business intelligence, VOSB, veteran owned, government contracting, data science, machine learning"
         />
       </Head>
 
@@ -238,7 +223,7 @@ export default function HomePage() {
             <SectionSubtitle>Comprehensive data analytics solutions tailored to your mission</SectionSubtitle>
             
             <ServiceCardsGrid>
-              {services.map((service, index) => (
+              {services.map((service) => (
                 <ServiceCard key={service.title}>
                   <ServiceIcon>{service.icon}</ServiceIcon>
                   <ServiceTitle>{service.title}</ServiceTitle>
@@ -269,7 +254,17 @@ export default function HomePage() {
             <CertGrid>
               <CertCard>
                 <CertLogo>
-                  <img src="/Veteran-Owned-Certified.png" alt="VOSB Certified" />
+                  <Image 
+                    src="/Veteran-Owned-Certified.png" 
+                    alt="VOSB Certified" 
+                    width={150}
+                    height={100}
+                    style={{
+                      objectFit: 'contain',
+                      maxHeight: '10rem',
+                      maxWidth: '15rem'
+                    }}
+                  />
                 </CertLogo>
                 <CertTitle>Veteran-Owned Small Business</CertTitle>
                 <CertDescription>
@@ -292,7 +287,17 @@ export default function HomePage() {
               
               <CertCard>
                 <CertLogo>
-                  <img src="/SWAM_LOGO.jpg" alt="SWaM Certified" />
+                  <Image 
+                    src="/SWAM_LOGO.jpg" 
+                    alt="SWaM Certified" 
+                    width={150}
+                    height={100}
+                    style={{
+                      objectFit: 'contain',
+                      maxHeight: '10rem',
+                      maxWidth: '15rem'
+                    }}
+                  />
                 </CertLogo>
                 <CertTitle>SWaM Certified</CertTitle>
                 <CertDescription>
@@ -321,7 +326,7 @@ export default function HomePage() {
             <SectionSubtitle>Specialized expertise across key sectors</SectionSubtitle>
             
             <IndustriesGrid>
-              {industries.map((industry, index) => (
+              {industries.map((industry) => (
                 <IndustryCard key={industry.name}>
                   <IndustryIcon>{industry.icon}</IndustryIcon>
                   <IndustryName>{industry.name}</IndustryName>
@@ -446,7 +451,7 @@ export default function HomePage() {
                     rows={6}
                     value={contactData.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your data challenges, goals, and what you&apos;re hoping to achieve..."
+                    placeholder="Tell us about your data challenges, goals, and what you're hoping to achieve..."
                   />
                 </FormField>
 
@@ -458,7 +463,6 @@ export default function HomePage() {
           </ContactSection>
         </Container>
       </PageWrapper>
-{/* Footer is now handled globally by _app.tsx */}
     </>
   );
 }
@@ -468,7 +472,6 @@ const PageWrapper = styled.div`
   padding: 4rem 0;
 `;
 
-// Hero Section Styles
 const HeroSection = styled.section`
   text-align: center;
   padding: 6rem 0 8rem;
@@ -491,9 +494,13 @@ const HeroTitle = styled.h1`
   background-clip: text;
   margin-bottom: 1.5rem;
 
-  ${media.tablet`
-    font-size: 4rem;
-  `}
+  ${media.desktop(`
+    font-size: 4.8rem;
+  `)}
+
+  ${media.tablet(`
+    font-size: 3.6rem;
+  `)}
 `;
 
 const HeroSubtitle = styled.h2`
@@ -502,9 +509,9 @@ const HeroSubtitle = styled.h2`
   color: rgb(var(--text));
   margin-bottom: 2rem;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem;
-  `}
+  `)}
 `;
 
 const HeroDescription = styled.p`
@@ -516,9 +523,9 @@ const HeroDescription = styled.p`
   margin-left: auto;
   margin-right: auto;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;
 
 const HeroButtons = styled.div`
@@ -526,6 +533,12 @@ const HeroButtons = styled.div`
   gap: 2rem;
   justify-content: center;
   flex-wrap: wrap;
+
+  ${media.tablet(`
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  `)}
 `;
 
 const PrimaryButton = styled.button`
@@ -543,6 +556,11 @@ const PrimaryButton = styled.button`
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(255, 125, 0, 0.3);
   }
+
+  ${media.tablet(`
+    padding: 1.2rem 2.5rem;
+    font-size: 1.6rem;
+  `)}
 `;
 
 const SecondaryButtonLink = styled.div`
@@ -563,9 +581,13 @@ const SecondaryButtonLink = styled.div`
     color: white;
     transform: translateY(-2px);
   }
+
+  ${media.tablet(`
+    padding: 1.2rem 2.5rem;
+    font-size: 1.6rem;
+  `)}
 `;
 
-// Services Section Styles
 const ServicesSection = styled.section`
   margin-bottom: 8rem;
 `;
@@ -576,6 +598,10 @@ const SectionTitle = styled.h2`
   text-align: center;
   margin-bottom: 1rem;
   color: rgb(var(--text));
+
+  ${media.tablet(`
+    font-size: 2.8rem;
+  `)}
 `;
 
 const SectionSubtitle = styled.p`
@@ -583,6 +609,10 @@ const SectionSubtitle = styled.p`
   text-align: center;
   margin-bottom: 4rem;
   color: rgb(var(--text), 0.7);
+
+  ${media.tablet(`
+    font-size: 1.6rem;
+  `)}
 `;
 
 const ServiceCardsGrid = styled.div`
@@ -593,10 +623,10 @@ const ServiceCardsGrid = styled.div`
   max-width: 120rem;
   margin: 0 auto;
 
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
-  `}
+    gap: 2rem;
+  `)}
 `;
 
 const ServiceCard = styled.div`
@@ -614,11 +644,19 @@ const ServiceCard = styled.div`
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
   }
+
+  ${media.tablet(`
+    padding: 2rem;
+  `)}
 `;
 
 const ServiceIcon = styled.div`
   font-size: 4rem;
   margin-bottom: 1.5rem;
+
+  ${media.tablet(`
+    font-size: 3rem;
+  `)}
 `;
 
 const ServiceTitle = styled.h3`
@@ -626,6 +664,10 @@ const ServiceTitle = styled.h3`
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: rgb(255, 125, 0);
+
+  ${media.tablet(`
+    font-size: 2rem;
+  `)}
 `;
 
 const ServiceDescription = styled.p`
@@ -633,6 +675,10 @@ const ServiceDescription = styled.p`
   line-height: 1.6;
   margin-bottom: 2rem;
   color: rgb(var(--text), 0.8);
+
+  ${media.tablet(`
+    font-size: 1.4rem;
+  `)}
 `;
 
 const FeaturesSection = styled.div`
@@ -646,6 +692,10 @@ const FeaturesTitle = styled.h4`
   font-weight: 600;
   margin-bottom: 1rem;
   color: rgb(var(--text));
+
+  ${media.tablet(`
+    font-size: 1.4rem;
+  `)}
 `;
 
 const FeaturesList = styled.ul`
@@ -667,6 +717,10 @@ const FeatureItem = styled.li`
     position: absolute;
     left: 0;
   }
+
+  ${media.tablet(`
+    font-size: 1.2rem;
+  `)}
 `;
 
 const LearnMoreButton = styled.button`
@@ -686,14 +740,22 @@ const LearnMoreButton = styled.button`
     color: white;
     transform: translateY(-2px);
   }
+
+  ${media.tablet(`
+    padding: 1rem 1.5rem;
+    font-size: 1.4rem;
+  `)}
 `;
 
-// Certifications Section
 const CertificationsSection = styled.section`
   margin-bottom: 8rem;
   padding: 6rem 0;
   background: rgba(var(--cardBackground), 0.5);
   border-radius: 2rem;
+
+  ${media.tablet(`
+    padding: 4rem 0;
+  `)}
 `;
 
 const CertGrid = styled.div`
@@ -703,9 +765,10 @@ const CertGrid = styled.div`
   max-width: 100rem;
   margin: 0 auto;
 
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  `}
+    gap: 2rem;
+  `)}
 `;
 
 const CertCard = styled.div`
@@ -720,6 +783,10 @@ const CertCard = styled.div`
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
   }
+
+  ${media.tablet(`
+    padding: 2rem;
+  `)}
 `;
 
 const CertLogo = styled.div`
@@ -728,12 +795,6 @@ const CertLogo = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 2rem;
-  
-  img {
-    max-height: 10rem;
-    max-width: 15rem;
-    object-fit: contain;
-  }
 `;
 
 const CertTitle = styled.h3`
@@ -741,6 +802,10 @@ const CertTitle = styled.h3`
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: rgb(var(--text));
+
+  ${media.tablet(`
+    font-size: 1.8rem;
+  `)}
 `;
 
 const CertDescription = styled.p`
@@ -748,6 +813,10 @@ const CertDescription = styled.p`
   line-height: 1.6;
   margin-bottom: 2rem;
   color: rgb(var(--text), 0.8);
+
+  ${media.tablet(`
+    font-size: 1.4rem;
+  `)}
 `;
 
 const CertFeatures = styled.ul`
@@ -770,6 +839,10 @@ const CertFeatures = styled.ul`
       position: absolute;
       left: 0;
     }
+
+    ${media.tablet(`
+      font-size: 1.2rem;
+    `)}
   }
 `;
 
@@ -784,9 +857,12 @@ const CertLink = styled.a`
     color: rgb(255, 165, 0);
     text-decoration: underline;
   }
+
+  ${media.tablet(`
+    font-size: 1.4rem;
+  `)}
 `;
 
-// Industries Section
 const IndustriesSection = styled.section`
   margin-bottom: 8rem;
 `;
@@ -796,9 +872,10 @@ const IndustriesGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   gap: 2.5rem;
 
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  `}
+    gap: 2rem;
+  `)}
 `;
 
 const IndustryCard = styled.div`
@@ -813,11 +890,19 @@ const IndustryCard = styled.div`
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
   }
+
+  ${media.tablet(`
+    padding: 2rem;
+  `)}
 `;
 
 const IndustryIcon = styled.div`
   font-size: 3.5rem;
   margin-bottom: 1.5rem;
+
+  ${media.tablet(`
+    font-size: 2.5rem;
+  `)}
 `;
 
 const IndustryName = styled.h3`
@@ -825,15 +910,22 @@ const IndustryName = styled.h3`
   font-weight: 600;
   margin-bottom: 1rem;
   color: rgb(var(--text));
+
+  ${media.tablet(`
+    font-size: 1.8rem;
+  `)}
 `;
 
 const IndustryDescription = styled.p`
   font-size: 1.5rem;
   line-height: 1.6;
   color: rgb(var(--text), 0.8);
+
+  ${media.tablet(`
+    font-size: 1.3rem;
+  `)}
 `;
 
-// Contact Form Styles (enhanced)
 const ContactSection = styled.section`
   margin-bottom: 8rem;
 `;
@@ -846,9 +938,9 @@ const FormWrapper = styled.div`
   max-width: 80rem;
   margin: 0 auto;
 
-  ${media.tablet`
-    padding: 3rem 2rem;
-  `}
+  ${media.tablet(`
+    padding: 2rem;
+  `)}
 `;
 
 const FormTitle = styled.h2`
@@ -857,6 +949,10 @@ const FormTitle = styled.h2`
   text-align: center;
   margin-bottom: 1rem;
   color: rgb(var(--text));
+
+  ${media.tablet(`
+    font-size: 2.4rem;
+  `)}
 `;
 
 const FormSubtitle = styled.p`
@@ -864,6 +960,10 @@ const FormSubtitle = styled.p`
   text-align: center;
   margin-bottom: 3rem;
   color: rgb(var(--text), 0.7);
+
+  ${media.tablet(`
+    font-size: 1.6rem;
+  `)}
 `;
 
 const FormGrid = styled.div`
@@ -871,9 +971,10 @@ const FormGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  `}
+    gap: 1.5rem;
+  `)}
 `;
 
 const FormField = styled.div`
@@ -906,6 +1007,11 @@ const Form = styled.form`
     &[aria-invalid="true"] {
       border-color: #dc3545;
     }
+
+    ${media.tablet(`
+      padding: 1.2rem;
+      font-size: 1.4rem;
+    `)}
   }
 
   label {
@@ -914,6 +1020,10 @@ const Form = styled.form`
     color: rgb(var(--text), 0.8);
     margin-bottom: 0.5rem;
     display: block;
+
+    ${media.tablet(`
+      font-size: 1.2rem;
+    `)}
   }
 `;
 
@@ -946,6 +1056,11 @@ const SubmitBtn = styled.button`
     cursor: not-allowed;
     transform: none;
   }
+
+  ${media.tablet(`
+    padding: 1.5rem;
+    font-size: 1.6rem;
+  `)}
 `;
 
 const StatusMessage = styled.p<{ success: boolean }>`
@@ -957,4 +1072,8 @@ const StatusMessage = styled.p<{ success: boolean }>`
   border-radius: 0.8rem;
   color: ${props => props.success ? 'green' : 'red'};
   margin-bottom: 2rem;
+
+  ${media.tablet(`
+    font-size: 1.4rem;
+  `)}
 `;

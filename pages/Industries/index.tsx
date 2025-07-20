@@ -98,7 +98,7 @@ export default function SectorsPage() {
             >
               <CTATitle>Ready to Partner With Us?</CTATitle>
               <CTADescription>
-                Let’s discuss how our sector-specific analytics solutions can accelerate your growth and performance.
+                Let&apos;s discuss how our sector-specific analytics solutions can accelerate your growth and performance.
               </CTADescription>
               <CTAButton href="/contact">Get Started</CTAButton>
             </motion.div>
@@ -123,15 +123,15 @@ const HeroTitle = styled.h1`
   font-weight: 800;
   margin-bottom: 2rem;
   color: rgb(var(--text));
-  ${media.desktop`font-size: 4.8rem;`}
-  ${media.tablet`font-size: 3.6rem;`}
+  ${media.desktop(`font-size: 4.8rem;`)}
+  ${media.tablet(`font-size: 3.6rem;`)}
 `;
 const HeroDescription = styled.p`
   font-size: 2.2rem;
   color: rgba(var(--text), 0.8);
   max-width: 80rem;
   margin: 0 auto;
-  ${media.tablet`font-size: 1.8rem;`}
+  ${media.tablet(`font-size: 1.8rem;`)}
 `;
 const SectorsSection = styled.section`padding: 10rem 0;`;
 const SectionTitle = styled.h2`
@@ -140,13 +140,13 @@ const SectionTitle = styled.h2`
   text-align: center;
   margin-bottom: 6rem;
   color: rgb(var(--text));
-  ${media.tablet`font-size: 2.8rem; margin-bottom: 4rem;`}
+  ${media.tablet(`font-size: 2.8rem; margin-bottom: 4rem;`)}
 `;
 const SectorGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
   gap: 3rem;
-  ${media.tablet`grid-template-columns: 1fr; gap: 2rem;`}
+  ${media.tablet(`grid-template-columns: 1fr; gap: 2rem;`)}
 `;
 const SectorCard = styled(NextLink)`
   display: block;
@@ -187,13 +187,18 @@ const CTASection = styled.section`
   text-align: center;
   color: white;
 `;
-const CTATitle = styled.h2`font-size: 3.6rem; font-weight: 700; margin-bottom: 2rem; ${media.tablet`font-size: 2.8rem;`}`;
+const CTATitle = styled.h2`
+  font-size: 3.6rem; 
+  font-weight: 700; 
+  margin-bottom: 2rem; 
+  ${media.tablet(`font-size: 2.8rem;`)}
+`;
 const CTADescription = styled.p`
   font-size: 2rem;
   opacity: 0.9;
   margin: 0 auto 4rem;
   max-width: 60rem;
-  ${media.tablet`font-size: 1.8rem;`}
+  ${media.tablet(`font-size: 1.8rem;`)}
 `;
 const CTAButton = styled(NextLink)`
   display: inline-block;

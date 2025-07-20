@@ -13,29 +13,25 @@ const sectors = [
     id: 'healthcare',
     name: 'Healthcare',
     title: 'Healthcare Analytics Solutions',
-    description:
-      'Transform patient care with data-driven insights, compliance reporting, and operational efficiency solutions.',
+    description: 'Transform patient care with data-driven insights, compliance reporting, and operational efficiency solutions.',
   },
   {
     id: 'manufacturing',
     name: 'Manufacturing',
     title: 'Manufacturing Analytics',
-    description:
-      'Optimize production, reduce costs, and improve quality with advanced manufacturing analytics and IoT integration.',
+    description: 'Optimize production, reduce costs, and improve quality with advanced manufacturing analytics and IoT integration.',
   },
   {
     id: 'finance',
     name: 'Finance',
     title: 'Financial Technology Solutions',
-    description:
-      'Risk management, fraud detection, regulatory compliance, and customer insights for financial institutions.',
+    description: 'Risk management, fraud detection, regulatory compliance, and customer insights for financial institutions.',
   },
   {
     id: 'retail',
     name: 'Retail',
     title: 'Retail Analytics Solutions',
-    description:
-      'Customer behavior analysis, inventory optimization, and sales forecasting for retail excellence.',
+    description: 'Customer behavior analysis, inventory optimization, and sales forecasting for retail excellence.',
   },
 ];
 
@@ -110,7 +106,7 @@ export default function SectorsPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <CTATitle>Ready to Accelerate Your Sector’s Success?</CTATitle>
+              <CTATitle>Ready to Accelerate Your Sector&apos;s Success?</CTATitle>
               <CTADescription>
                 Discover how Precise Analytics can help transform your data into measurable outcomes.
               </CTADescription>
@@ -146,13 +142,13 @@ const HeroTitle = styled.h1`
   margin-bottom: 2rem;
   color: rgb(var(--text));
 
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 4.8rem;
-  `}
+  `)}
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 3.6rem;
-  `}
+  `)}
 `;
 
 const HeroDescription = styled.p`
@@ -162,9 +158,9 @@ const HeroDescription = styled.p`
   max-width: 80rem;
   margin: 0 auto;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
-  `}
+  `)}
 `;
 
 const IndustriesSection = styled.section`
@@ -178,10 +174,10 @@ const SectionTitle = styled.h2`
   margin-bottom: 6rem;
   color: rgb(var(--text));
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2.8rem;
     margin-bottom: 4rem;
-  `}
+  `)}
 `;
 
 const IndustryGrid = styled.div`
@@ -191,10 +187,10 @@ const IndustryGrid = styled.div`
   justify-items: center;
   align-items: stretch;
 
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
     gap: 3rem;
-  `}
+  `)}
 `;
 
 const CardWrapper = styled(motion.div)`
@@ -266,9 +262,9 @@ const CTATitle = styled.h2`
   font-weight: 700;
   margin-bottom: 2rem;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2.8rem;
-  `}
+  `)}
 `;
 
 const CTADescription = styled.p`
@@ -280,9 +276,9 @@ const CTADescription = styled.p`
   margin-left: auto;
   margin-right: auto;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
-  `}
+  `)}
 `;
 
 const CTAButton = styled(NextLink)`

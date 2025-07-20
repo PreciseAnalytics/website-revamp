@@ -58,9 +58,9 @@ const ContentWrapper = styled.div`
   box-shadow: 0 30px 60px -15px rgba(var(--accent), 0.15);
   overflow: hidden;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 4rem 2rem;
-  }
+  `)}
 `;
 
 const Title = styled.h2`
@@ -71,9 +71,9 @@ const Title = styled.h2`
   position: relative;
   z-index: 1;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 3rem;
-  }
+  `)}
 `;
 
 const Description = styled.p`
@@ -86,9 +86,9 @@ const Description = styled.p`
   position: relative;
   z-index: 1;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.6rem;
-  }
+  `)}
 `;
 
 const ButtonsGroup = styled.div`
@@ -98,18 +98,18 @@ const ButtonsGroup = styled.div`
   position: relative;
   z-index: 1;
   
-  ${media('<=phone')} {
+  ${media.phone(`
     flex-direction: column;
     align-items: center;
-  }
+  `)}
 `;
 
 const CtaButton = styled(Button)`
   min-width: 20rem;
   
-  ${media('<=phone')} {
+  ${media.phone(`
     width: 100%;
-  }
+  `)}
 `;
 
 const BackgroundElements = styled.div`

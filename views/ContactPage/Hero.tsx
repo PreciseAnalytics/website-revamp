@@ -116,9 +116,9 @@ const HeroWrapper = styled.div`
   padding: 12rem 0 8rem;
   overflow: hidden;
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 10rem 0 6rem;
-  `}
+  `)}
 `;
 
 const Content = styled.div`
@@ -130,9 +130,9 @@ const Content = styled.div`
   width: 100%;
   padding: 0 2rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 0 1rem;
-  `}
+  `)}
 `;
 
 const Title = styled.h1`
@@ -142,13 +142,13 @@ const Title = styled.h1`
   margin: 1rem 0 2.5rem;
   color: rgb(var(--text));
   
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 4.6rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 4rem;
-  `}
+  `)}
   
   @media (max-width: 480px) {
     font-size: 3.4rem;
@@ -167,10 +167,10 @@ const Description = styled.p`
   margin: 0 auto 4rem;
   max-width: 70rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
     margin-bottom: 3rem;
-  `}
+  `)}
 `;
 
 const ContactOptions = styled.div`
@@ -180,10 +180,10 @@ const ContactOptions = styled.div`
   max-width: 60rem;
   margin: 0 auto 3rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     gap: 1.5rem;
     margin-bottom: 2rem;
-  `}
+  `)}
 `;
 
 const ContactOption = styled.div`
@@ -202,21 +202,21 @@ const ContactOption = styled.div`
     transform: translateY(-2px);
   }
   
-  ${media.tablet`
+  ${media.tablet(`
     flex-direction: column;
     text-align: center;
     gap: 1rem;
     padding: 1.5rem;
-  `}
+  `)}
 `;
 
 const OptionIcon = styled.div`
   font-size: 2.5rem;
   flex-shrink: 0;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem;
-  `}
+  `)}
 `;
 
 const OptionText = styled.p`
@@ -230,10 +230,10 @@ const OptionText = styled.p`
     color: rgb(var(--accent));
   }
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.4rem;
     text-align: center;
-  `}
+  `)}
 `;
 
 const SubNote = styled.p`
@@ -243,10 +243,10 @@ const SubNote = styled.p`
   font-style: italic;
   margin: 0 0 2rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.2rem;
     margin-bottom: 1.5rem;
-  `}
+  `)}
 `;
 
 const SectionTitle = styled.h2`
@@ -259,9 +259,9 @@ const SectionTitle = styled.h2`
   -webkit-text-fill-color: transparent;
   background-clip: text;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2.4rem;
-  `}
+  `)}
 `;
 
 const SectionSubtitle = styled.p`
@@ -271,9 +271,9 @@ const SectionSubtitle = styled.p`
   margin-bottom: 2rem;
   line-height: 1.5;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.4rem;
-  `}
+  `)}
 `;
 
 const CalendlySection = styled.div`
@@ -283,9 +283,9 @@ const CalendlySection = styled.div`
   text-align: center;
   margin-top: 4rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     margin-top: 3rem;
-  `}
+  `)}
 `;
 
 const CalendlyContainer = styled.div`
@@ -299,10 +299,10 @@ const CalendlyContainer = styled.div`
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(var(--accent), 0.2);
   
-  ${media.tablet`
+  ${media.tablet(`
     max-width: 100%;
     border-radius: 1.2rem;
-  `}
+  `)}
 `;
 
 const CertificationBadges = styled.div`
@@ -312,10 +312,10 @@ const CertificationBadges = styled.div`
   border-radius: 1.5rem;
   border: 1px solid rgba(var(--accent), 0.1);
   
-  ${media.tablet`
+  ${media.tablet(`
     margin-top: 3rem;
     padding: 2rem;
-  `}
+  `)}
 `;
 
 const CertificationTitle = styled.h3`
@@ -325,9 +325,9 @@ const CertificationTitle = styled.h3`
   margin-bottom: 2rem;
   text-align: center;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem;
-  `}
+  `)}
 `;
 
 const CertificationLogos = styled.div`
@@ -337,9 +337,9 @@ const CertificationLogos = styled.div`
   flex-wrap: wrap;
   align-items: center;
 
-  ${media.tablet`
+  ${media.tablet(`
     gap: 2rem;
-  `}
+  `)}
 `;
 
 const CertificationLogoLink = styled.a`
@@ -363,10 +363,10 @@ const CertificationLogo = styled.img`
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
   }
 
-  ${media.tablet`
+  ${media.tablet(`
     height: 6rem;
     max-width: 10rem;
-  `}
+  `)}
 `;
 
 const BackgroundGlow = styled.div`

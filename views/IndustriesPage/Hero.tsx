@@ -87,15 +87,15 @@ const HeroWrapper = styled.section`
   overflow: hidden;
   background: radial-gradient(circle at 50% 50%, rgba(var(--background-rgb), 0.7), rgba(var(--background-rgb), 1));
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     min-height: 50rem;
     padding: 8rem 0;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     min-height: 45rem;
     padding: 6rem 0;
-  }
+  `)}
 `;
 
 const ContentWrapper = styled.div`
@@ -116,9 +116,9 @@ const CustomOverTitle = styled(OverTitle)`
   margin-bottom: 2rem;
   color: rgb(var(--accent-rgb));
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     margin-bottom: 1.5rem;
-  }
+  `)}
 `;
 
 const Title = styled.h1`
@@ -130,15 +130,15 @@ const Title = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 4rem;
     line-height: 1.3;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     font-size: 3.2rem;
     margin-bottom: 1.5rem;
-  }
+  `)}
 `;
 
 const AccentText = styled.span`
@@ -154,16 +154,16 @@ const Description = styled.p`
   opacity: 0.8;
   max-width: 70rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.6rem;
     margin-bottom: 3rem;
     padding: 0 2rem;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     font-size: 1.5rem;
     margin-bottom: 2.5rem;
-  }
+  `)}
 `;
 
 const HighlightCardsWrapper = styled.div`
@@ -172,16 +172,16 @@ const HighlightCardsWrapper = styled.div`
   gap: 3rem;
   margin-top: 4rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     gap: 2rem;
     margin-top: 3rem;
-  }
+  `)}
   
-  ${media('<=phone')} {
+  ${media.phone(`
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-  }
+  `)}
 `;
 
 const Card = styled.article`
@@ -199,16 +199,16 @@ const Card = styled.article`
     box-shadow: 0 15px 40px -10px rgba(var(--accent-rgb), 0.3);
   }
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 2rem;
     width: 18rem;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     width: 100%;
     max-width: 26rem;
     padding: 1.8rem;
-  }
+  `)}
 `;
 
 const CardIcon = styled.div`
@@ -220,9 +220,9 @@ const CardIcon = styled.div`
     transform: scale(1.1);
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 3rem;
-  }
+  `)}
 `;
 
 const CardText = styled.div`
@@ -238,9 +238,9 @@ const CardValue = styled.span`
   margin-bottom: 0.5rem;
   line-height: 1;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 2.2rem;
-  }
+  `)}
 `;
 
 const CardLabel = styled.span`
@@ -249,7 +249,7 @@ const CardLabel = styled.span`
   opacity: 0.9;
   line-height: 1.4;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.5rem;
-  }
+  `)}
 `;

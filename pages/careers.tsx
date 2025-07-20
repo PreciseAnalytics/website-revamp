@@ -6,7 +6,7 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import AnimatedFooter from 'components/AnimatedFooter';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
-import { media } from 'utils/media';
+import { media, mq } from 'utils/media';
 
 const jobs = [
   {
@@ -307,9 +307,7 @@ const PageTitle = styled.h1`
   text-align: center;
   margin-bottom: 1rem;
 
-  ${media.tablet} {
-    font-size: 3.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 3.6rem;')}
 `;
 
 const PageSubtitle = styled.p`
@@ -332,9 +330,9 @@ const FormWrapper = styled.div`
   max-width: 80rem;
   margin: 0 auto;
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     padding: 3rem 2rem;
-  }
+  `)}
 `;
 
 const FormTitle = styled.h2`
@@ -357,9 +355,7 @@ const FormGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const FileUploadGrid = styled.div`
@@ -367,9 +363,7 @@ const FileUploadGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const FileUploadWrapper = styled.div`
@@ -471,9 +465,7 @@ const JobCardsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
   gap: 3rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const JobCard = styled.div`

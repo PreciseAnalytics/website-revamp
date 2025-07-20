@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import Container from '../../components/Container';
-import { media } from '../../utils/media';
+import Container from 'components/Container';
+import { media } from 'utils/media';
 
 const industryData = {
   healthcare: {
@@ -81,9 +81,9 @@ const Wrapper = styled.div`
 const Title = styled.h1`
   font-size: 3.2rem;
   margin-bottom: 2rem;
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 2.8rem;
-  }
+  `)}
 `;
 
 const Description = styled.p`

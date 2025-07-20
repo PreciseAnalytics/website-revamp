@@ -53,7 +53,7 @@ export default function Testimonials() {
                   width={200}
                   height={40}
                 />
-                <Content>“{singleTestimonial.content}”</Content>
+                <Content>"{singleTestimonial.content}"</Content>
                 <AuthorContainer>
                   <AuthorImageContainer>
                     <NextImage src={singleTestimonial.author.avatarUrl} alt={singleTestimonial.author.name} width={48} height={48} />
@@ -80,9 +80,9 @@ const TestimonialsWrapper = styled(Container)`
   .swiper-button-next {
     color: rgb(var(--secondary));
 
-    ${media('<=desktop')} {
+    ${media.desktop(`
       display: none;
-    }
+    `)}
   }
 
   .swiper-button-prev {
@@ -113,9 +113,9 @@ const Content = styled.blockquote`
   font-style: italic;
   max-width: 60%;
 
-  ${media('<=desktop')} {
+  ${media.desktop(`
     max-width: 100%;
-  }
+  `)}
 `;
 
 const AuthorContainer = styled.div`

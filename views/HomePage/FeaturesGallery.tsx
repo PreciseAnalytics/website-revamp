@@ -99,9 +99,9 @@ const GalleryWrapper = styled.div`
   align-items: center;
   margin-top: 4rem;
 
-  ${media('<=desktop')} {
+  ${media.desktop(`
     flex-direction: column;
-  }
+  `)}
 `;
 
 const Content = styled.div`
@@ -119,18 +119,22 @@ const TabsContainer = styled.div`
     margin-top: 2rem;
   }
 
-  ${media('<=desktop')} {
+  ${media.desktop(`
     margin-right: 0;
     margin-bottom: 4rem;
     width: 100%;
-  }
+  `)}
 `;
 
-const ImageContainer = styled.div<{ isActive: boolean }>`
+interface ImageContainerProps {
+  isActive: boolean;
+}
+
+const ImageContainer = styled.div<ImageContainerProps>`
   position: relative;
   overflow: hidden;
   border-radius: 0.8rem;
-  flex: ${(p) => (p.isActive ? '2' : '0')};
+  flex: ${(p: ImageContainerProps) => (p.isActive ? '2' : '0')};
   box-shadow: var(--shadow-md);
 
   &:before {
@@ -148,18 +152,22 @@ const ImageContainer = styled.div<{ isActive: boolean }>`
     left: 0;
   }
 
-  ${media('<=desktop')} {
-    width: ${(p) => (p.isActive ? '100%' : '0')};
-  }
+  ${media.desktop(`
+    width: ${(p: ImageContainerProps) => (p.isActive ? '100%' : '0')};
+  `)}
 `;
 
-const Tab = styled.div<{ isActive: boolean }>`
+interface TabProps {
+  isActive: boolean;
+}
+
+const Tab = styled.div<TabProps>`
   display: flex;
   flex-direction: column;
   padding: 2rem 1.5rem;
   background: rgb(var(--cardBackground));
   box-shadow: var(--shadow-md);
-  opacity: ${(p) => (p.isActive ? 1 : 0.6)};
+  opacity: ${(p: TabProps) => (p.isActive ? 1 : 0.6)};
   cursor: pointer;
   border-radius: 0.6rem;
   transition: opacity 0.2s;
@@ -167,9 +175,9 @@ const Tab = styled.div<{ isActive: boolean }>`
   font-size: 1.6rem;
   font-weight: bold;
 
-  ${media('<=desktop')} {
+  ${media.desktop(`
     width: 100%;
-  }
+  `)}
 `;
 
 const TabTitleContainer = styled.div`
@@ -189,9 +197,9 @@ const TabContent = styled.div`
   font-size: 1.5rem;
   padding-left: calc(5rem + 1.5rem);
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding-left: calc(4rem + 1.25rem);
-  }
+  `)}
 
   p {
     font-weight: normal;
@@ -201,7 +209,7 @@ const TabContent = styled.div`
 const CircleContainer = styled.div`
   flex: 0 calc(5rem + 1.5rem);
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     flex: 0 calc(4rem + 1.25rem);
-  }
+  `)}
 `;

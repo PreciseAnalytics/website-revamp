@@ -122,11 +122,11 @@ const HeroWrapper = styled(Container)`
   padding-bottom: 5rem;
   position: relative;
   
-  ${media.desktop`
+  ${media.desktop(`
     padding-top: 3rem;
     flex-direction: column;
     align-items: center;
-  `}
+  `)}
 `;
 
 const BackgroundContainer = styled.div`
@@ -144,17 +144,17 @@ const Contents = styled.div`
   max-width: 60rem;
   z-index: 10;
   
-  ${media.desktop`
+  ${media.desktop(`
     max-width: 100%;
-  `}
+  `)}
 `;
 
 const CustomButtonGroup = styled(ButtonGroup)`
   margin-top: 4rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     margin-top: 3rem;
-  `}
+  `)}
 `;
 
 const ImageContainer = styled.div`
@@ -168,13 +168,13 @@ const ImageContainer = styled.div`
     max-width: 45rem;
   }
 
-  ${media.desktop`
+  ${media.desktop(`
     margin-top: 5rem;
     justify-content: center;
     svg {
       max-width: 80%;
     }
-  `}
+  `)}
 `;
 
 const Description = styled.p`
@@ -183,13 +183,13 @@ const Description = styled.p`
   line-height: 1.6;
   margin-top: 2.5rem;
 
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 1.8rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;
 
 const CustomHeadingTagline = styled.h2`
@@ -202,9 +202,9 @@ const CustomHeadingTagline = styled.h2`
   position: relative;
   display: inline-block;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;
 
 const Heading = styled.h1`
@@ -213,9 +213,9 @@ const Heading = styled.h1`
   line-height: 1.1;
   letter-spacing: -0.03em;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 4.6rem;
-  `}
+  `)}
 `;
 
 const HighlightText = styled.span`
@@ -239,10 +239,10 @@ const CertificationsContainer = styled.div`
   gap: 2rem;
   margin-top: 4rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     margin-top: 3rem;
     gap: 1.5rem;
-  `}
+  `)}
 `;
 
 const CertificationBadge = styled(motion.div)`

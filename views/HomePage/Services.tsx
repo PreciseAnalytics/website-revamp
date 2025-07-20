@@ -111,9 +111,9 @@ const ServicesWrapper = styled.div`
   padding: 10rem 0;
   position: relative;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 8rem 0;
-  }
+  `)}
 `;
 
 const Subtitle = styled.p`
@@ -124,10 +124,10 @@ const Subtitle = styled.p`
   margin: 0 auto;
   margin-bottom: 6rem;
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.8rem;
     margin-bottom: 4rem;
-  }
+  `)}
 `;
 
 const ServicesGrid = styled.div`
@@ -135,11 +135,11 @@ const ServicesGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 3rem;
   
-  ${media('<=desktop')} {
+  ${media.desktop(`
     grid-template-columns: repeat(2, 1fr);
-  }
+  `)}
   
-  ${media('<=tablet')} {
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  }
+  `)}
 `;

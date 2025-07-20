@@ -30,13 +30,13 @@ export default function BlogIndexPage({ posts }: InferGetStaticPropsType<typeof 
 const CustomAutofitGrid = styled(AutofitGrid)`
   --autofit-grid-item-size: 40rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     --autofit-grid-item-size: 30rem;
-  }
+  `)}
 
-  ${media('<=phone')} {
+  ${media.phone(`
     --autofit-grid-item-size: 100%;
-  }
+  `)}
 
   .article-card-wrapper {
     max-width: 100%;

@@ -132,7 +132,6 @@ export default function SolutionsPage() {
     setIsSubmitting(true);
     setSubmitSuccess(null);
 
-    // Simulate async submission
     setTimeout(() => {
       console.log('Submitted:', contactData);
       setIsSubmitting(false);
@@ -173,7 +172,6 @@ export default function SolutionsPage() {
             <PageSubtitle>Transforming data into actionable insights that drive mission success.</PageSubtitle>
           </motion.div>
 
-          {/* Solutions Section */}
           <SolutionsSection>
             <SectionTitle>Our Solutions</SectionTitle>
             <SectionSubtitle>Comprehensive analytics tools and technologies tailored to your needs</SectionSubtitle>
@@ -206,7 +204,6 @@ export default function SolutionsPage() {
             </SolutionCardsGrid>
           </SolutionsSection>
 
-          {/* Industries Section */}
           <IndustriesSection>
             <SectionTitle>Industries We Serve</SectionTitle>
             <SectionSubtitle>Specialized expertise across key sectors</SectionSubtitle>
@@ -233,7 +230,6 @@ export default function SolutionsPage() {
             </IndustriesGrid>
           </IndustriesSection>
 
-          {/* Contact Form Section */}
           <ContactSection id="contact-form">
             <FormWrapper>
               <FormTitle>Start Your Project</FormTitle>
@@ -361,7 +357,7 @@ export default function SolutionsPage() {
   );
 }
 
-// === Styled Components ===
+// Styled Components with fixed media queries
 const PageWrapper = styled.div`
   padding: 4rem 0;
 `;
@@ -376,9 +372,9 @@ const PageTitle = styled.h1`
   text-align: center;
   margin-bottom: 1rem;
 
-  ${media.tablet} {
+  ${media.tablet(`
     font-size: 3.6rem;
-  }
+  `)}
 `;
 
 const PageSubtitle = styled.p`
@@ -388,7 +384,6 @@ const PageSubtitle = styled.p`
   color: rgb(var(--text), 0.8);
 `;
 
-// Solutions Section Styles
 const SolutionsSection = styled.section`
   margin-top: 8rem;
 `;
@@ -413,9 +408,9 @@ const SolutionCardsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
   gap: 3rem;
 
-  ${media.tablet} {
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  }
+  `)}
 `;
 
 const SolutionCard = styled.div`
@@ -517,7 +512,6 @@ const GetStartedButton = styled.button`
   }
 `;
 
-// Industries Section Styles
 const IndustriesSection = styled.section`
   margin-top: 8rem;
 `;
@@ -527,9 +521,9 @@ const IndustriesGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
   gap: 2.5rem;
 
-  ${media.tablet} {
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  }
+  `)}
 `;
 
 const IndustryCard = styled.div`
@@ -596,7 +590,6 @@ const ExpertiseItem = styled.li`
   }
 `;
 
-// Contact Form Styles
 const ContactSection = styled.section`
   margin-top: 8rem;
   margin-bottom: 8rem;
@@ -610,9 +603,9 @@ const FormWrapper = styled.div`
   max-width: 80rem;
   margin: 0 auto;
 
-  ${media.tablet} {
+  ${media.tablet(`
     padding: 3rem 2rem;
-  }
+  `)}
 `;
 
 const FormTitle = styled.h2`
@@ -635,9 +628,9 @@ const FormGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 
-  ${media.tablet} {
+  ${media.tablet(`
     grid-template-columns: 1fr;
-  }
+  `)}
 `;
 
 const Form = styled.form`

@@ -182,7 +182,8 @@ const CustomContainer = styled(Container)`
   max-width: 90rem;
   margin: 10rem auto;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     margin: 5rem auto;
-  }
+  `)}
 `;
+

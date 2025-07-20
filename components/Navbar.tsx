@@ -111,15 +111,15 @@ const NavItemList = styled.div`
   display: flex;
   list-style: none;
 
-  ${media('<desktop')} {
+  ${media.desktop(`
     display: none;
-  }
+  `)}
 `;
 
 const HamburgerMenuWrapper = styled.div`
-  ${media('>=desktop')} {
+  ${media.desktop(`
     display: none;
-  }
+  `)}
 `;
 
 const LogoWrapper = styled.a`
@@ -128,24 +128,23 @@ const LogoWrapper = styled.a`
   margin-right: auto;
   text-decoration: none;
   color: rgb(var(--logoColor));
-  
-  /* Ensure logo scales properly on mobile */
+
   img {
     max-height: 6.5rem;
     width: auto;
   }
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     img {
       max-height: 5rem;
     }
-  }
-  
-  ${media('<=phone')} {
+  `)}
+
+  ${media.phone(`
     img {
       max-height: 4rem;
     }
-  }
+  `)}
 `;
 
 const NavItemWrapper = styled.li<Partial<SingleNavItem>>`

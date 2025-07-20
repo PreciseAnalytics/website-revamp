@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
@@ -63,14 +64,34 @@ export default function TeamPage() {
             {teamMembers.map((member, index) => (
               <TeamCard key={index}>
                 <ImageWrapper>
-                  <img src={member.image} alt={member.name} />
+                  <Image 
+                    src={member.image} 
+                    alt={member.name} 
+                    width={120}
+                    height={120}
+                    style={{
+                      objectFit: 'contain',
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
                 </ImageWrapper>
                 <Name>{member.name}</Name>
                 <Title>{member.title}</Title>
                 <Bio>{member.bio}</Bio>
                 {member.linkedin && (
                   <LinkedInLink href={member.linkedin} target="_blank" rel="noopener noreferrer">
-                    <img src="/linkedin-icon.svg" alt="LinkedIn" width="24" height="24" />
+                    <Image 
+                      src="/linkedin-icon.svg" 
+                      alt="LinkedIn" 
+                      width={24}
+                      height={24}
+                      style={{
+                        display: 'block',
+                        width: '24px',
+                        height: '24px'
+                      }}
+                    />
                   </LinkedInLink>
                 )}
               </TeamCard>
@@ -132,12 +153,6 @@ const ImageWrapper = styled.div`
   margin: 0 auto 1.5rem;
   overflow: hidden;
   border: 3px solid rgb(0, 153, 255);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
 `;
 
 const Name = styled.h3`
@@ -163,10 +178,4 @@ const Bio = styled.p`
 const LinkedInLink = styled.a`
   display: inline-block;
   margin-top: 1rem;
-
-  img {
-    display: block;
-    width: 24px;
-    height: 24px;
-  }
 `;

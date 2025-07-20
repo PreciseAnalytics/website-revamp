@@ -21,9 +21,9 @@ const OverTitle = styled.span`
   line-height: 0;
   text-transform: uppercase;
 
-  ${media.desktop`
+  ${media.desktop(`
     line-height: 1.5;
-  `}
+  `)}
 `;
 
 export default OverTitle;

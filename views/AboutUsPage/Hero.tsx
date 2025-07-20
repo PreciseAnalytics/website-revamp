@@ -27,8 +27,6 @@ export default function AboutUsHero() {
               help organizations unlock the full potential of their data.
             </Description>
           </motion.div>
-          
-          {/* Stats container has been removed as requested */}
         </Content>
       </Container>
     </HeroWrapper>
@@ -40,9 +38,9 @@ const HeroWrapper = styled.div`
   padding: 12rem 0 6rem;
   overflow: hidden;
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 10rem 0 6rem;
-  `}
+  `)}
 `;
 
 const Content = styled.div`
@@ -56,13 +54,13 @@ const StyledOverTitle = styled(OverTitle)`
   color: #ff8c00 !important;
   font-weight: 600;
   
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 2.2rem !important;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem !important;
-  `}
+  `)}
   
   @media (max-width: 480px) {
     font-size: 1.8rem !important;
@@ -76,13 +74,13 @@ const Title = styled.h1`
   margin: 1rem 0 2.5rem;
   color: rgb(var(--text));
   
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 4.6rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 4rem;
-  `}
+  `)}
   
   @media (max-width: 480px) {
     font-size: 3.4rem;
@@ -101,10 +99,10 @@ const Description = styled.p`
   margin: 0 auto 4rem;
   max-width: 80rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
     max-width: 60rem;
-  `}
+  `)}
 `;
 
 const StatsContainer = styled.div`
@@ -113,14 +111,14 @@ const StatsContainer = styled.div`
   gap: 6rem;
   margin-top: 6rem;
   
-  ${media.desktop`
+  ${media.desktop(`
     gap: 4rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     flex-wrap: wrap;
     gap: 3rem;
-  `}
+  `)}
 `;
 
 const StatItem = styled(motion.div)`
@@ -135,13 +133,13 @@ const StatNumber = styled.div`
   color: rgb(var(--accent));
   line-height: 1;
   
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 4rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 3.6rem;
-  `}
+  `)}
 `;
 
 const StatLabel = styled.div`
@@ -149,7 +147,7 @@ const StatLabel = styled.div`
   color: rgb(var(--text));
   margin-top: 1rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;

@@ -97,11 +97,11 @@ const ContentStack = styled.div`
     margin-top: 3rem;
   }
 
-  ${media.tablet`
+  ${media.tablet(`
     & > *:not(:first-child) {
       margin-top: 2rem;
     }
-  `}
+  `)}
 `;
 
 const StyledSectionTitle = styled(SectionTitle)`
@@ -116,9 +116,9 @@ const Description = styled.p`
   color: rgba(255, 255, 255, 0.9);
   margin: 0 auto;
 
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.6rem;
-  `}
+  `)}
 `;
 
 const PrimaryButton = styled(Button)`
@@ -175,11 +175,11 @@ const TrustBadges = styled.div`
   flex-wrap: wrap;
   justify-content: center;
 
-  ${media.tablet`
+  ${media.tablet(`
     flex-direction: column;
     gap: 1.5rem;
     margin-top: 3rem;
-  `}
+  `)}
 `;
 
 const TrustBadge = styled(motion.div)`
@@ -197,10 +197,10 @@ const TrustBadge = styled(motion.div)`
     background: rgba(255, 255, 255, 0.2);
   }
 
-  ${media.tablet`
+  ${media.tablet(`
     padding: 0.8rem 1.8rem;
     font-size: 1.3rem;
-  `}
+  `)}
 `;
 
 const Checkmark = styled.svg`

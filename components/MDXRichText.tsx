@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { TinaMarkdown } from '@tinacms/markdown';
-import type { TinaMarkdownContent, Components } from '@tinacms/markdown';
+import { TinaMarkdown } from 'tinacms/dist/rich-text';
+import type { TinaMarkdownContent } from 'tinacms/dist/rich-text';
 import { mq } from 'utils/media';
 import ArticleImage from './ArticleImage';
 import Code from './Code';
@@ -103,14 +103,13 @@ const TextHighlight = styled.code`
 `;
 
 const components = {
-  h2: SecondHeading,
-  h3: ThirdHeading,
-  p: Paragraph,
-  br: Break,
-  inlineCode: TextHighlight,
-  img: ArticleImage,
-  a: Link,
-  code: Code,
-  blockquote: Quote,
-  ArticleImage,
+  h2: (props: any) => <SecondHeading {...props} />,
+  h3: (props: any) => <ThirdHeading {...props} />,
+  p: (props: any) => <Paragraph {...props} />,
+  br: (props: any) => <Break {...props} />,
+  inlineCode: (props: any) => <TextHighlight {...props} />,
+  img: (props: any) => <ArticleImage {...props} />,
+  a: (props: any) => <Link {...props} />,
+  code: (props: any) => <Code {...props} />,
+  blockquote: (props: any) => <Quote {...props} />,
 };

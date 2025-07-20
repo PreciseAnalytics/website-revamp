@@ -4,10 +4,9 @@ import { useState, useRef } from 'react';
 import Container from 'components/Container';
 import Button from 'components/Button';
 import Input from 'components/Input';
-import { media } from 'utils/media'; // Ensure this exports an object like { desktop: ..., tablet: ... }
+import { media } from 'utils/media';
 import { EnvVars } from 'env';
 
-// Define interfaces for type safety
 interface FormState {
   firstName: string;
   lastName: string;
@@ -37,13 +36,10 @@ export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
 
-  // File size limit (e.g., 5MB)
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
   const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
       ...prev,
@@ -109,7 +105,7 @@ export default function ContactForm() {
         });
         setSelectedFile(null);
         if (fileInputRef.current) {
-          fileInputRef.current.value = ''; // Reset file input
+          fileInputRef.current.value = '';
         }
       } else {
         setSubmitResult({
@@ -274,7 +270,6 @@ export default function ContactForm() {
               </a>
             </InfoSection>
 
-
             <InfoSection>
               <InfoTitle>Follow Us</InfoTitle>
               <SocialLinks>
@@ -311,8 +306,6 @@ export default function ContactForm() {
   );
 }
 
-// --- Styled Components ---
-
 const Wrapper = styled.div`
   padding: 10rem 0;
   background: radial-gradient(circle at 50% 0%, rgba(var(--background), 0.8), rgba(var(--background), 1) 70%);
@@ -323,10 +316,10 @@ const ContentWrapper = styled.div`
   grid-template-columns: 1.5fr 1fr;
   gap: 6rem;
 
-  ${media.desktop} {
+  ${media.desktop(`
     grid-template-columns: 1fr;
     gap: 4rem;
-  }
+  `)}
 `;
 
 const FormContainer = styled(motion.div)`
@@ -337,9 +330,9 @@ const FormContainer = styled(motion.div)`
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(var(--primary), 0.1);
 
-  ${media.tablet} {
+  ${media.tablet(`
     padding: 3rem;
-  }
+  `)}
 `;
 
 const FormTitle = styled.h2`
@@ -367,10 +360,10 @@ const FormRow = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
 
-  ${media.tablet} {
+  ${media.tablet(`
     grid-template-columns: 1fr;
     gap: 1rem;
-  }
+  `)}
 `;
 
 const InputContainer = styled.div`
@@ -471,9 +464,9 @@ const InfoContainer = styled(motion.div)`
   gap: 4rem;
   justify-content: center;
 
-  ${media.desktop} {
+  ${media.desktop(`
     gap: 3rem;
-  }
+  `)}
 `;
 
 const InfoSection = styled.div`

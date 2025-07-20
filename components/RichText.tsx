@@ -35,12 +35,12 @@ const RichText = styled.div`
 
   table {
     border-collapse: collapse;
-
     table-layout: fixed;
     border-spacing: 0;
     border-radius: 5px;
     border-collapse: separate;
   }
+
   th {
     background: rgb(var(--textSecondary));
   }
@@ -55,9 +55,9 @@ const RichText = styled.div`
     background: rgb(var(--textSecondary));
   }
 
-  ${media('<=desktop')} {
+  ${media.desktop(`
     font-size: 1.5rem;
-  }
+  `)}
 `;
 
 export default RichText;

@@ -124,9 +124,9 @@ const WhyChooseUsWrapper = styled.section`
   position: relative;
   z-index: 1;
   
-  ${media.tablet`
+  ${media.tablet(`
     padding: 10rem 0;
-  `}
+  `)}
 `;
 
 const Subtitle = styled.h3`
@@ -136,13 +136,13 @@ const Subtitle = styled.h3`
   text-align: center;
   margin: 3rem 0 2rem;
   
-  ${media.desktop`
+  ${media.desktop(`
     font-size: 2.6rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2.4rem;
-  `}
+  `)}
 `;
 
 const Description = styled.p`
@@ -153,10 +153,10 @@ const Description = styled.p`
   max-width: 80rem;
   margin: 0 auto 5rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 1.8rem;
     max-width: 100%;
-  `}
+  `)}
 `;
 
 const SubTitle = styled.h4`
@@ -166,9 +166,9 @@ const SubTitle = styled.h4`
   text-align: center;
   margin-bottom: 4rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2.2rem;
-  `}
+  `)}
 `;
 
 const FeatureGrid = styled.div`
@@ -178,15 +178,15 @@ const FeatureGrid = styled.div`
   max-width: 120rem;
   margin: 0 auto;
   
-  ${media.desktop`
+  ${media.desktop(`
     gap: 4rem;
-  `}
+  `)}
   
-  ${media.tablet`
+  ${media.tablet(`
     grid-template-columns: 1fr;
     max-width: 55rem;
     gap: 3rem;
-  `}
+  `)}
 `;
 
 const FeatureItem = styled.div`
@@ -201,10 +201,10 @@ const FeatureIcon = styled.svg`
   color: rgb(255, 125, 0);
   flex-shrink: 0;
   
-  ${media.tablet`
+  ${media.tablet(`
     width: 4.5rem;
     height: 4.5rem;
-  `}
+  `)}
 `;
 
 const FeatureTitle = styled.h5`
@@ -213,9 +213,9 @@ const FeatureTitle = styled.h5`
   color: rgb(var(--text));
   margin-bottom: 1rem;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem;
-  `}
+  `)}
 `;
 
 const FeatureDescription = styled.p`
@@ -235,8 +235,8 @@ const ClosingStatement = styled.p`
   margin-left: auto;
   margin-right: auto;
   
-  ${media.tablet`
+  ${media.tablet(`
     font-size: 2rem;
     margin-top: 4rem;
-  `}
+  `)}
 `;

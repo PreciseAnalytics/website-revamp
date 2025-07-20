@@ -104,9 +104,9 @@ const CardWrapper = styled(motion.article)`
     border-color: rgba(var(--accent-rgb), 0.3);
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     border-radius: 1rem;
-  }
+  `)}
 `;
 
 const CardImageWrapper = styled.div`
@@ -114,9 +114,9 @@ const CardImageWrapper = styled.div`
   height: 20rem;
   overflow: hidden;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     height: 16rem;
-  }
+  `)}
 `;
 
 const ImageOverlay = styled.div`
@@ -135,9 +135,9 @@ const CardContent = styled.div`
   display: flex;
   flex-direction: column;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 1.8rem;
-  }
+  `)}
 `;
 
 const IconWrapper = styled.div`
@@ -152,12 +152,12 @@ const IconWrapper = styled.div`
   border-radius: 1rem;
   color: rgb(var(--accent-rgb));
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 3rem;
     height: 4.5rem;
     width: 4.5rem;
     margin-bottom: 1.5rem;
-  }
+  `)}
 `;
 
 const CardTitle = styled.h3`
@@ -169,9 +169,9 @@ const CardTitle = styled.h3`
   -webkit-text-fill-color: transparent;
   line-height: 1.3;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 2rem;
-  }
+  `)}
 `;
 
 const CardDescription = styled.p`
@@ -182,10 +182,10 @@ const CardDescription = styled.p`
   opacity: 0.8;
   flex-grow: 1;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
-  }
+  `)}
 `;
 
 const BenefitsList = styled.ul`
@@ -193,9 +193,9 @@ const BenefitsList = styled.ul`
   padding: 0;
   margin: 0 0 2.5rem;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     margin-bottom: 2rem;
-  }
+  `)}
 `;
 
 const BenefitItem = styled(motion.li)`
@@ -206,9 +206,9 @@ const BenefitItem = styled(motion.li)`
   color: rgb(var(--text-rgb));
   line-height: 1.4;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.4rem;
-  }
+  `)}
 `;
 
 const BenefitIcon = styled.span`
@@ -253,7 +253,7 @@ const LearnMoreButton = styled.button`
     transform: translateY(0);
   }
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     padding: 1rem 2rem;
-  }
+  `)}
 `;

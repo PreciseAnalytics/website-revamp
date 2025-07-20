@@ -17,10 +17,10 @@ const ThreeLayersCircle = styled.div<ThreeLayersCircleProps>`
   z-index: 0;
   transition: background 0.2s;
 
-  ${media('<=tablet')} {
+  ${media.tablet(`
     width: 4rem;
     height: 4rem;
-  }
+  `)}
 
   &:after,
   &:before {

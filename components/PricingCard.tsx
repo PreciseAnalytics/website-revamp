@@ -11,7 +11,13 @@ interface PricingCardProps {
   isOutlined?: boolean;
 }
 
-export default function PricingCard({ title, description, benefits, isOutlined, children }: PropsWithChildren<PricingCardProps>) {
+export default function PricingCard({
+  title,
+  description,
+  benefits,
+  isOutlined,
+  children,
+}: PropsWithChildren<PricingCardProps>) {
   const isAnyBenefitPresent = benefits?.length;
 
   return (
@@ -48,11 +54,11 @@ const Wrapper = styled.div<{ isOutlined?: boolean }>`
     margin-top: 1rem;
   }
 
-  ${media('<=desktop')} {
+  ${media.desktop(`
     box-shadow: var(--shadow-md);
     transform: none;
-    order: ${(p) => (p.isOutlined ? -1 : 0)};
-  }
+    order: ${(p: { isOutlined?: boolean }) => (p.isOutlined ? -1 : 0)};
+  `)}
 `;
 
 const Title = styled.h3`

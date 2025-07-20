@@ -7,14 +7,14 @@ import Separator from 'components/Separator';
 import { media } from 'utils/media';
 import SolutionCard from './SolutionCard';
 
-// Solution categories with their specific solutions
+// Solution categories with properly escaped strings
 const solutionCategories = [
   {
     id: 'etl-integration',
     name: 'ETL & Data Integration',
     description: 'Seamlessly connect your data from multiple sources into a unified, clean, and reliable format. Our ETL solutions streamline data extraction, transformation, and loading processes to power real-time analytics and informed decision-making.',
     icon: '🔄',
-    accentColor: '0, 120, 255', // Blue
+    accentColor: '0, 120, 255',
     solutions: [
       {
         title: 'Data Pipeline Automation',
@@ -45,12 +45,12 @@ const solutionCategories = [
     name: 'Custom Dashboards',
     description: 'Transform complex data into intuitive, interactive dashboards tailored to your business needs. From executive overviews to detailed operational metrics, we deliver visualizations that make insights accessible to every stakeholder.',
     icon: '📊',
-    accentColor: '0, 200, 83', // Green
+    accentColor: '0, 200, 83',
     solutions: [
       {
         title: 'Executive Dashboards',
         description: 'High-level strategic insights and KPI monitoring for leadership teams.',
-        icon: '�',
+        icon: '👔',
         features: [
           'Real-time business performance metrics',
           'Interactive data exploration tools',
@@ -74,9 +74,9 @@ const solutionCategories = [
   {
     id: 'ai-ml-solutions',
     name: 'AI & ML Solutions',
-    description: 'Leverage the power of artificial intelligence and machine learning to forecast trends, detect anomalies, and automate complex tasks. Our models are customized to your data and goals—whether you\'re improving customer targeting, predicting resource needs, or enhancing decision-making.',
+    description: `Leverage the power of artificial intelligence and machine learning to forecast trends, detect anomalies, and automate complex tasks. Our models are customized to your data and goals—whether you're improving customer targeting, predicting resource needs, or enhancing decision-making.`,
     icon: '🤖',
-    accentColor: '147, 51, 234', // Purple
+    accentColor: '147, 51, 234',
     solutions: [
       {
         title: 'Predictive Analytics',
@@ -105,14 +105,14 @@ const solutionCategories = [
   {
     id: 'data-strategy',
     name: 'Data Strategy',
-    description: 'Build a scalable data foundation with our expert guidance on governance, architecture, and analytics maturity. We help you define a clear roadmap to harness your data as a strategic asset—aligning technology, people, and processes.',
+    description: `Build a scalable data foundation with our expert guidance on governance, architecture, and analytics maturity. We help you define a clear roadmap to harness your data as a strategic asset—aligning technology, people, and processes.`,
     icon: '🎯',
-    accentColor: '255, 125, 0', // Orange
+    accentColor: '255, 125, 0',
     solutions: [
       {
         title: 'Data Governance',
         description: 'Establish comprehensive data governance frameworks and policies.',
-        icon: '�',
+        icon: '🛡️',
         features: [
           'Data quality standards and policies',
           'Compliance and regulatory frameworks',
@@ -122,7 +122,7 @@ const solutionCategories = [
       },
       {
         title: 'Analytics Maturity Assessment',
-        description: 'Evaluate and improve your organization\'s analytics capabilities.',
+        description: `Evaluate and improve your organization's analytics capabilities.`,
         icon: '📈',
         features: [
           'Current state analytics assessment',
@@ -137,8 +137,6 @@ const solutionCategories = [
 
 export default function SolutionsContent() {
   const [activeCategory, setActiveCategory] = useState(solutionCategories[0].id);
-  
-  // Get active category data
   const activeCategoryData = solutionCategories.find(cat => cat.id === activeCategory);
   
   return (
@@ -152,7 +150,7 @@ export default function SolutionsContent() {
         </ContentHeader>
         
         <CategoryTabs>
-          {solutionCategories.map((category, index) => (
+          {solutionCategories.map((category) => (
             <CategoryTab 
               key={category.id}
               isActive={activeCategory === category.id}
@@ -324,6 +322,7 @@ export default function SolutionsContent() {
   );
 }
 
+// Styled components with fixed media queries
 const Wrapper = styled.div`
   padding: 8rem 0;
   background: radial-gradient(
@@ -352,10 +351,10 @@ const CategoryTabs = styled.div`
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 4rem;
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     gap: 1rem;
-  }
+  `)}
 `;
 
 const CategoryTab = styled.button<{ isActive: boolean; accentColor: string }>`
@@ -385,31 +384,31 @@ const CategoryTab = styled.button<{ isActive: boolean; accentColor: string }>`
     background: rgba(${(p) => p.accentColor}, 0.1);
     border-color: rgba(${(p) => p.accentColor}, 0.3);
   }
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     padding: 0.8rem 1.5rem;
     font-size: 1.5rem;
-  }
-  
-  ${media('<=phone')} {
+  `)}
+
+  ${media.phone(`
     width: 100%;
     justify-content: center;
-  }
+  `)}
 `;
 
 const TabIcon = styled.span`
   font-size: 2rem;
   margin-right: 1rem;
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     font-size: 1.8rem;
-  }
+  `)}
 `;
 
 const TabName = styled.span`
-  ${media('<=tablet')} {
+  ${media.tablet(`
     font-size: 1.4rem;
-  }
+  `)}
 `;
 
 const ActiveIndicator = styled(motion.div)`
@@ -442,10 +441,10 @@ const CategoryTitle = styled.h3`
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: rgb(var(--text));
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     font-size: 2.6rem;
-  }
+  `)}
 `;
 
 const CategoryText = styled.p`
@@ -454,10 +453,10 @@ const CategoryText = styled.p`
   color: rgb(var(--text));
   opacity: 0.8;
   max-width: 70rem;
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     font-size: 1.6rem;
-  }
+  `)}
 `;
 
 const SolutionsGrid = styled.div`
@@ -468,15 +467,15 @@ const SolutionItemsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 3rem;
-  
-  ${media('<=desktop')} {
+
+  ${media.desktop(`
     grid-template-columns: repeat(2, 1fr);
-  }
-  
-  ${media('<=tablet')} {
+  `)}
+
+  ${media.tablet(`
     grid-template-columns: 1fr;
     gap: 2.5rem;
-  }
+  `)}
 `;
 
 const TechnologySection = styled.div`
@@ -490,10 +489,10 @@ const TechDescription = styled.p`
   opacity: 0.8;
   max-width: 70rem;
   margin: 2rem auto 5rem;
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     font-size: 1.6rem;
-  }
+  `)}
 `;
 
 const TechCategoriesWrapper = styled.div`
@@ -524,15 +523,15 @@ const TechItemsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
   gap: 3rem;
-  
-  ${media('<=tablet')} {
+
+  ${media.tablet(`
     grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
     gap: 2rem;
-  }
-  
-  ${media('<=phone')} {
+  `)}
+
+  ${media.phone(`
     grid-template-columns: 1fr;
-  }
+  `)}
 `;
 
 const TechItem = styled.div`

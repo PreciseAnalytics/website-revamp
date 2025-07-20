@@ -6,9 +6,9 @@ const Separator = styled.div`
   border: 1px solid rgba(var(--secondary), 0.025);
   height: 0px;
 
-  ${media.tablet`
+  ${media.tablet(`
     margin: 7.5rem 0;
-  `}
+  `)}
 `;
 
 export default Separator;

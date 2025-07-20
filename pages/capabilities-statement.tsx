@@ -5,7 +5,7 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import AnimatedFooter from 'components/AnimatedFooter';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
-import { media } from 'utils/media';
+import { media, mq } from 'utils/media';
 import Link from 'next/link';
 
 
@@ -449,9 +449,7 @@ const HeroTitle = styled.h1`
   background-clip: text;
   margin-bottom: 1.5rem;
 
-  ${media.tablet} {
-    font-size: 3.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 3.6rem;')}
 `;
 
 const HeroSubtitle = styled.h2`
@@ -460,9 +458,7 @@ const HeroSubtitle = styled.h2`
   color: rgb(var(--text));
   margin-bottom: 4rem;
 
-  ${media.tablet} {
-    font-size: 1.8rem;
-  }
+  ${mq('<=tablet', 'font-size: 1.8rem;')}
 `;
 
 const CertificationSection = styled.div`
@@ -479,9 +475,7 @@ const CertificationLogos = styled.div`
   flex-wrap: wrap;
   align-items: center;
 
-  ${media.tablet} {
-    gap: 2rem;
-  }
+  ${mq('<=tablet', 'gap: 2rem;')}
 `;
 
 const LogoContainer = styled.div`
@@ -512,20 +506,20 @@ const CertificationLogo = styled.img`
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
   }
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     height: 6rem;
     max-width: 10rem;
-  }
+  `)}
 `;
 
 const EnlargedSwamLogo = styled(CertificationLogo)`
   height: 16rem;
   max-width: 20rem;
   
-  ${media.tablet} {
+  ${mq('<=tablet', `
     height: 12rem;
     max-width: 16rem;
-  }
+  `)}
 `;
 
 const LogoLabel = styled.div`
@@ -536,9 +530,7 @@ const LogoLabel = styled.div`
   text-transform: uppercase;
   letter-spacing: 1px;
 
-  ${media.tablet} {
-    font-size: 1rem;
-  }
+  ${mq('<=tablet', 'font-size: 1rem;')}
 `;
 
 const ComplianceBadge = styled.div`
@@ -556,10 +548,10 @@ const ComplianceBadge = styled.div`
   border: 2px solid rgba(255, 125, 0, 0.3);
   box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     padding: 1.2rem 2.5rem;
     font-size: 1.2rem;
-  }
+  `)}
 `;
 
 const ComplianceIcon = styled.div`
@@ -594,9 +586,7 @@ const SectionTitle = styled.h2`
     border-radius: 2px;
   }
 
-  ${media.tablet} {
-    font-size: 2.8rem;
-  }
+  ${mq('<=tablet', 'font-size: 2.8rem;')}
 `;
 
 const OverviewText = styled.p`
@@ -607,9 +597,7 @@ const OverviewText = styled.p`
   max-width: 90rem;
   margin: 0 auto;
 
-  ${media.tablet} {
-    font-size: 1.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 1.6rem;')}
 `;
 
 const CompetenciesGrid = styled.div`
@@ -617,9 +605,7 @@ const CompetenciesGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
   gap: 3rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const CompetencyCard = styled.div`
@@ -684,9 +670,7 @@ const ProjectsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(40rem, 1fr));
   gap: 3rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const ProjectCard = styled.div`
@@ -729,9 +713,7 @@ const ProductsShowcase = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
   gap: 3rem;
 
-  ${media.tablet} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
 const ProductItem = styled.div`
@@ -765,13 +747,9 @@ const CompanyDataGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   gap: 2rem;
 
-  ${media.tablet} {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  ${mq('<=tablet', 'grid-template-columns: repeat(2, 1fr);')}
 
-  ${media.mobile} {
-    grid-template-columns: 1fr;
-  }
+  ${mq('<=phone', 'grid-template-columns: 1fr;')}
 `;
 
 const DataCard = styled.div`
@@ -812,11 +790,11 @@ const NAICSItem = styled.div`
   margin-bottom: 1.5rem;
   border: 1px solid rgba(255, 125, 0, 0.1);
 
-  ${media.mobile} {
+  ${mq('<=phone', `
     flex-direction: column;
     text-align: center;
     gap: 1rem;
-  }
+  `)}
 `;
 
 const NAICSCode = styled.div`
@@ -846,9 +824,7 @@ const CTATitle = styled.h2`
   color: white;
   margin-bottom: 1.5rem;
 
-  ${media.tablet} {
-    font-size: 2.4rem;
-  }
+  ${mq('<=tablet', 'font-size: 2.4rem;')}
 `;
 
 const CTADescription = styled.p`
@@ -860,9 +836,7 @@ const CTADescription = styled.p`
   margin-left: auto;
   margin-right: auto;
 
-  ${media.tablet} {
-    font-size: 1.6rem;
-  }
+  ${mq('<=tablet', 'font-size: 1.6rem;')}
 `;
 
 
@@ -951,8 +925,8 @@ const CTAButton = styled.div`
     box-shadow: 0 12px 25px rgba(255, 125, 0, 0.4);
   }
 
-  ${media.tablet} {
+  ${mq('<=tablet', `
     padding: 1.4rem 2.8rem;
     font-size: 1.6rem;
-  }
+  `)}
 `;

@@ -20,22 +20,22 @@ function EnhancedContactForm() {
     budget: '',
     timeline: '',
     message: '',
-    attachments: null
+    attachments: [] as File[]
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // Refs for auto-advancing
-  const lastNameRef = useRef(null);
-  const emailRef = useRef(null);
-  const phoneRef = useRef(null);
-  const companyRef = useRef(null);
-  const jobTitleRef = useRef(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const companyRef = useRef<HTMLInputElement>(null);
+  const jobTitleRef = useRef<HTMLInputElement>(null);
 
   // Format phone number as (XXX) XXX-XXXX
-  const formatPhoneNumber = (value) => {
+  const formatPhoneNumber = (value: string) => {
     const phoneNumber = value.replace(/[^\d]/g, '');
     const phoneNumberLength = phoneNumber.length;
 
@@ -47,19 +47,19 @@ function EnhancedContactForm() {
   };
 
   // Validate phone number
-  const validatePhone = (phone) => {
+  const validatePhone = (phone: string) => {
     const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
     return phoneRegex.test(phone);
   };
 
   // Validate email
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
   // Handle input changes with auto-advancing
-  const handleInputChange = (e, nextRef) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>, nextRef?: React.RefObject<HTMLInputElement>) => {
     const { name, value } = e.target;
     let processedValue = value;
 
@@ -69,7 +69,7 @@ function EnhancedContactForm() {
       
       // Auto-advance when phone is complete
       if (processedValue.length === 14 && nextRef?.current) {
-        setTimeout(() => nextRef.current.focus(), 100);
+        setTimeout(() => nextRef.current?.focus(), 100);
       }
       
       // Validate phone
@@ -94,25 +94,25 @@ function EnhancedContactForm() {
     // Auto-advance for first/last name when reasonable length
     if ((name === 'firstName' && value.length >= 2 && nextRef?.current) ||
         (name === 'lastName' && value.length >= 2 && nextRef?.current)) {
-      setTimeout(() => nextRef.current.focus(), 100);
+      setTimeout(() => nextRef.current?.focus(), 100); 
     }
 
     setFormData(prev => ({ ...prev, [name]: processedValue }));
   };
 
   // Handle file uploads
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => { 
+    const files = Array.from(e.target.files || []);
     setFormData(prev => ({ ...prev, attachments: files }));
   };
 
   // Handle form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     // Validation
-    const newErrors = {};
+    const newErrors: { [key: string]: string } = {};
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.email.trim()) newErrors.email = 'Email is required';
@@ -130,7 +130,7 @@ function EnhancedContactForm() {
         setSubmitSuccess(true);
         setFormData({
           firstName: '', lastName: '', email: '', phone: '', company: '',
-          jobTitle: '', projectType: '', budget: '', timeline: '', message: '', attachments: null
+          jobTitle: '', projectType: '', budget: '', timeline: '', message: '', attachments: []
         });
       } catch (error) {
         console.error('Form submission error:', error);
@@ -185,7 +185,7 @@ function EnhancedContactForm() {
                 value={formData.firstName}
                 onChange={(e) => handleInputChange(e, lastNameRef)}
                 placeholder="Enter your first name"
-                $hasError={errors.firstName}
+                $hasError={!!errors.firstName}
               />
               {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
             </FormGroup>
@@ -198,7 +198,7 @@ function EnhancedContactForm() {
                 value={formData.lastName}
                 onChange={(e) => handleInputChange(e, emailRef)}
                 placeholder="Enter your last name"
-                $hasError={errors.lastName}
+                $hasError={!!errors.lastName}
               />
               {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
             </FormGroup>
@@ -218,7 +218,7 @@ function EnhancedContactForm() {
                 value={formData.email}
                 onChange={(e) => handleInputChange(e, phoneRef)}
                 placeholder="your.email@company.com"
-                $hasError={errors.email}
+                $hasError={!!errors.email}
               />
               {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
             </FormGroup>
@@ -231,8 +231,8 @@ function EnhancedContactForm() {
                 value={formData.phone}
                 onChange={(e) => handleInputChange(e, companyRef)}
                 placeholder="(555) 123-4567"
-                maxLength="14"
-                $hasError={errors.phone}
+                maxLength={14}
+                $hasError={!!errors.phone}
               />
               {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
             </FormGroup>
@@ -330,8 +330,8 @@ function EnhancedContactForm() {
               value={formData.message}
               onChange={(e) => handleInputChange(e)}
               placeholder="Tell us about your project, goals, challenges, and any specific requirements..."
-              rows="6"
-              $hasError={errors.message}
+              rows={6}
+              $hasError={!!errors.message}
             />
             {errors.message && <ErrorMessage>{errors.message}</ErrorMessage>}
           </FormGroup>
@@ -344,7 +344,7 @@ function EnhancedContactForm() {
             <FileUploadLabel htmlFor="file-upload">
               <FileUploadIcon>📎</FileUploadIcon>
               <FileUploadText>
-                {formData.attachments ? 
+                {formData.attachments.length > 0 ? 
                   `${formData.attachments.length} file(s) selected` : 
                   'Click to attach files or drag and drop'
                 }
@@ -762,7 +762,7 @@ const FormLabel = styled.label`
   color: rgb(var(--text));
 `;
 
-const FormInput = styled.input`
+const FormInput = styled.input<{ $hasError?: boolean }>`
   padding: 1.2rem 1.6rem;
   border: 2px solid ${props => props.$hasError ? 'rgb(220, 38, 38)' : 'rgba(255, 125, 0, 0.2)'};
   border-radius: 0.8rem;
@@ -798,7 +798,7 @@ const FormSelect = styled.select`
   }
 `;
 
-const FormTextarea = styled.textarea`
+const FormTextarea = styled.textarea<{ $hasError?: boolean }>`
   padding: 1.2rem 1.6rem;
   border: 2px solid ${props => props.$hasError ? 'rgb(220, 38, 38)' : 'rgba(255, 125, 0, 0.2)'};
   border-radius: 0.8rem;

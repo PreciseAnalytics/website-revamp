@@ -1,15 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const CloseIcon: React.FC = () => {
-  return (
-    <CloseWrapper aria-label="Close menu" role="img">
-      <Line />
-      <Line rotated />
-    </CloseWrapper>
-  );
-};
+const CloseIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ style, ...props }, ref) => {
+    return (
+      <CloseWrapper ref={ref} style={style} {...props}>
+        <Line />
+        <Line rotated />
+      </CloseWrapper>
+    );
+  }
+);
 
+CloseIcon.displayName = 'CloseIcon';
 export default CloseIcon;
 
 const CloseWrapper = styled.div`

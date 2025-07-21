@@ -91,6 +91,7 @@ export default function CareersPage() {
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [submittedInfo, setSubmittedInfo] = useState<{position: string; email: string} | null>(null);
 
   useEffect(() => setIsClient(true), []);
 
@@ -219,7 +220,14 @@ export default function CareersPage() {
         throw new Error(result.error || 'Failed to submit application');
       }
 
-      setSubmitSuccess('Your application has been submitted successfully! You should receive a confirmation email shortly.');
+      setSubmitSuccess('application-submitted');
+      
+      // Store submitted info for success message
+      setSubmittedInfo({
+        position: formData.position,
+        email: formData.email
+      });
+      
       setFormData({
         firstName: '',
         lastName: '',
@@ -311,12 +319,146 @@ export default function CareersPage() {
               <FormTitle>Apply Now</FormTitle>
               <FormSubtitle>Ready to make an impact? Submit your application below.</FormSubtitle>
               
+              <ApplicationProcess>
+                <ProcessHeader>
+                  <ProcessIcon>📋</ProcessIcon>
+                  <ProcessTitle>Our Application Process</ProcessTitle>
+                </ProcessHeader>
+                <ProcessSteps>
+                  <ProcessStep>
+                    <StepNumber>1</StepNumber>
+                    <StepText>Submit your complete application with resume</StepText>
+                  </ProcessStep>
+                  <ProcessStep>
+                    <StepNumber>2</StepNumber>
+                    <StepText>Receive confirmation email within 5 minutes</StepText>
+                  </ProcessStep>
+                  <ProcessStep>
+                    <StepNumber>3</StepNumber>
+                    <StepText>Initial review by our talent team (1-3 business days)</StepText>
+                  </ProcessStep>
+                  <ProcessStep>
+                    <StepNumber>4</StepNumber>
+                    <StepText>Response with next steps (within 5 business days)</StepText>
+                  </ProcessStep>
+                </ProcessSteps>
+                <ProcessNote>
+                  <strong>Note:</strong> We review every application personally and provide feedback regardless of the outcome. We believe in treating all candidates with respect and transparency throughout the process.
+                </ProcessNote>
+              </ApplicationProcess>
+              
               {submitSuccess && (
-                <StatusMessage success>{submitSuccess}</StatusMessage>
+                <ProfessionalSuccessMessage>
+                  <SuccessHeader>
+                    <SuccessIcon>✅</SuccessIcon>
+                    <SuccessTitle>Application Successfully Submitted</SuccessTitle>
+                  </SuccessHeader>
+                  
+                  <SuccessContent>
+                    <WelcomeMessage>
+                      Thank you for your interest in joining the Precise Analytics team! Your application for the <strong>{submittedInfo?.position || 'selected position'}</strong> has been received and is now under review.
+                    </WelcomeMessage>
+                    
+                    <ProcessTimeline>
+                      <TimelineTitle>What Happens Next:</TimelineTitle>
+                      <TimelineList>
+                        <TimelineItem>
+                          <TimelineStep>1</TimelineStep>
+                          <TimelineContent>
+                            <TimelineLabel>Confirmation Email (Within 5 minutes)</TimelineLabel>
+                            <TimelineDescription>You'll receive a detailed confirmation email at {submittedInfo?.email || 'your email address'} with your application details.</TimelineDescription>
+                          </TimelineContent>
+                        </TimelineItem>
+                        
+                        <TimelineItem>
+                          <TimelineStep>2</TimelineStep>
+                          <TimelineContent>
+                            <TimelineLabel>Initial Review (1-3 business days)</TimelineLabel>
+                            <TimelineDescription>Our talent acquisition team will carefully review your qualifications and experience.</TimelineDescription>
+                          </TimelineContent>
+                        </TimelineItem>
+                        
+                        <TimelineItem>
+                          <TimelineStep>3</TimelineStep>
+                          <TimelineContent>
+                            <TimelineLabel>Response & Next Steps (Within 5 business days)</TimelineLabel>
+                            <TimelineDescription>We'll contact you with our decision and next steps, whether that's scheduling an interview or providing feedback.</TimelineDescription>
+                          </TimelineContent>
+                        </TimelineItem>
+                      </TimelineList>
+                    </ProcessTimeline>
+                    
+                    <ContactSection>
+                      <ContactTitle>Questions or Need Assistance?</ContactTitle>
+                      <ContactInfo>
+                        <ContactItem>
+                          <ContactIcon>📧</ContactIcon>
+                          <ContactText>Email us at <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></ContactText>
+                        </ContactItem>
+                        <ContactItem>
+                          <ContactIcon>💼</ContactIcon>
+                          <ContactText>Reference ID: PA-{Date.now().toString().slice(-6)}</ContactText>
+                        </ContactItem>
+                      </ContactInfo>
+                    </ContactSection>
+                    
+                    <AdditionalInfo>
+                      <InfoTitle>Good to Know:</InfoTitle>
+                      <InfoList>
+                        <InfoItem>• We review all applications thoroughly and personally</InfoItem>
+                        <InfoItem>• Our process is designed to find the best mutual fit</InfoItem>
+                        <InfoItem>• We welcome candidates from diverse backgrounds and experiences</InfoItem>
+                        <InfoItem>• Your information is kept confidential throughout the process</InfoItem>
+                      </InfoList>
+                    </AdditionalInfo>
+                    
+                    <SubmitAnotherBtn onClick={() => {
+                      setSubmitSuccess(null);
+                      setSubmittedInfo(null);
+                      setFormData({
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        phone: '',
+                        position: '',
+                        message: '',
+                        resume: null,
+                        coverLetter: null,
+                      });
+                    }}>
+                      Submit Another Application
+                    </SubmitAnotherBtn>
+                  </SuccessContent>
+                </ProfessionalSuccessMessage>
               )}
 
               {submitError && (
-                <StatusMessage error>{submitError}</StatusMessage>
+                <ProfessionalErrorMessage>
+                  <ErrorHeader>
+                    <ErrorIcon>⚠️</ErrorIcon>
+                    <ErrorTitle>Application Submission Issue</ErrorTitle>
+                  </ErrorHeader>
+                  <ErrorContent>
+                    <ErrorMessage>{submitError}</ErrorMessage>
+                    <ErrorGuidance>
+                      <GuidanceTitle>What you can do:</GuidanceTitle>
+                      <GuidanceList>
+                        <li>Please check your internet connection and try again</li>
+                        <li>Ensure all required fields are completed</li>
+                        <li>Verify your resume file is under 5MB and in PDF, DOC, or DOCX format</li>
+                        <li>If the issue persists, email your application directly to <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></li>
+                      </GuidanceList>
+                    </ErrorGuidance>
+                    <ErrorActions>
+                      <RetryButton onClick={() => setSubmitError(null)}>
+                        Try Again
+                      </RetryButton>
+                      <EmailButton href="mailto:apply@preciseanalytics.io">
+                        Email Application Instead
+                      </EmailButton>
+                    </ErrorActions>
+                  </ErrorContent>
+                </ProfessionalErrorMessage>
               )}
               
               <Form onSubmit={handleSubmit}>
@@ -456,6 +598,16 @@ export default function CareersPage() {
                 <ContactInfo>
                   <p>Questions about the position? Contact us at <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></p>
                 </ContactInfo>
+                
+                <CompanyCommitment>
+                  <CommitmentTitle>Our Commitment to You</CommitmentTitle>
+                  <CommitmentText>
+                    At Precise Analytics, we believe every candidate deserves respect and transparency. 
+                    We commit to reviewing your application thoroughly, providing timely communication, 
+                    and offering constructive feedback regardless of the outcome. Your time and interest 
+                    in our company are valued, and we strive to make this process as positive as possible.
+                  </CommitmentText>
+                </CompanyCommitment>
               </Form>
             </FormWrapper>
           </ApplicationSection>
@@ -521,6 +673,114 @@ const FormSubtitle = styled.p`
   text-align: center;
   margin-bottom: 3rem;
   color: rgb(var(--text), 0.7);
+`;
+
+const ApplicationProcess = styled.div`
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.05), rgba(255, 165, 0, 0.02));
+  border: 2px solid rgba(255, 125, 0, 0.2);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 15px rgba(255, 125, 0, 0.1);
+`;
+
+const ProcessHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+    gap: 1rem;
+  `)}
+`;
+
+const ProcessIcon = styled.div`
+  font-size: 2.5rem;
+  background: rgba(255, 125, 0, 0.1);
+  padding: 1rem;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 125, 0, 0.3);
+`;
+
+const ProcessTitle = styled.h3`
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin: 0;
+  
+  ${mq('<=tablet', `
+    font-size: 2rem;
+  `)}
+`;
+
+const ProcessSteps = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  
+  ${mq('<=tablet', `
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  `)}
+`;
+
+const ProcessStep = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(var(--cardBackground), 0.8);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--text), 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(var(--cardBackground), 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.15);
+  }
+`;
+
+const StepNumber = styled.div`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+`;
+
+const StepText = styled.p`
+  margin: 0;
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  font-weight: 500;
+  line-height: 1.4;
+`;
+
+const ProcessNote = styled.div`
+  background: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  line-height: 1.5;
+  text-align: center;
+  
+  strong {
+    color: rgb(34, 197, 94);
+    font-weight: 600;
+  }
 `;
 
 const FormGrid = styled.div`
@@ -690,6 +950,433 @@ const ContactInfo = styled.div`
     &:hover {
       text-decoration: underline;
     }
+  }
+`;
+
+const CompanyCommitment = styled.div`
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.05), rgba(255, 165, 0, 0.02));
+  border: 1px solid rgba(255, 125, 0, 0.2);
+  border-radius: 1.2rem;
+  padding: 2.5rem;
+  margin-top: 2.5rem;
+  text-align: center;
+`;
+
+const CommitmentTitle = styled.h4`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin-bottom: 1.5rem;
+`;
+
+const CommitmentText = styled.p`
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: rgb(var(--text), 0.8);
+  margin: 0;
+  font-style: italic;
+`;
+
+// Professional Success Message Components
+const ProfessionalSuccessMessage = styled.div`
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.05));
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.15);
+  
+  ${mq('<=tablet', `
+    padding: 2rem;
+    margin: 1rem 0 3rem 0;
+  `)}
+`;
+
+const SuccessHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid rgba(34, 197, 94, 0.2);
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  `)}
+`;
+
+const SuccessIcon = styled.div`
+  font-size: 3rem;
+  background: rgba(34, 197, 94, 0.1);
+  padding: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6rem;
+  min-height: 6rem;
+`;
+
+const SuccessTitle = styled.h3`
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: rgb(34, 197, 94);
+  margin: 0;
+  
+  ${mq('<=tablet', `
+    font-size: 2.4rem;
+  `)}
+`;
+
+const SuccessContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+`;
+
+const WelcomeMessage = styled.p`
+  font-size: 1.8rem;
+  line-height: 1.6;
+  color: rgb(var(--text));
+  margin: 0;
+  font-weight: 500;
+  
+  strong {
+    color: rgb(255, 125, 0);
+    font-weight: 600;
+  }
+  
+  ${mq('<=tablet', `
+    font-size: 1.6rem;
+  `)}
+`;
+
+const ProcessTimeline = styled.div`
+  background: rgba(var(--cardBackground), 0.7);
+  border-radius: 1.2rem;
+  padding: 2.5rem;
+  border: 1px solid rgba(var(--text), 0.1);
+`;
+
+const TimelineTitle = styled.h4`
+  font-size: 2rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const TimelineList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+`;
+
+const TimelineItem = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  `)}
+`;
+
+const TimelineStep = styled.div`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.3rem;
+`;
+
+const TimelineContent = styled.div`
+  flex: 1;
+`;
+
+const TimelineLabel = styled.h5`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin-bottom: 0.8rem;
+`;
+
+const TimelineDescription = styled.p`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  line-height: 1.5;
+  margin: 0;
+`;
+
+const ContactSection = styled.div`
+  background: rgba(255, 125, 0, 0.05);
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid rgba(255, 125, 0, 0.2);
+`;
+
+const ContactTitle = styled.h4`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const ContactInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  ${mq('>=tablet', `
+    flex-direction: row;
+    justify-content: space-around;
+  `)}
+`;
+
+const ContactItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+    gap: 0.5rem;
+  `)}
+`;
+
+const ContactIcon = styled.span`
+  font-size: 1.6rem;
+`;
+
+const ContactText = styled.p`
+  margin: 0;
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  
+  a {
+    color: rgb(255, 125, 0);
+    text-decoration: none;
+    font-weight: 600;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+const AdditionalInfo = styled.div`
+  border-top: 1px solid rgba(var(--text), 0.1);
+  padding-top: 2rem;
+`;
+
+const InfoTitle = styled.h4`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 1.5rem;
+`;
+
+const InfoList = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+  
+  ${mq('>=tablet', `
+    grid-template-columns: 1fr 1fr;
+  `)}
+`;
+
+const InfoItem = styled.div`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.7);
+  line-height: 1.4;
+`;
+
+const SubmitAnotherBtn = styled.button`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  border: none;
+  padding: 1.4rem 2.8rem;
+  border-radius: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-self: center;
+  margin-top: 1rem;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 125, 0, 0.3);
+  }
+  
+  ${mq('<=tablet', `
+    width: 100%;
+  `)}
+`;
+
+// Professional Error Message Components
+const ProfessionalErrorMessage = styled.div`
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(239, 68, 68, 0.05));
+  border: 2px solid rgba(220, 38, 38, 0.3);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.15);
+  
+  ${mq('<=tablet', `
+    padding: 2rem;
+    margin: 1rem 0 3rem 0;
+  `)}
+`;
+
+const ErrorHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(220, 38, 38, 0.2);
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  `)}
+`;
+
+const ErrorIcon = styled.div`
+  font-size: 2.5rem;
+  background: rgba(220, 38, 38, 0.1);
+  padding: 1rem;
+  border-radius: 50%;
+  border: 2px solid rgba(220, 38, 38, 0.3);
+`;
+
+const ErrorTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgb(220, 38, 38);
+  margin: 0;
+  
+  ${mq('<=tablet', `
+    font-size: 2.2rem;
+  `)}
+`;
+
+const ErrorContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+`;
+
+const ErrorMessage = styled.p`
+  font-size: 1.6rem;
+  color: rgb(220, 38, 38);
+  margin: 0;
+  font-weight: 500;
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(220, 38, 38, 0.05);
+  border-radius: 1rem;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+`;
+
+const ErrorGuidance = styled.div`
+  background: rgba(var(--cardBackground), 0.7);
+  border-radius: 1rem;
+  padding: 2rem;
+  border: 1px solid rgba(var(--text), 0.1);
+`;
+
+const GuidanceTitle = styled.h4`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 1.5rem;
+`;
+
+const GuidanceList = styled.ul`
+  margin: 0;
+  padding-left: 2rem;
+  
+  li {
+    font-size: 1.4rem;
+    color: rgb(var(--text), 0.8);
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+    
+    a {
+      color: rgb(255, 125, 0);
+      text-decoration: none;
+      font-weight: 600;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+`;
+
+const ErrorActions = styled.div`
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+  `)}
+`;
+
+const RetryButton = styled.button`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  border: none;
+  padding: 1.2rem 2.4rem;
+  border-radius: 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 125, 0, 0.3);
+  }
+`;
+
+const EmailButton = styled.a`
+  background: transparent;
+  color: rgb(255, 125, 0);
+  border: 2px solid rgb(255, 125, 0);
+  padding: 1.2rem 2.4rem;
+  border-radius: 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: rgb(255, 125, 0);
+    color: white;
+    transform: translateY(-2px);
   }
 `;
 

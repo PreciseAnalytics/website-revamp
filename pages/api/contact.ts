@@ -71,6 +71,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
+  // TEMPORARY DEBUG: Log environment variables to Vercel function logs
+  console.log('=== VERCEL ENVIRONMENT DEBUG ===');
+  console.log('SMTP_HOST:', process.env.SMTP_HOST || 'NOT SET');
+  console.log('SMTP_PORT:', process.env.SMTP_PORT || 'NOT SET');
+  console.log('SMTP_USER:', process.env.SMTP_USER ? 'SET' : 'NOT SET');
+  console.log('SMTP_PASS:', process.env.SMTP_PASS ? `SET (length: ${process.env.SMTP_PASS?.length})` : 'NOT SET');
+  console.log('CONTACT_EMAIL:', process.env.CONTACT_EMAIL || 'NOT SET');
+  console.log('ZOHO_EMAIL (should be NOT SET):', process.env.ZOHO_EMAIL || 'NOT SET');
+  console.log('ZOHO_PASSWORD (should be NOT SET):', process.env.ZOHO_PASSWORD ? 'SET' : 'NOT SET');
+  console.log('=================================');
+
   try {
     const {
       firstName,
@@ -143,6 +154,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
+    // ... rest of your existing code stays exactly the same ...
+    
     const currentTime = new Date().toLocaleString('en-US', {
       timeZone: 'America/New_York',
       year: 'numeric',

@@ -366,7 +366,7 @@ export default function CareersPage() {
                           <TimelineStep>1</TimelineStep>
                           <TimelineContent>
                             <TimelineLabel>Confirmation Email (Within 5 minutes)</TimelineLabel>
-                            <TimelineDescription>You'll receive a detailed confirmation email at {submittedInfo?.email || 'your email address'} with your application details.</TimelineDescription>
+                            <TimelineDescription>You&apos;ll receive a detailed confirmation email at {submittedInfo?.email || 'your email address'} with your application details.</TimelineDescription>
                           </TimelineContent>
                         </TimelineItem>
                         
@@ -382,7 +382,7 @@ export default function CareersPage() {
                           <TimelineStep>3</TimelineStep>
                           <TimelineContent>
                             <TimelineLabel>Response & Next Steps (Within 5 business days)</TimelineLabel>
-                            <TimelineDescription>We'll contact you with our decision and next steps, whether that's scheduling an interview or providing feedback.</TimelineDescription>
+                            <TimelineDescription>We&apos;ll contact you with our decision and next steps, whether That&apos;s scheduling an interview or providing feedback.</TimelineDescription>
                           </TimelineContent>
                         </TimelineItem>
                       </TimelineList>
@@ -1133,17 +1133,6 @@ const ContactTitle = styled.h4`
   color: rgb(var(--text));
   margin-bottom: 1.5rem;
   text-align: center;
-`;
-
-const ContactInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  
-  ${mq('>=tablet', `
-    flex-direction: row;
-    justify-content: space-around;
-  `)}
 `;
 
 const ContactItem = styled.div`

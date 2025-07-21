@@ -245,7 +245,7 @@ function EnhancedContactForm() {
           <SuccessIcon>✨</SuccessIcon>
           <SuccessTitle>Thank You!</SuccessTitle>
           <SuccessText>
-            🎉 Fantastic! Your detailed project information is on its way to our team! We're excited to dive deep into your requirements and will reach out within 24 hours with a comprehensive plan tailored just for you. Get ready for some amazing analytics transformation! ✨
+            🎉 Fantastic! Your detailed project information is on its way to our team! We&apos;re excited to dive deep into your requirements and will reach out within 24 hours with a comprehensive plan tailored just for you. Get ready for some amazing analytics transformation! ✨
           </SuccessText>
           <ResetButton onClick={() => setSubmitSuccess(false)}>
             Send Another Message

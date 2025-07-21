@@ -118,14 +118,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       message: sanitizeInput(message)
     };
 
-    // Create email transporter - FIXED IMPORT
+    // Create Zoho email transporter
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
+      host: 'smtppro.zoho.com',
+      port: 587, // Use 587 with STARTTLS
+      secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: process.env.ZOHO_EMAIL,
+        pass: process.env.ZOHO_PASSWORD
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
@@ -133,7 +136,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       await transporter.verify();
     } catch (error) {
-      console.error('SMTP configuration error:', error);
+      console.error('Zoho SMTP configuration error:', error);
       return res.status(500).json({
         success: false,
         message: 'Email service configuration error'
@@ -281,8 +284,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Send email to your team
     await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: process.env.CONTACT_EMAIL || 'contact@preciseanalytics.io',
+      from: process.env.ZOHO_EMAIL,
+      to: process.env.CONTACT_EMAIL || process.env.ZOHO_EMAIL,
       subject: `New Contact: ${sanitizedData.firstName} ${sanitizedData.lastName} - ${sanitizedData.projectType || 'General Inquiry'}`,
       html: teamEmailHtml,
       replyTo: sanitizedData.email
@@ -290,7 +293,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Send auto-reply to customer
     await transporter.sendMail({
-      from: process.env.FROM_EMAIL || process.env.SMTP_USER,
+      from: process.env.ZOHO_EMAIL,
       to: sanitizedData.email,
       subject: 'Thank you for contacting Precise Analytics',
       html: customerEmailHtml

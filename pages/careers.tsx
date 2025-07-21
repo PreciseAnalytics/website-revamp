@@ -250,7 +250,7 @@ export default function CareersPage() {
       setSubmitError(
         error instanceof Error 
           ? error.message 
-          : 'An unexpected error occurred. Please try again or contact us directly at apply@preciseanalytics.io'
+          : 'An unexpected error occurred. Please try again or contact us directly at careers@preciseanalytics.io'
       );
     } finally {
       setIsSubmitting(false);
@@ -393,7 +393,7 @@ export default function CareersPage() {
                       <ContactInfo>
                         <ContactItem>
                           <ContactIcon>📧</ContactIcon>
-                          <ContactText>Email us at <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></ContactText>
+                          <ContactText>Email us at <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a></ContactText>
                         </ContactItem>
                         <ContactItem>
                           <ContactIcon>💼</ContactIcon>
@@ -446,14 +446,14 @@ export default function CareersPage() {
                         <li>Please check your internet connection and try again</li>
                         <li>Ensure all required fields are completed</li>
                         <li>Verify your resume file is under 5MB and in PDF, DOC, or DOCX format</li>
-                        <li>If the issue persists, email your application directly to <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></li>
+                        <li>If the issue persists, email your application directly to <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a></li>
                       </GuidanceList>
                     </ErrorGuidance>
                     <ErrorActions>
                       <RetryButton onClick={() => setSubmitError(null)}>
                         Try Again
                       </RetryButton>
-                      <EmailButton href="mailto:apply@preciseanalytics.io">
+                      <EmailButton href="mailto:careers@preciseanalytics.io">
                         Email Application Instead
                       </EmailButton>
                     </ErrorActions>
@@ -596,7 +596,7 @@ export default function CareersPage() {
                 </SubmitBtn>
 
                 <ContactInfo>
-                  <p>Questions about the position? Contact us at <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></p>
+                  <p>Questions about the position? Contact us at <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a></p>
                 </ContactInfo>
                 
                 <CompanyCommitment>

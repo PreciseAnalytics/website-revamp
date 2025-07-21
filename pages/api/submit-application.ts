@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Parse the incoming form data
     const form = formidable({
-      uploadDir: './tmp',
+      uploadDir: '/tmp',
       keepExtensions: true,
       maxFileSize: 5 * 1024 * 1024, // 5MB
     });
@@ -86,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Send notification email to company
     const companyEmailResult = await resend.emails.send({
       from: 'careers@preciseanalytics.io', // This should be a verified domain in Resend
-      to: ['apply@preciseanalytics.io'],
+      to: ['careers@preciseanalytics.io'],
       subject: `New Application: ${applicationData.position} - ${applicationData.firstName} ${applicationData.lastName}`,
       html: generateCompanyNotificationEmail(applicationData),
       attachments: attachments,
@@ -121,11 +121,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
   } catch (error) {
-    console.error('Application submission error:', error);
-    res.status(500).json({ 
-      error: 'Failed to submit application. Please try again or contact us directly.' 
-    });
+  console.error('Application submission error:', error);
+  
+  // Better error logging for debugging
+  if (error instanceof Error) {
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
   }
+  
+  res.status(500).json({ 
+    error: 'Failed to submit application. Please try again or contact us directly.',
+    // Remove this debug info in production:
+    debug: error instanceof Error ? error.message : 'Unknown error'
+  });
 }
 
 function generateCompanyNotificationEmail(data: ApplicationData): string {
@@ -321,4 +329,4 @@ async function storeApplicationData(data: ApplicationData, resumeFileName: strin
     // Don't throw error - we don't want to fail the application submission if DB fails
   }
   */
-}
+}} // <- MAKE SURE THIS CLOSING BRACE IS HERE

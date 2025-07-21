@@ -118,14 +118,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       message: sanitizeInput(message)
     };
 
-    // Create Zoho email transporter
-    const transporter = nodemailer.createTransport({
-      host: 'smtppro.zoho.com',
-      port: 587, // Use 587 with STARTTLS
+    // Create email transporter - USING WORKING CONFIGURATION
+    const transporter = nodemailer.createTransporter({
+      host: process.env.SMTP_HOST || 'smtp.zoho.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
       },
       tls: {
         rejectUnauthorized: false
@@ -136,7 +136,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       await transporter.verify();
     } catch (error) {
-      console.error('Zoho SMTP configuration error:', error);
+      console.error('SMTP configuration error:', error);
       return res.status(500).json({
         success: false,
         message: 'Email service configuration error'
@@ -282,18 +282,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       </div>
     `;
 
-    // Send email to your team
+    // Send email to your team - USING CORRECT VARIABLES
     await transporter.sendMail({
-      from: process.env.ZOHO_EMAIL,
-      to: process.env.CONTACT_EMAIL || process.env.ZOHO_EMAIL,
+      from: process.env.SMTP_USER,
+      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
       subject: `New Contact: ${sanitizedData.firstName} ${sanitizedData.lastName} - ${sanitizedData.projectType || 'General Inquiry'}`,
       html: teamEmailHtml,
       replyTo: sanitizedData.email
     });
 
-    // Send auto-reply to customer
+    // Send auto-reply to customer - USING CORRECT VARIABLES
     await transporter.sendMail({
-      from: process.env.ZOHO_EMAIL,
+      from: process.env.SMTP_USER,
       to: sanitizedData.email,
       subject: 'Thank you for contacting Precise Analytics',
       html: customerEmailHtml

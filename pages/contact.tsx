@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { EnvVars } from 'env';
 import AnimatedHeader from 'components/AnimatedHeader';
 
@@ -26,12 +26,75 @@ function EnhancedContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Refs for auto-advancing
+  // Refs for auto-advancing, success message, and form container
   const lastNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const companyRef = useRef<HTMLInputElement>(null);
   const jobTitleRef = useRef<HTMLInputElement>(null);
+  const successMessageRef = useRef<HTMLDivElement>(null);
+  const formContainerRef = useRef<HTMLDivElement>(null); // NEW: Form container ref
+
+  // ROBUST: Auto-scroll to success message when it appears
+  useEffect(() => {
+    if (submitSuccess) {
+      // Multiple attempts to ensure visibility
+      const scrollToSuccess = () => {
+        // Method 1: Try to scroll to form container first
+        if (formContainerRef.current) {
+          // Get the form container position
+          const containerRect = formContainerRef.current.getBoundingClientRect();
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          
+          // Position form container near top of viewport
+          const targetPosition = containerRect.top + scrollTop - 50;
+          
+          window.scrollTo({
+            top: Math.max(0, targetPosition),
+            behavior: 'smooth'
+          });
+          
+          // After scroll, focus success message
+          setTimeout(() => {
+            if (successMessageRef.current) {
+              successMessageRef.current.focus();
+              successMessageRef.current.style.animation = 'successPulse 1.5s ease-in-out';
+              
+              // Double-check visibility and scroll again if needed
+              const successRect = successMessageRef.current.getBoundingClientRect();
+              if (successRect.top < 0 || successRect.top > window.innerHeight * 0.8) {
+                // Success message not properly visible, scroll directly to it
+                successMessageRef.current.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'start' 
+                });
+              }
+            }
+          }, 800);
+        } 
+        // Method 2: Fallback - scroll directly to success message
+        else if (successMessageRef.current) {
+          successMessageRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+          
+          setTimeout(() => {
+            if (successMessageRef.current) {
+              successMessageRef.current.focus();
+              successMessageRef.current.style.animation = 'successPulse 1.5s ease-in-out';
+            }
+          }, 600);
+        }
+      };
+
+      // Initial scroll attempt
+      setTimeout(scrollToSuccess, 100);
+      
+      // Backup scroll attempt in case first one fails
+      setTimeout(scrollToSuccess, 500);
+    }
+  }, [submitSuccess]);
 
   // Format phone number as (XXX) XXX-XXXX
   const formatPhoneNumber = (value: string) => {
@@ -89,8 +152,6 @@ function EnhancedContactForm() {
         setErrors(prev => ({ ...prev, email: '' }));
       }
     }
-
-    // Auto-advance is only used for phone numbers, not names
 
     setFormData(prev => ({ ...prev, [name]: processedValue }));
   };
@@ -169,26 +230,34 @@ function EnhancedContactForm() {
 
   if (submitSuccess) {
     return (
-      <SuccessMessage
-        as={motion.div}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <SuccessIcon>✨</SuccessIcon>
-        <SuccessTitle>Thank You!</SuccessTitle>
-        <SuccessText>
-          🎉 Fantastic! Your detailed project information is on its way to our team! We&apos;re excited to dive deep into your requirements and will reach out within 24 hours with a comprehensive plan tailored just for you. Get ready for some amazing analytics transformation! ✨
-        </SuccessText>
-        <ResetButton onClick={() => setSubmitSuccess(false)}>
-          Send Another Message
-        </ResetButton>
-      </SuccessMessage>
+      <FormContainer ref={formContainerRef}> {/* Add ref here */}
+        <EnhancedSuccessMessage
+          ref={successMessageRef}
+          as={motion.div}
+          initial={{ opacity: 0, scale: 0.8, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+          tabIndex={-1}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <SuccessIcon>✨</SuccessIcon>
+          <SuccessTitle>Thank You!</SuccessTitle>
+          <SuccessText>
+            🎉 Fantastic! Your detailed project information is on its way to our team! We're excited to dive deep into your requirements and will reach out within 24 hours with a comprehensive plan tailored just for you. Get ready for some amazing analytics transformation! ✨
+          </SuccessText>
+          <ResetButton onClick={() => setSubmitSuccess(false)}>
+            Send Another Message
+          </ResetButton>
+        </EnhancedSuccessMessage>
+      </FormContainer>
     );
   }
 
   return (
     <FormContainer
+      ref={formContainerRef} // Add ref here too
       as={motion.div}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -457,7 +526,6 @@ export default function ContactPage() {
           </ContactFormWrapper>
         </EnhancedContentWrapper>
       </PageWrapper>
-      
     </>
   );
 }
@@ -888,47 +956,219 @@ const Spinner = styled.div`
   }
 `;
 
-const SuccessMessage = styled.div`
+// Enhanced Success Message Components with extra visibility
+const EnhancedSuccessMessage = styled.div`
   text-align: center;
   padding: 4rem;
-  background: rgba(var(--cardBackground), 0.95);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1));
   border-radius: 2rem;
-  border: 2px solid rgba(34, 197, 94, 0.3);
-  max-width: 60rem;
-  margin: 0 auto;
+  border: 3px solid rgba(34, 197, 94, 0.4);
+  max-width: 70rem;
+  margin: 2rem auto; /* Added top margin for better separation */
+  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.2);
+  position: relative;
+  overflow: hidden;
+  
+  /* Enhanced visibility and prominence */
+  min-height: 35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  /* Added: Bright border for maximum visibility */
+  border: 4px solid rgb(34, 197, 94);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.15));
+  
+  /* Pulse animation that gets applied via JavaScript */
+  @keyframes successPulse {
+    0%, 100% { 
+      transform: scale(1);
+      box-shadow: 0 20px 50px rgba(34, 197, 94, 0.3);
+      border-color: rgb(34, 197, 94);
+    }
+    50% { 
+      transform: scale(1.02);
+      box-shadow: 0 25px 60px rgba(34, 197, 94, 0.5);
+      border-color: rgb(16, 185, 129);
+    }
+  }
+  
+  /* Shimmer effect for celebration */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: celebrateShimmer 2s ease-in-out 0.5s;
+  }
+  
+  @keyframes celebrateShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  /* Floating particles effect */
+  &::after {
+    content: '✨🎉🚀✨';
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    opacity: 0;
+    animation: floatingParticles 3s ease-in-out 1s;
+  }
+  
+  @keyframes floatingParticles {
+    0% { 
+      opacity: 0;
+      transform: translateX(-50%) translateY(0);
+    }
+    20% { 
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-3rem);
+    }
+    100% { 
+      opacity: 0;
+      transform: translateX(-50%) translateY(-5rem);
+    }
+  }
+  
+  /* Focus styles for accessibility */
+  &:focus {
+    outline: 4px solid rgba(34, 197, 94, 0.8);
+    outline-offset: 4px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 3rem 2rem;
+    min-height: 30rem;
+    margin: 1rem;
+  }
 `;
 
 const SuccessIcon = styled.div`
-  font-size: 4rem;
+  font-size: 5rem;
   margin-bottom: 2rem;
+  animation: bounceIn 0.8s ease-out 0.3s both;
+  filter: drop-shadow(0 4px 8px rgba(34, 197, 94, 0.3));
+  
+  @keyframes bounceIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.3) rotate(0deg);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1) rotate(180deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(360deg);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 4rem;
+  }
 `;
 
 const SuccessTitle = styled.h3`
-  font-size: 2.4rem;
+  font-size: 3rem;
   font-weight: 700;
-  color: rgb(34, 197, 94);
-  margin-bottom: 1rem;
+  background: linear-gradient(135deg, rgb(34, 197, 94), rgb(16, 185, 129));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+  animation: slideInFromLeft 0.6s ease-out 0.5s both;
+  text-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+  
+  @keyframes slideInFromLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 2.4rem;
+  }
 `;
 
 const SuccessText = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   color: rgb(var(--text));
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  line-height: 1.6;
+  animation: slideInFromRight 0.6s ease-out 0.7s both;
+  max-width: 55rem;
+  font-weight: 500;
+  
+  @keyframes slideInFromRight {
+    0% {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1.6rem;
+    margin-bottom: 2.5rem;
+  }
 `;
 
 const ResetButton = styled.button`
   background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
   border: none;
-  padding: 1.2rem 2.4rem;
-  border-radius: 0.8rem;
-  font-size: 1.4rem;
+  padding: 1.4rem 2.8rem;
+  border-radius: 1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  animation: slideInFromBottom 0.6s ease-out 0.9s both;
+  box-shadow: 0 4px 15px rgba(255, 125, 0, 0.3);
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 125, 0, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 125, 0, 0.4);
+    background: linear-gradient(135deg, rgb(255, 140, 20), rgb(255, 180, 20));
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+  }
+  
+  @keyframes slideInFromBottom {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1.2rem 2.4rem;
+    font-size: 1.4rem;
   }
 `;

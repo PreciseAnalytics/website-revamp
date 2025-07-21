@@ -71,12 +71,17 @@ const jobs = [
   },
 ];
 
+interface FormErrors {
+  [key: string]: string;
+}
+
 export default function CareersPage() {
   const [isClient, setIsClient] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
     position: '',
     message: '',
     resume: null as File | null,
@@ -84,38 +89,164 @@ export default function CareersPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   useEffect(() => setIsClient(true), []);
 
+  const formatPhoneNumber = (value: string): string => {
+    // Remove all non-numeric characters
+    const phoneNumber = value.replace(/[^\d]/g, '');
+    
+    // Don't format if less than 4 digits
+    if (phoneNumber.length < 4) return phoneNumber;
+    
+    // Format as (XXX) XXX-XXXX
+    if (phoneNumber.length < 7) {
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+    }
+    
+    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
+  const validateForm = (): boolean => {
+    const errors: FormErrors = {};
+
+    if (!formData.firstName.trim()) {
+      errors.firstName = 'First name is required';
+    }
+
+    if (!formData.lastName.trim()) {
+      errors.lastName = 'Last name is required';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    } else {
+      const phoneDigits = formData.phone.replace(/[^\d]/g, '');
+      if (phoneDigits.length !== 10) {
+        errors.phone = 'Please enter a valid 10-digit phone number';
+      }
+    }
+
+    if (!formData.position) {
+      errors.position = 'Please select a position';
+    }
+
+    if (!formData.message.trim()) {
+      errors.message = 'Please tell us why you are interested in this role';
+    }
+
+    if (!formData.resume) {
+      errors.resume = 'Resume is required';
+    } else if (formData.resume.size > 5 * 1024 * 1024) { // 5MB limit
+      errors.resume = 'Resume file must be under 5MB';
+    }
+
+    if (formData.coverLetter && formData.coverLetter.size > 5 * 1024 * 1024) {
+      errors.coverLetter = 'Cover letter file must be under 5MB';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleChange = (e: any) => {
     const { name, value, files } = e.target;
+    
     if (files) {
       setFormData({ ...formData, [name]: files[0] });
     } else {
-      setFormData({ ...formData, [name]: value });
+      let processedValue = value;
+      
+      // Format phone number as user types
+      if (name === 'phone') {
+        processedValue = formatPhoneNumber(value);
+      }
+      
+      setFormData({ ...formData, [name]: processedValue });
+    }
+
+    // Clear specific field error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: '' });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitSuccess(null);
+    setSubmitError(null);
 
-    // Simulate async upload
-    setTimeout(() => {
-      console.log('Submitted:', formData);
-      setIsSubmitting(false);
-      setSubmitSuccess('Your application has been submitted successfully!');
+    try {
+      const formDataToSend = new FormData();
+      
+      // Append text fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key !== 'resume' && key !== 'coverLetter' && value) {
+          formDataToSend.append(key, value as string);
+        }
+      });
+
+      // Append files
+      if (formData.resume) {
+        formDataToSend.append('resume', formData.resume);
+      }
+      if (formData.coverLetter) {
+        formDataToSend.append('coverLetter', formData.coverLetter);
+      }
+
+      const response = await fetch('/api/submit-application', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit application');
+      }
+
+      setSubmitSuccess('Your application has been submitted successfully! You should receive a confirmation email shortly.');
       setFormData({
         firstName: '',
         lastName: '',
         email: '',
+        phone: '',
         position: '',
         message: '',
         resume: null,
         coverLetter: null,
       });
-    }, 2000);
+
+      // Reset file inputs
+      const resumeInput = document.getElementById('resume') as HTMLInputElement;
+      const coverLetterInput = document.getElementById('coverLetter') as HTMLInputElement;
+      if (resumeInput) resumeInput.value = '';
+      if (coverLetterInput) coverLetterInput.value = '';
+
+    } catch (error) {
+      console.error('Submission error:', error);
+      setSubmitError(
+        error instanceof Error 
+          ? error.message 
+          : 'An unexpected error occurred. Please try again or contact us directly at apply@preciseanalytics.io'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleApplyClick = (jobTitle: string) => {
@@ -181,12 +312,16 @@ export default function CareersPage() {
               <FormSubtitle>Ready to make an impact? Submit your application below.</FormSubtitle>
               
               {submitSuccess && (
-                <StatusMessage>{submitSuccess}</StatusMessage>
+                <StatusMessage success>{submitSuccess}</StatusMessage>
+              )}
+
+              {submitError && (
+                <StatusMessage error>{submitError}</StatusMessage>
               )}
               
               <Form onSubmit={handleSubmit}>
                 <FormGrid>
-                  <div>
+                  <FormField>
                     <label htmlFor="firstName">First Name *</label>
                     <input
                       type="text"
@@ -194,11 +329,14 @@ export default function CareersPage() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
+                      autoComplete="given-name"
+                      placeholder="Enter your first name"
                       required
                     />
-                  </div>
+                    {formErrors.firstName && <ErrorText>{formErrors.firstName}</ErrorText>}
+                  </FormField>
                   
-                  <div>
+                  <FormField>
                     <label htmlFor="lastName">Last Name *</label>
                     <input
                       type="text"
@@ -206,12 +344,15 @@ export default function CareersPage() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
+                      autoComplete="family-name"
+                      placeholder="Enter your last name"
                       required
                     />
-                  </div>
+                    {formErrors.lastName && <ErrorText>{formErrors.lastName}</ErrorText>}
+                  </FormField>
                 </FormGrid>
 
-                <div>
+                <FormField>
                   <label htmlFor="email">Email Address *</label>
                   <input
                     type="email"
@@ -219,17 +360,38 @@ export default function CareersPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    autoComplete="email"
+                    placeholder="your.email@example.com"
                     required
                   />
-                </div>
+                  {formErrors.email && <ErrorText>{formErrors.email}</ErrorText>}
+                </FormField>
 
-                <div>
+                <FormField>
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    autoComplete="tel"
+                    placeholder="(555) 123-4567"
+                    maxLength={14}
+                    required
+                  />
+                  <PhoneNote>US phone number required for contact purposes</PhoneNote>
+                  {formErrors.phone && <ErrorText>{formErrors.phone}</ErrorText>}
+                </FormField>
+
+                <FormField>
                   <label htmlFor="position">Position of Interest *</label>
                   <select
                     id="position"
                     name="position"
                     value={formData.position}
                     onChange={handleChange}
+                    autoComplete="organization-title"
                     required
                   >
                     <option value="">Select a position...</option>
@@ -239,12 +401,13 @@ export default function CareersPage() {
                       </option>
                     ))}
                   </select>
-                </div>
+                  {formErrors.position && <ErrorText>{formErrors.position}</ErrorText>}
+                </FormField>
 
                 <FileUploadGrid>
                   <FileUploadWrapper>
                     <label htmlFor="resume">Resume/CV *</label>
-                    <input
+                    <FileInput
                       type="file"
                       id="resume"
                       name="resume"
@@ -252,22 +415,26 @@ export default function CareersPage() {
                       onChange={handleChange}
                       required
                     />
+                    <FileNote>PDF, DOC, or DOCX (max 5MB)</FileNote>
+                    {formErrors.resume && <ErrorText>{formErrors.resume}</ErrorText>}
                   </FileUploadWrapper>
                   
                   <FileUploadWrapper>
                     <label htmlFor="coverLetter">Cover Letter (Optional)</label>
-                    <input
+                    <FileInput
                       type="file"
                       id="coverLetter"
                       name="coverLetter"
                       accept=".pdf,.doc,.docx"
                       onChange={handleChange}
                     />
+                    <FileNote>PDF, DOC, or DOCX (max 5MB)</FileNote>
+                    {formErrors.coverLetter && <ErrorText>{formErrors.coverLetter}</ErrorText>}
                   </FileUploadWrapper>
                 </FileUploadGrid>
 
-                <div>
-                  <label htmlFor="message">Why are you interested in this role?</label>
+                <FormField>
+                  <label htmlFor="message">Why are you interested in this role? *</label>
                   <textarea
                     id="message"
                     name="message"
@@ -275,19 +442,25 @@ export default function CareersPage() {
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Tell us about your interest in this position and what you'd bring to our team..."
+                    minLength={50}
+                    required
                   />
-                </div>
+                  <MessageNote>Please provide at least 50 characters describing your interest</MessageNote>
+                  {formErrors.message && <ErrorText>{formErrors.message}</ErrorText>}
+                </FormField>
 
                 <SubmitBtn type="submit" disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}
                 </SubmitBtn>
+
+                <ContactInfo>
+                  <p>Questions about the position? Contact us at <a href="mailto:apply@preciseanalytics.io">apply@preciseanalytics.io</a></p>
+                </ContactInfo>
               </Form>
             </FormWrapper>
           </ApplicationSection>
         </Container>
       </PageWrapper>
-
-      
     </>
   );
 }
@@ -366,6 +539,11 @@ const FileUploadGrid = styled.div`
   ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
 
+const FormField = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const FileUploadWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -379,7 +557,7 @@ const Form = styled.form`
 
   input[type='text'],
   input[type='email'],
-  input[type='file'],
+  input[type='tel'],
   select,
   textarea {
     padding: 1.5rem;
@@ -394,6 +572,10 @@ const Form = styled.form`
       outline: none;
       border-color: rgb(255, 125, 0);
     }
+
+    &:invalid {
+      border-color: #ff6b6b;
+    }
   }
 
   label {
@@ -401,8 +583,35 @@ const Form = styled.form`
     font-weight: 600;
     color: rgb(var(--text), 0.8);
     margin-bottom: 0.5rem;
-    display: block;
   }
+`;
+
+const FileInput = styled.input`
+  padding: 1rem !important;
+  border: 2px dashed rgba(var(--text), 0.3) !important;
+  background: rgba(var(--background), 0.5) !important;
+
+  &::-webkit-file-upload-button {
+    background: rgb(255, 125, 0);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin-right: 1rem;
+  }
+`;
+
+const FileNote = styled.small`
+  font-size: 1.2rem;
+  color: rgb(var(--text), 0.6);
+  margin-top: 0.5rem;
+`;
+
+const ErrorText = styled.span`
+  font-size: 1.2rem;
+  color: #ff6b6b;
+  margin-top: 0.5rem;
 `;
 
 const SubmitBtn = styled.button`
@@ -417,27 +626,71 @@ const SubmitBtn = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(255, 125, 0, 0.3);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
   }
 `;
 
-const StatusMessage = styled.p`
+const StatusMessage = styled.p<{ success?: boolean; error?: boolean }>`
   font-size: 1.6rem;
   text-align: center;
-  padding: 1rem;
-  background: rgba(0, 255, 0, 0.1);
-  border: 1px solid rgba(0, 255, 0, 0.3);
+  padding: 1.5rem;
   border-radius: 0.8rem;
-  color: green;
   margin-bottom: 2rem;
+  
+  ${props => props.success && `
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    color: #28a745;
+  `}
+  
+  ${props => props.error && `
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    color: #dc3545;
+  `}
+`;
+
+const PhoneNote = styled.small`
+  font-size: 1.2rem;
+  color: rgb(var(--text), 0.6);
+  margin-top: 0.5rem;
+  font-style: italic;
+`;
+
+const MessageNote = styled.small`
+  font-size: 1.2rem;
+  color: rgb(var(--text), 0.6);
+  margin-top: 0.5rem;
+  font-style: italic;
+`;
+
+const ContactInfo = styled.div`
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(var(--text), 0.1);
+  
+  p {
+    font-size: 1.4rem;
+    color: rgb(var(--text), 0.7);
+  }
+  
+  a {
+    color: rgb(255, 125, 0);
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 // Positions Section Styles

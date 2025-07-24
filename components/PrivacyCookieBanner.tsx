@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 interface CookiePreferences {
   strictlyNecessary: boolean;
@@ -192,10 +193,12 @@ const PrivacyCookieBanner = () => {
         return (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <img 
-                src="/logo.png" 
-                alt="Precision Analytics" 
-                style={{ height: '28px' }}
+              <Image
+                src="/cookie-icon.svg"
+                alt="Cookie"
+                width={24}
+                height={24}
+                className="w-6 h-6"
               />
               <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', margin: 0 }}>
                 Performance Cookies
@@ -426,10 +429,12 @@ const PrivacyCookieBanner = () => {
               borderBottom: '1px solid #eee'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <img 
-                  src="/logo.png" 
-                  alt="Precision Analytics" 
-                  style={{ height: '32px' }}
+                <Image
+                  src="/privacy-icon.svg" 
+                  alt="Privacy"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5"
                 />
                 <h3 style={{
                   fontSize: '28px',

@@ -3,7 +3,7 @@ import Head from 'next/head';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
-
+import Image from 'next/image';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { media } from 'utils/media';
@@ -59,7 +59,13 @@ export default function OurTeamPage() {
             {teamMembers.map((member, index) => (
               <TeamCard key={index}>
                 <ImageWrapper>
-                  <img src={member.image} alt={member.name} />
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    width={400}
+                    height={400}
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
                 </ImageWrapper>
                 <Name>{member.name}</Name>
                 <Title>{member.title}</Title>

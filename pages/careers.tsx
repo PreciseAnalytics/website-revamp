@@ -1309,7 +1309,7 @@ const MessageNote = styled.small`
   font-style: italic;
 `;
 
-const ContactInfo = styled.div`
+const ContactInfoFooter = styled.div`
   text-align: center;
   margin-top: 2rem;
   padding-top: 2rem;

@@ -6,7 +6,7 @@ import { EnvVars } from 'env';
 import { media } from 'utils/media';
 import Button from 'components/Button';
 import Container from 'components/Container';
-import { HamburgerIcon } from 'components/HamburgerIcon';
+import { HamburgerIcon } from './HamburgerIcon';
 import CloseIcon from 'components/CloseIcon';
 
 const LINKS = [

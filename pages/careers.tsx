@@ -7,68 +7,22 @@ import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { mq } from 'utils/media';
 
-const jobs = [
-  {
-    title: 'Data Analyst',
-    location: 'Remote | Full-Time',
-    description: 'Analyze complex datasets to generate actionable insights for government and commercial clients.',
-    requirements: [
-      '2+ years experience in data analytics or BI',
-      'Proficient in SQL, Excel, and data visualization tools (Tableau, Power BI)',
-      'Strong communication skills',
-    ],
-  },
-  {
-    title: 'BI Developer',
-    location: 'VA/DC Metro | Hybrid',
-    description: 'Develop business intelligence dashboards and reports to support client decision-making.',
-    requirements: [
-      '3+ years experience in BI development',
-      'Experience with Tableau, Power BI, or Looker',
-      'Familiarity with relational databases and ETL processes',
-    ],
-  },
-  {
-    title: 'Federal Proposal Writer',
-    location: 'Remote | Part-Time',
-    description: 'Support federal bid development by drafting technical proposals, capability statements, and responses to RFPs.',
-    requirements: [
-      'Experience writing for government proposals (preferably GSA/SAM/FedBizOpps)',
-      'Excellent written communication',
-      'Understanding of SDVOSB/small business compliance a plus',
-    ],
-  },
-  {
-    title: 'Data Engineer',
-    location: 'Remote | Full-Time',
-    description: 'Design and maintain scalable data pipelines and infrastructure for analytics workloads.',
-    requirements: [
-      'Experience with Python, Spark, or similar',
-      'Familiarity with cloud platforms (AWS, Azure)',
-      'Strong SQL and database optimization skills',
-    ],
-  },
-  {
-    title: 'Client Success Manager',
-    location: 'Remote | Full-Time',
-    description: 'Support long-term success of government and commercial clients by managing project delivery and outcomes.',
-    requirements: [
-      'Strong communication and project management skills',
-      'Experience in analytics or SaaS services',
-      'Ability to coordinate with technical teams and clients',
-    ],
-  },
-  {
-    title: 'Visualization Specialist',
-    location: 'Remote | Contract',
-    description: 'Create visually compelling dashboards, infographics, and reports that simplify complex data.',
-    requirements: [
-      'Advanced knowledge of Power BI or Tableau',
-      'Design-first thinking and attention to detail',
-      'Experience working with analysts and decision-makers',
-    ],
-  },
-];
+// ATS API Configuration
+const ATS_BASE_URL = 'https://precise-analytics-ats.vercel.app';
+
+// Dynamic positions interface
+interface Position {
+  id: number;
+  title: string;
+  department: string;
+  location: string;
+  employment_type: string;
+  description: string;
+  requirements: string[];
+  salary_min?: number;
+  salary_max?: number;
+  benefits?: string;
+}
 
 interface FormErrors {
   [key: string]: string;
@@ -76,15 +30,20 @@ interface FormErrors {
 
 export default function CareersPage() {
   const [isClient, setIsClient] = useState(false);
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     position: '',
+    positionId: '',
     message: '',
     resume: null as File | null,
     coverLetter: null as File | null,
+    linkedinUrl: '',
+    portfolioUrl: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
@@ -92,7 +51,36 @@ export default function CareersPage() {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submittedInfo, setSubmittedInfo] = useState<{position: string; email: string; applicationId?: string} | null>(null);
 
-  useEffect(() => setIsClient(true), []);
+  useEffect(() => {
+    setIsClient(true);
+    fetchPositions();
+  }, []);
+
+  // Fetch positions from ATS
+  const fetchPositions = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Fetching positions from ATS...');
+      
+      const response = await fetch(`${ATS_BASE_URL}/api/jobs`);
+      const data = await response.json();
+      
+      const processedPositions = data.map((pos: any) => ({
+        ...pos,
+        requirements: typeof pos.requirements === 'string' 
+          ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
+          : pos.requirements || []
+      }));
+
+      setPositions(processedPositions);
+            
+    } catch (error) {
+      console.error('❌ Error fetching positions:', error);
+      setPositions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatPhoneNumber = (value: string): string => {
     const phoneNumber = value.replace(/[^\d]/g, '');
@@ -101,6 +89,15 @@ export default function CareersPage() {
       return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
     }
     return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+  };
+
+  const isValidUrl = (string: string): boolean => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
   };
 
   const validateForm = (): boolean => {
@@ -129,7 +126,7 @@ export default function CareersPage() {
       }
     }
 
-    if (!formData.position) {
+    if (!formData.positionId) {
       errors.position = 'Please select a position';
     }
 
@@ -147,8 +144,39 @@ export default function CareersPage() {
       errors.coverLetter = 'Cover letter file must be under 5MB';
     }
 
+    if (formData.linkedinUrl && !isValidUrl(formData.linkedinUrl)) {
+      errors.linkedinUrl = 'Please enter a valid LinkedIn URL';
+    }
+
+    if (formData.portfolioUrl && !isValidUrl(formData.portfolioUrl)) {
+      errors.portfolioUrl = 'Please enter a valid portfolio/website URL';
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const uploadFile = async (file: File, type: 'resume' | 'cover_letter'): Promise<string> => {
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('type', type);
+
+    const response = await fetch(`${ATS_BASE_URL}/api/upload`, {
+      method: 'POST',
+      body: uploadFormData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`File upload failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'File upload failed');
+    }
+    
+    return result.url;
   };
 
   const handleChange = (e: any) => {
@@ -162,8 +190,17 @@ export default function CareersPage() {
       if (name === 'phone') {
         processedValue = formatPhoneNumber(value);
       }
-      
-      setFormData({ ...formData, [name]: processedValue });
+
+      if (name === 'position') {
+        const selectedPosition = positions.find(p => p.id.toString() === value);
+        setFormData({ 
+          ...formData, 
+          positionId: value,
+          position: selectedPosition?.title || ''
+        });
+      } else {
+        setFormData({ ...formData, [name]: processedValue });
+      }
     }
 
     if (formErrors[name]) {
@@ -183,26 +220,37 @@ export default function CareersPage() {
     setSubmitError(null);
 
     try {
+      console.log('🚀 Starting application submission to ATS...');
+      
+      // Upload files first
+      let resumeUrl = '';
+      let coverLetterFileUrl = '';
+
+      if (formData.resume) {
+        resumeUrl = await uploadFile(formData.resume, 'resume');
+      }
+
+      if (formData.coverLetter) {
+        coverLetterFileUrl = await uploadFile(formData.coverLetter, 'cover_letter');
+      }
+
+      // Submit to ATS API
       const applicationData = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
+        position_id: parseInt(formData.positionId),
+        position_applied: formData.position,
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-        position: formData.position,
-        location: 'Remote',
-        experience: '',
-        coverLetter: formData.message.trim(),
-        resumeUrl: '',
-        source: 'Website Careers Page'
+        cover_letter: formData.message.trim(),
+        resume_url: resumeUrl,
+        cover_letter_file_url: coverLetterFileUrl,
+        linkedin_url: formData.linkedinUrl.trim() || null,
+        portfolio_url: formData.portfolioUrl.trim() || null,
+        source: 'preciseanalytics.io_careers'
       };
 
-      console.log('🚀 Submitting application...', {
-        name: `${applicationData.firstName} ${applicationData.lastName}`,
-        email: applicationData.email,
-        position: applicationData.position
-      });
-
-      const response = await fetch('/api/applications', {
+      const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -212,33 +260,33 @@ export default function CareersPage() {
 
       const result = await response.json();
 
-      if (!response.ok || !result.success) {
+      if (!response.ok || !result.application) {
         throw new Error(result.error || `Server error: ${response.status}`);
       }
-
-      console.log('✅ Application submitted successfully:', {
-        applicationId: result.applicationId,
-        message: result.message
-      });
 
       setSubmitSuccess('application-submitted');
       setSubmittedInfo({
         position: formData.position,
         email: formData.email,
-        applicationId: result.applicationId
+        applicationId: result.application.id
       });
       
+      // Reset form
       setFormData({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
         position: '',
+        positionId: '',
         message: '',
         resume: null,
         coverLetter: null,
+        linkedinUrl: '',
+        portfolioUrl: '',
       });
 
+      // Clear file inputs
       const resumeInput = document.getElementById('resume') as HTMLInputElement;
       const coverLetterInput = document.getElementById('coverLetter') as HTMLInputElement;
       if (resumeInput) resumeInput.value = '';
@@ -247,8 +295,8 @@ export default function CareersPage() {
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'application_submitted', {
           'job_position': formData.position,
-          'application_source': 'careers_page',
-          'application_id': result.applicationId
+          'application_source': 'main_website',
+          'application_id': result.application.id
         });
       }
 
@@ -259,11 +307,11 @@ export default function CareersPage() {
       
       if (error instanceof Error) {
         if (error.message.includes('404')) {
-          errorMessage = 'Application service is temporarily unavailable. Please try again in a few minutes or email your application to careers@preciseanalytics.io';
+          errorMessage = 'The selected position is no longer available. Please refresh the page and try again.';
         } else if (error.message.includes('500')) {
-          errorMessage = 'Server error occurred. Our team has been notified. Please try again or email careers@preciseanalytics.io';
-        } else if (error.message.includes('Network')) {
-          errorMessage = 'Network connection issue. Please check your internet connection and try again.';
+          errorMessage = 'Server error occurred. Please try again or email careers@preciseanalytics.io';
+        } else if (error.message.includes('upload')) {
+          errorMessage = 'File upload failed. Please check your files and try again.';
         } else {
           errorMessage = `Submission failed: ${error.message}`;
         }
@@ -275,8 +323,12 @@ export default function CareersPage() {
     }
   };
 
-  const handleApplyClick = (jobTitle: string) => {
-    setFormData({ ...formData, position: jobTitle });
+  const handleApplyClick = (position: Position) => {
+    setFormData({ 
+      ...formData, 
+      positionId: position.id.toString(),
+      position: position.title 
+    });
     const formElement = document.getElementById('application-form');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
@@ -301,33 +353,54 @@ export default function CareersPage() {
 
           <PositionsSection>
             <SectionTitle>Open Positions</SectionTitle>
-            <SectionSubtitle>Explore opportunities to grow your career with us</SectionSubtitle>
+            <SectionSubtitle>
+              Explore opportunities to grow your career with us
+              {!loading && positions.length > 0 && (
+                <PositionCount>{positions.length} open position{positions.length !== 1 ? 's' : ''}</PositionCount>
+              )}
+            </SectionSubtitle>
             
-            <JobCardsGrid>
-              {jobs.map((job, index) => (
-                <JobCard key={index}>
-                  <JobCardHeader>
-                    <JobTitle>{job.title}</JobTitle>
-                    <JobLocation>{job.location}</JobLocation>
-                  </JobCardHeader>
-                  
-                  <JobDescription>{job.description}</JobDescription>
-                  
-                  <RequirementsSection>
-                    <RequirementsTitle>Key Requirements:</RequirementsTitle>
-                    <RequirementsList>
-                      {job.requirements.map((req, i) => (
-                        <RequirementItem key={i}>{req}</RequirementItem>
-                      ))}
-                    </RequirementsList>
-                  </RequirementsSection>
+            {loading ? (
+              <LoadingContainer>
+                <LoadingSpinner />
+                <LoadingText>Loading career opportunities...</LoadingText>
+              </LoadingContainer>
+            ) : positions.length === 0 ? (
+              <NoPositionsMessage>
+                <NoPositionsIcon>📋</NoPositionsIcon>
+                <NoPositionsTitle>No Open Positions</NoPositionsTitle>
+                <NoPositionsText>
+                  We don&apost have any open positions at the moment, but we&aposre always looking for talented individuals to join our team.
+                  Feel free to send your resume to <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a> and we&aposll keep you in mind for future opportunities.
+                </NoPositionsText>
+              </NoPositionsMessage>
+            ) : (
+              <JobCardsGrid>
+                {positions.map((position) => (
+                  <JobCard key={position.id}>
+                    <JobCardHeader>
+                      <JobTitle>{position.title}</JobTitle>
+                      <JobLocation>{position.location || 'Location TBD'}</JobLocation>
+                    </JobCardHeader>
+                    
+                    <JobDescription>{position.description}</JobDescription>
+                    
+                    <RequirementsSection>
+                      <RequirementsTitle>Key Requirements:</RequirementsTitle>
+                      <RequirementsList>
+                        {position.requirements.map((req, i) => (
+                          <RequirementItem key={i}>{req}</RequirementItem>
+                        ))}
+                      </RequirementsList>
+                    </RequirementsSection>
 
-                  <ApplyButton onClick={() => handleApplyClick(job.title)}>
-                    Apply Now
-                  </ApplyButton>
-                </JobCard>
-              ))}
-            </JobCardsGrid>
+                    <ApplyButton onClick={() => handleApplyClick(position)}>
+                      Apply Now
+                    </ApplyButton>
+                  </JobCard>
+                ))}
+              </JobCardsGrid>
+            )}
           </PositionsSection>
 
           <ApplicationSection id="application-form">
@@ -427,9 +500,12 @@ export default function CareersPage() {
                         email: '',
                         phone: '',
                         position: '',
+                        positionId: '',
                         message: '',
                         resume: null,
                         coverLetter: null,
+                        linkedinUrl: '',
+                        portfolioUrl: '',
                       });
                     }}>
                       Submit Another Application
@@ -528,20 +604,47 @@ export default function CareersPage() {
                   <select
                     id="position"
                     name="position"
-                    value={formData.position}
+                    value={formData.positionId}
                     onChange={handleChange}
-                    autoComplete="organization-title"
                     required
                   >
                     <option value="">Select a position...</option>
-                    {jobs.map((job, index) => (
-                      <option key={index} value={job.title}>
-                        {job.title}
+                    {positions.map((position) => (
+                      <option key={position.id} value={position.id.toString()}>
+                        {position.title}
                       </option>
                     ))}
                   </select>
                   {formErrors.position && <FieldError>{formErrors.position}</FieldError>}
                 </FormField>
+
+                <FormGrid>
+                  <FormField>
+                    <label htmlFor="linkedinUrl">LinkedIn Profile (Optional)</label>
+                    <input
+                      type="url"
+                      id="linkedinUrl"
+                      name="linkedinUrl"
+                      value={formData.linkedinUrl}
+                      onChange={handleChange}
+                      placeholder="https://linkedin.com/in/yourprofile"
+                    />
+                    {formErrors.linkedinUrl && <FieldError>{formErrors.linkedinUrl}</FieldError>}
+                  </FormField>
+
+                  <FormField>
+                    <label htmlFor="portfolioUrl">Portfolio/Website (Optional)</label>
+                    <input
+                      type="url"
+                      id="portfolioUrl"
+                      name="portfolioUrl"
+                      value={formData.portfolioUrl}
+                      onChange={handleChange}
+                      placeholder="https://yourportfolio.com"
+                    />
+                    {formErrors.portfolioUrl && <FieldError>{formErrors.portfolioUrl}</FieldError>}
+                  </FormField>
+                </FormGrid>
 
                 <FileUploadGrid>
                   <FileUploadWrapper>
@@ -599,9 +702,9 @@ export default function CareersPage() {
                   )}
                 </SubmitBtn>
 
-                <ContactInfo>
+                <ContactInfoFooter>
                   <p>Questions about the position? Contact us at <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a></p>
-                </ContactInfo>
+                </ContactInfoFooter>
                 
                 <CompanyCommitment>
                   <CommitmentTitle>Our Commitment to You</CommitmentTitle>
@@ -657,11 +760,91 @@ const SectionTitle = styled.h2`
   color: rgb(var(--text));
 `;
 
-const SectionSubtitle = styled.p`
+const SectionSubtitle = styled.div`
   font-size: 1.8rem;
   text-align: center;
   margin-bottom: 4rem;
   color: rgb(var(--text), 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const PositionCount = styled.span`
+  background: rgba(255, 125, 0, 0.1);
+  color: rgb(255, 125, 0);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 30vh;
+  gap: 2rem;
+`;
+
+const LoadingSpinner = styled.div`
+  width: 4rem;
+  height: 4rem;
+  border: 3px solid rgba(255, 125, 0, 0.1);
+  border-top: 3px solid rgb(255, 125, 0);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const LoadingText = styled.p`
+  font-size: 1.8rem;
+  color: rgb(var(--text), 0.7);
+  font-weight: 500;
+`;
+
+const NoPositionsMessage = styled.div`
+  text-align: center;
+  padding: 6rem 2rem;
+  background: rgba(var(--cardBackground), 0.5);
+  border-radius: 2rem;
+  border: 2px dashed rgba(var(--text), 0.2);
+`;
+
+const NoPositionsIcon = styled.div`
+  font-size: 4rem;
+  margin-bottom: 2rem;
+`;
+
+const NoPositionsTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 1.5rem;
+`;
+
+const NoPositionsText = styled.p`
+  font-size: 1.6rem;
+  color: rgb(var(--text), 0.7);
+  line-height: 1.6;
+  max-width: 50rem;
+  margin: 0 auto;
+
+  a {
+    color: rgb(255, 125, 0);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const JobCardsGrid = styled.div`
@@ -1190,6 +1373,7 @@ const Form = styled.form`
   input[type='text'],
   input[type='email'],
   input[type='tel'],
+  input[type='url'],
   select,
   textarea {
     padding: 1.5rem;

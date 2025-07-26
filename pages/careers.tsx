@@ -166,8 +166,8 @@ export default function CareersPage() {
       body: uploadFormData,
     });
 
-    if (!response.ok) {
-      throw new Error(`File upload failed: ${response.statusText}`);
+    if (!response.ok && response.status !== 201) {
+      throw new Error(`Server error: ${response.status}`);
     }
 
     const result = await response.json();

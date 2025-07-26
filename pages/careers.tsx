@@ -236,18 +236,13 @@ export default function CareersPage() {
 
       // Submit to ATS API
       const applicationData = {
-        position_id: parseInt(formData.positionId),
-        position_applied: formData.position,
+        job_id: formData.positionId,                      // ✅ Match API expectation
         first_name: formData.firstName.trim(),
         last_name: formData.lastName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
-        cover_letter: formData.message.trim(),
         resume_url: resumeUrl,
-        cover_letter_file_url: coverLetterFileUrl,
-        linkedin_url: formData.linkedinUrl.trim() || null,
-        portfolio_url: formData.portfolioUrl.trim() || null,
-        source: 'preciseanalytics.io_careers'
+        cover_letter: coverLetterFileUrl,                 // ✅ Match API expectation
       };
 
       const response = await fetch(`${ATS_BASE_URL}/api/applications`, {

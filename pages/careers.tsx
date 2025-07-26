@@ -56,24 +56,31 @@ export default function CareersPage() {
     fetchPositions();
   }, []);
 
-  // Fetch positions from ATS
+  // Fixed fetchPositions function for careers page
   const fetchPositions = async () => {
     try {
       setLoading(true);
       console.log('🔄 Fetching positions from ATS...');
       
-      const response = await fetch(`${ATS_BASE_URL}/api/jobs`);
+      // Add active_only parameter to get only active jobs
+      const response = await fetch(`${ATS_BASE_URL}/api/jobs?active_only=true`);
       const data = await response.json();
       
-      const processedPositions = data.map((pos: any) => ({
+      console.log('📊 ATS API Response:', data); // Debug log
+      
+      // Fix: Extract jobs array from API response
+      const jobsArray = data.success ? data.jobs : (Array.isArray(data) ? data : []);
+      
+      const processedPositions = jobsArray.map((pos: any) => ({
         ...pos,
         requirements: typeof pos.requirements === 'string' 
           ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
           : pos.requirements || []
       }));
 
+      console.log('✅ Processed positions:', processedPositions); // Debug log
       setPositions(processedPositions);
-            
+      
     } catch (error) {
       console.error('❌ Error fetching positions:', error);
       setPositions([]);

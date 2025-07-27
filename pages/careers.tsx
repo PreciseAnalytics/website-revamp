@@ -327,44 +327,55 @@ export default function CareersPage() {
 
   const handleApplyClick = (position: Position) => {
   // Create salary range from salary_min and salary_max
-  const salaryRange = position.salary_min && position.salary_max 
-    ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
-    : '';
+    const salaryRange = position.salary_min && position.salary_max 
+      ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
+      : '';
 
-  // Clean up employment type to avoid undefined values
-  const cleanEmploymentType = position.employment_type && position.employment_type !== 'undefined' 
-    ? position.employment_type 
-    : 'Full-time';
+    // Clean up employment type to avoid undefined values
+    const cleanEmploymentType = position.employment_type && position.employment_type !== 'undefined' 
+      ? position.employment_type 
+      : 'Full-time';
 
-  // Create URL parameters, filtering out empty/undefined values
-  const params: Record<string, string> = {
-    jobId: position.id.toString(),
-    title: position.title || '',
-    department: position.department || '',
-    location: position.location || '',
-    employmentType: cleanEmploymentType,
-    description: position.description || '',
-    requirements: JSON.stringify(position.requirements || []),
-    benefits: position.benefits || ''
-  };
+    // Create URL parameters, filtering out empty/undefined values
+    const params: Record<string, string> = {
+      jobId: position.id.toString(),
+      title: position.title || '',
+      department: position.department || '',
+      location: position.location || '',
+      employmentType: cleanEmploymentType,
+      description: position.description || '',
+      requirements: JSON.stringify(position.requirements || []),
+      benefits: position.benefits || ''
+    };
 
-  // Only add salary range if it exists
-  if (salaryRange) {
-    params.salaryRange = salaryRange;
-  }
+    // Only add salary range if it exists
+    if (salaryRange) {
+      params.salaryRange = salaryRange;
+    }
 
-  // Create URL with cleaned parameters
-  const applicationUrl = `/application?${new URLSearchParams(params).toString()}`;
+    // Create URL with cleaned parameters
+    const applicationUrl = `/application?${new URLSearchParams(params).toString()}`;
 
-  // Open in new tab
-  window.open(applicationUrl, '_blank');
+    // FIX: Use direct navigation instead of window.open for mobile compatibility
+    if (typeof window !== 'undefined') {
+      // Check if mobile device
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // On mobile: navigate directly in same tab
+        window.location.href = applicationUrl;
+      } else {
+        // On desktop: open in new tab
+        window.open(applicationUrl, '_blank');
+      }
+    }
   
   // Analytics tracking
   if (typeof window !== 'undefined' && (window as any).gtag) {
     (window as any).gtag('event', 'apply_button_clicked', {
       'job_position': position.title,
       'job_id': position.id,
-      'application_source': 'careers_page_new_tab'
+      'application_source': 'careers_page_mobile_fixed'
     });
   }
 };

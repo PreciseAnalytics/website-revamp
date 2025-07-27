@@ -1,4 +1,5 @@
 // pages/application.tsx - Enhanced comprehensive application page
+/* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -475,10 +476,18 @@ export default function ApplicationPage() {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <JobTitle>{jobDetails.title}</JobTitle>
               <JobMeta>
-                <JobMetaItem>🏢 {jobDetails.department}</JobMetaItem>
-                <JobMetaItem>📍 {jobDetails.location}</JobMetaItem>
-                <JobMetaItem>💼 {jobDetails.employmentType}</JobMetaItem>
-                {jobDetails.salaryRange && <JobMetaItem>💰 {jobDetails.salaryRange}</JobMetaItem>}
+                {jobDetails.department && (
+                  <JobMetaItem>🏢 {jobDetails.department}</JobMetaItem>
+                )}
+                {jobDetails.location && (
+                  <JobMetaItem>📍 {jobDetails.location}</JobMetaItem>
+                )}
+                {jobDetails.employmentType && jobDetails.employmentType !== 'undefined' && (
+                  <JobMetaItem>💼 {jobDetails.employmentType.replace('_', ' ').toUpperCase()}</JobMetaItem>
+                )}
+                {jobDetails.salaryRange && jobDetails.salaryRange !== 'undefined' && (
+                  <JobMetaItem>💰 {jobDetails.salaryRange}</JobMetaItem>
+                )}
               </JobMeta>
               <JobDescription>{jobDetails.description}</JobDescription>
             </motion.div>

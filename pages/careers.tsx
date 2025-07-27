@@ -328,26 +328,38 @@ export default function CareersPage() {
   const handleApplyClick = (position: Position) => {
   // Create salary range from salary_min and salary_max
   const salaryRange = position.salary_min && position.salary_max 
-    ? `${position.salary_min.toLocaleString()} - ${position.salary_max.toLocaleString()}`
+    ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
     : '';
 
-  // Create URL with job parameters for the new comprehensive application page
-  const applicationUrl = `/application?` + new URLSearchParams({
+  // Clean up employment type to avoid undefined values
+  const cleanEmploymentType = position.employment_type && position.employment_type !== 'undefined' 
+    ? position.employment_type 
+    : 'Full-time';
+
+  // Create URL parameters, filtering out empty/undefined values
+  const params: Record<string, string> = {
     jobId: position.id.toString(),
-    title: position.title,
-    department: position.department,
-    location: position.location,
-    employmentType: position.employment_type,
-    description: position.description,
-    requirements: JSON.stringify(position.requirements),
-    salaryRange: salaryRange,
+    title: position.title || '',
+    department: position.department || '',
+    location: position.location || '',
+    employmentType: cleanEmploymentType,
+    description: position.description || '',
+    requirements: JSON.stringify(position.requirements || []),
     benefits: position.benefits || ''
-  }).toString();
+  };
+
+  // Only add salary range if it exists
+  if (salaryRange) {
+    params.salaryRange = salaryRange;
+  }
+
+  // Create URL with cleaned parameters
+  const applicationUrl = `/application?${new URLSearchParams(params).toString()}`;
 
   // Open in new tab
   window.open(applicationUrl, '_blank');
   
-  // Keep your existing analytics tracking
+  // Analytics tracking
   if (typeof window !== 'undefined' && (window as any).gtag) {
     (window as any).gtag('event', 'apply_button_clicked', {
       'job_position': position.title,

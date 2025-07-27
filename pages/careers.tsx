@@ -326,16 +326,36 @@ export default function CareersPage() {
   };
 
   const handleApplyClick = (position: Position) => {
-    setFormData({ 
-      ...formData, 
-      positionId: position.id.toString(),
-      position: position.title 
+  // Create salary range from salary_min and salary_max
+  const salaryRange = position.salary_min && position.salary_max 
+    ? `${position.salary_min.toLocaleString()} - ${position.salary_max.toLocaleString()}`
+    : '';
+
+  // Create URL with job parameters for the new comprehensive application page
+  const applicationUrl = `/application?` + new URLSearchParams({
+    jobId: position.id.toString(),
+    title: position.title,
+    department: position.department,
+    location: position.location,
+    employmentType: position.employment_type,
+    description: position.description,
+    requirements: JSON.stringify(position.requirements),
+    salaryRange: salaryRange,
+    benefits: position.benefits || ''
+  }).toString();
+
+  // Open in new tab
+  window.open(applicationUrl, '_blank');
+  
+  // Keep your existing analytics tracking
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', 'apply_button_clicked', {
+      'job_position': position.title,
+      'job_id': position.id,
+      'application_source': 'careers_page_new_tab'
     });
-    const formElement = document.getElementById('application-form');
-    if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  }
+};
 
   return (
     <>

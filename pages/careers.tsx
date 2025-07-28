@@ -325,36 +325,10 @@ export default function CareersPage() {
     }
   };
 
+  // FIXED: Only pass the job ID, not all the data
   const handleApplyClick = (position: Position) => {
-  // Create salary range from salary_min and salary_max
-    const salaryRange = position.salary_min && position.salary_max 
-      ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
-      : '';
-
-    // Clean up employment type to avoid undefined values
-    const cleanEmploymentType = position.employment_type && position.employment_type !== 'undefined' 
-      ? position.employment_type 
-      : 'Full-time';
-
-    // Create URL parameters, filtering out empty/undefined values
-    const params: Record<string, string> = {
-      jobId: position.id.toString(),
-      title: position.title || '',
-      department: position.department || '',
-      location: position.location || '',
-      employmentType: cleanEmploymentType,
-      description: position.description || '',
-      requirements: JSON.stringify(position.requirements || []),
-      benefits: position.benefits || ''
-    };
-
-    // Only add salary range if it exists
-    if (salaryRange) {
-      params.salaryRange = salaryRange;
-    }
-
-    // Create URL with cleaned parameters
-    const applicationUrl = `/application?${new URLSearchParams(params).toString()}`;
+    // FIXED: Only pass the job ID, not all the data
+    const applicationUrl = `/application/${position.id}`;
 
     // FIX: Use direct navigation instead of window.open for mobile compatibility
     if (typeof window !== 'undefined') {
@@ -369,16 +343,16 @@ export default function CareersPage() {
         window.open(applicationUrl, '_blank');
       }
     }
-  
-  // Analytics tracking
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', 'apply_button_clicked', {
-      'job_position': position.title,
-      'job_id': position.id,
-      'application_source': 'careers_page_mobile_fixed'
-    });
-  }
-};
+
+    // Analytics tracking
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'apply_button_clicked', {
+        'job_position': position.title,
+        'job_id': position.id,
+        'application_source': 'careers_page_fixed_urls'
+      });
+    }
+  };
 
   return (
     <>
@@ -395,6 +369,63 @@ export default function CareersPage() {
             <PageTitle>Join Our Team</PageTitle>
             <PageSubtitle>Empowering missions through data—together.</PageSubtitle>
           </motion.div>
+
+          {/* NEW: Welcome Section */}
+          <WelcomeSection>
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
+              <WelcomeCard>
+                <WelcomeIcon>🚀</WelcomeIcon>
+                <WelcomeTitle>Join Our Mission-Driven Team</WelcomeTitle>
+                <WelcomeText>
+                  At Precise Analytics, we&apos;re more than just a data company—we&apos;re a team of passionate professionals 
+                  dedicated to transforming how government and enterprise organizations leverage data for mission-critical decisions.
+                  As a <strong>Veteran-Owned Small Business (VOSB)</strong> and <strong>Service-Disabled Veteran-Owned Small Business (SDVOSB)</strong>, 
+                  we bring unique perspectives and unwavering commitment to excellence.
+                </WelcomeText>
+                
+                <WelcomeFeatures>
+                  <FeatureItem>
+                    <FeatureIcon>💡</FeatureIcon>
+                    <FeatureText><strong>Innovative Work:</strong> Tackle complex data challenges for federal agencies</FeatureText>
+                  </FeatureItem>
+                  <FeatureItem>
+                    <FeatureIcon>🌟</FeatureIcon>
+                    <FeatureText><strong>Growth Opportunities:</strong> Advance your career in a supportive environment</FeatureText>
+                  </FeatureItem>
+                  <FeatureItem>
+                    <FeatureIcon>🤝</FeatureIcon>
+                    <FeatureText><strong>Team Culture:</strong> Collaborate with industry experts and veterans</FeatureText>
+                  </FeatureItem>
+                  <FeatureItem>
+                    <FeatureIcon>🎯</FeatureIcon>
+                    <FeatureText><strong>Meaningful Impact:</strong> Your work directly supports national priorities</FeatureText>
+                  </FeatureItem>
+                </WelcomeFeatures>
+                
+                <ApplicationProcess>
+                  <ProcessTitle>How to Apply</ProcessTitle>
+                  <WelcomeProcessSteps>
+                    <WelcomeProcessStep>
+                      <WelcomeStepNumber>1</WelcomeStepNumber>
+                      <WelcomeStepText>Browse our open positions below</WelcomeStepText>
+                    </WelcomeProcessStep>
+                    <WelcomeProcessStep>
+                      <WelcomeStepNumber>2</WelcomeStepNumber>
+                      <WelcomeStepText>Click &quot;Apply Now&quot; on your preferred role</WelcomeStepText>
+                    </WelcomeProcessStep>
+                    <WelcomeProcessStep>
+                      <WelcomeStepNumber>3</WelcomeStepNumber>
+                      <WelcomeStepText>Complete our comprehensive application</WelcomeStepText>
+                    </WelcomeProcessStep>
+                    <WelcomeProcessStep>
+                      <WelcomeStepNumber>4</WelcomeStepNumber>
+                      <WelcomeStepText>Track your application status online</WelcomeStepText>
+                    </WelcomeProcessStep>
+                  </WelcomeProcessSteps>
+                </ApplicationProcess>
+              </WelcomeCard>
+            </motion.div>
+          </WelcomeSection>
 
           <PositionsSection>
             <SectionTitle>Open Positions</SectionTitle>
@@ -415,354 +446,65 @@ export default function CareersPage() {
                 <NoPositionsIcon>📋</NoPositionsIcon>
                 <NoPositionsTitle>No Open Positions</NoPositionsTitle>
                 <NoPositionsText>
-                  We don&apost have any open positions at the moment, but we&aposre always looking for talented individuals to join our team.
-                  Feel free to send your resume to <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a> and we&aposll keep you in mind for future opportunities.
+                  We don&apos;t have any open positions at the moment, but we&apos;re always looking for talented individuals to join our team.
+                  Feel free to send your resume to <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a> and we&apos;ll keep you in mind for future opportunities.
                 </NoPositionsText>
               </NoPositionsMessage>
             ) : (
-              <JobCardsGrid>
-                {positions.map((position) => (
-                  <JobCard key={position.id}>
-                    <JobCardHeader>
-                      <JobTitle>{position.title}</JobTitle>
-                      <JobLocation>{position.location || 'Location TBD'}</JobLocation>
-                    </JobCardHeader>
-                    
-                    <JobDescription>{position.description}</JobDescription>
-                    
-                    <RequirementsSection>
-                      <RequirementsTitle>Key Requirements:</RequirementsTitle>
-                      <RequirementsList>
-                        {position.requirements.map((req, i) => (
-                          <RequirementItem key={i}>{req}</RequirementItem>
-                        ))}
-                      </RequirementsList>
-                    </RequirementsSection>
+              <JobListContainer>
+                {/* Header */}
+                <JobListHeader>
+                  <HeaderCell className="title">Position</HeaderCell>
+                  <HeaderCell className="department">Department</HeaderCell>
+                  <HeaderCell className="location">Location</HeaderCell>
+                  <HeaderCell className="type">Type</HeaderCell>
+                  <HeaderCell className="salary">Salary</HeaderCell>
+                  <HeaderCell className="action">Apply</HeaderCell>
+                </JobListHeader>
 
-                    <ApplyButton onClick={() => handleApplyClick(position)}>
-                      Apply Now
-                    </ApplyButton>
-                  </JobCard>
+                {/* Job Rows */}
+                {positions.map((position) => (
+                  <JobListRow key={position.id}>
+                    <JobCell className="title">
+                      <JobTitle>{position.title}</JobTitle>
+                      <JobPreview>{position.description.substring(0, 120)}...</JobPreview>
+                    </JobCell>
+                    
+                    <JobCell className="department">
+                      <DepartmentTag>{position.department}</DepartmentTag>
+                    </JobCell>
+                    
+                    <JobCell className="location">
+                      <LocationText>{position.location || 'Location TBD'}</LocationText>
+                    </JobCell>
+                    
+                    <JobCell className="type">
+                      <TypeBadge>
+                        {position.employment_type?.replace('_', ' ').toUpperCase() || 'FULL-TIME'}
+                      </TypeBadge>
+                    </JobCell>
+                    
+                    <JobCell className="salary">
+                      <SalaryText>
+                        {position.salary_min && position.salary_max 
+                          ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
+                          : 'Competitive'
+                        }
+                      </SalaryText>
+                    </JobCell>
+                    
+                    <JobCell className="action">
+                      <CompactApplyButton onClick={() => handleApplyClick(position)}>
+                        Apply Now
+                      </CompactApplyButton>
+                    </JobCell>
+                  </JobListRow>
                 ))}
-              </JobCardsGrid>
+              </JobListContainer>
             )}
           </PositionsSection>
 
-          <ApplicationSection id="application-form">
-            <FormWrapper>
-              <FormTitle>Apply Now</FormTitle>
-              <FormSubtitle>Ready to make an impact? Submit your application below.</FormSubtitle>
-              
-              <ApplicationProcess>
-                <ProcessHeader>
-                  <ProcessIcon>📋</ProcessIcon>
-                  <ProcessTitle>Our Application Process</ProcessTitle>
-                </ProcessHeader>
-                <ProcessSteps>
-                  <ProcessStep>
-                    <StepNumber>1</StepNumber>
-                    <StepText>Submit your complete application with resume</StepText>
-                  </ProcessStep>
-                  <ProcessStep>
-                    <StepNumber>2</StepNumber>
-                    <StepText>Receive confirmation email within 5 minutes</StepText>
-                  </ProcessStep>
-                  <ProcessStep>
-                    <StepNumber>3</StepNumber>
-                    <StepText>Initial review by our talent team (1-3 business days)</StepText>
-                  </ProcessStep>
-                  <ProcessStep>
-                    <StepNumber>4</StepNumber>
-                    <StepText>Response with next steps (within 5 business days)</StepText>
-                  </ProcessStep>
-                </ProcessSteps>
-                <ProcessNote>
-                  <strong>Note:</strong> We review every application personally and provide feedback regardless of the outcome. We believe in treating all candidates with respect and transparency throughout the process.
-                </ProcessNote>
-              </ApplicationProcess>
-              
-              {submitSuccess && (
-                <SuccessMessage>
-                  <SuccessHeader>
-                    <SuccessIcon>✅</SuccessIcon>
-                    <SuccessTitle>Application Successfully Submitted</SuccessTitle>
-                  </SuccessHeader>
-                  
-                  <SuccessContent>
-                    <WelcomeMessage>
-                      Thank you for your interest in joining the Precise Analytics team! Your application for the <strong>{submittedInfo?.position || 'selected position'}</strong> has been received and is now under review.
-                    </WelcomeMessage>
-                    
-                    <ProcessTimeline>
-                      <TimelineTitle>What Happens Next:</TimelineTitle>
-                      <TimelineList>
-                        <TimelineItem>
-                          <TimelineStep>1</TimelineStep>
-                          <TimelineContent>
-                            <TimelineLabel>Confirmation Email (Within 5 minutes)</TimelineLabel>
-                            <TimelineDescription>You&apos;ll receive a detailed confirmation email at {submittedInfo?.email || 'your email address'} with your application details.</TimelineDescription>
-                          </TimelineContent>
-                        </TimelineItem>
-                        
-                        <TimelineItem>
-                          <TimelineStep>2</TimelineStep>
-                          <TimelineContent>
-                            <TimelineLabel>Initial Review (1-3 business days)</TimelineLabel>
-                            <TimelineDescription>Our talent acquisition team will carefully review your qualifications and experience.</TimelineDescription>
-                          </TimelineContent>
-                        </TimelineItem>
-                        
-                        <TimelineItem>
-                          <TimelineStep>3</TimelineStep>
-                          <TimelineContent>
-                            <TimelineLabel>Response & Next Steps (Within 5 business days)</TimelineLabel>
-                            <TimelineDescription>We&apos;ll contact you with our decision and next steps, whether that&apos;s scheduling an interview or providing feedback.</TimelineDescription>
-                          </TimelineContent>
-                        </TimelineItem>
-                      </TimelineList>
-                    </ProcessTimeline>
-                    
-                    <ContactSection>
-                      <ContactTitle>Questions or Need Assistance?</ContactTitle>
-                      <ContactInfo>
-                        <ContactItem>
-                          <ContactIcon>📧</ContactIcon>
-                          <ContactText>Email us at <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a></ContactText>
-                        </ContactItem>
-                        <ContactItem>
-                          <ContactIcon>💼</ContactIcon>
-                          <ContactText>Application ID: {submittedInfo?.applicationId || `PA-${Date.now().toString().slice(-6)}`}</ContactText>
-                        </ContactItem>
-                      </ContactInfo>
-                    </ContactSection>
-                    
-                    <SubmitAnotherBtn onClick={() => {
-                      setSubmitSuccess(null);
-                      setSubmittedInfo(null);
-                      setFormData({
-                        firstName: '',
-                        lastName: '',
-                        email: '',
-                        phone: '',
-                        position: '',
-                        positionId: '',
-                        message: '',
-                        resume: null,
-                        coverLetter: null,
-                        linkedinUrl: '',
-                        portfolioUrl: '',
-                      });
-                    }}>
-                      Submit Another Application
-                    </SubmitAnotherBtn>
-                  </SuccessContent>
-                </SuccessMessage>
-              )}
-
-              {submitError && (
-                <ErrorMessage>
-                  <ErrorHeader>
-                    <ErrorIcon>⚠️</ErrorIcon>
-                    <ErrorTitle>Application Submission Issue</ErrorTitle>
-                  </ErrorHeader>
-                  <ErrorContent>
-                    <ErrorText>{submitError}</ErrorText>
-                    <ErrorActions>
-                      <RetryButton onClick={() => setSubmitError(null)}>
-                        Try Again
-                      </RetryButton>
-                      <EmailButton href="mailto:careers@preciseanalytics.io">
-                        Email Application Instead
-                      </EmailButton>
-                    </ErrorActions>
-                  </ErrorContent>
-                </ErrorMessage>
-              )}
-              
-              <Form onSubmit={handleSubmit}>
-                <FormGrid>
-                  <FormField>
-                    <label htmlFor="firstName">First Name *</label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      autoComplete="given-name"
-                      placeholder="Enter your first name"
-                      required
-                    />
-                    {formErrors.firstName && <FieldError>{formErrors.firstName}</FieldError>}
-                  </FormField>
-                  
-                  <FormField>
-                    <label htmlFor="lastName">Last Name *</label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      autoComplete="family-name"
-                      placeholder="Enter your last name"
-                      required
-                    />
-                    {formErrors.lastName && <FieldError>{formErrors.lastName}</FieldError>}
-                  </FormField>
-                </FormGrid>
-
-                <FormField>
-                  <label htmlFor="email">Email Address *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    autoComplete="email"
-                    placeholder="your.email@example.com"
-                    required
-                  />
-                  {formErrors.email && <FieldError>{formErrors.email}</FieldError>}
-                </FormField>
-
-                <FormField>
-                  <label htmlFor="phone">Phone Number *</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    autoComplete="tel"
-                    placeholder="(555) 123-4567"
-                    maxLength={14}
-                    required
-                  />
-                  <PhoneNote>US phone number required for contact purposes</PhoneNote>
-                  {formErrors.phone && <FieldError>{formErrors.phone}</FieldError>}
-                </FormField>
-
-                <FormField>
-                  <label htmlFor="position">Position of Interest *</label>
-                  <select
-                    id="position"
-                    name="position"
-                    value={formData.positionId}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Select a position...</option>
-                    {positions.map((position) => (
-                      <option key={position.id} value={position.id.toString()}>
-                        {position.title}
-                      </option>
-                    ))}
-                  </select>
-                  {formErrors.position && <FieldError>{formErrors.position}</FieldError>}
-                </FormField>
-
-                <FormGrid>
-                  <FormField>
-                    <label htmlFor="linkedinUrl">LinkedIn Profile (Optional)</label>
-                    <input
-                      type="url"
-                      id="linkedinUrl"
-                      name="linkedinUrl"
-                      value={formData.linkedinUrl}
-                      onChange={handleChange}
-                      placeholder="https://linkedin.com/in/yourprofile"
-                    />
-                    {formErrors.linkedinUrl && <FieldError>{formErrors.linkedinUrl}</FieldError>}
-                  </FormField>
-
-                  <FormField>
-                    <label htmlFor="portfolioUrl">Portfolio/Website (Optional)</label>
-                    <input
-                      type="url"
-                      id="portfolioUrl"
-                      name="portfolioUrl"
-                      value={formData.portfolioUrl}
-                      onChange={handleChange}
-                      placeholder="https://yourportfolio.com"
-                    />
-                    {formErrors.portfolioUrl && <FieldError>{formErrors.portfolioUrl}</FieldError>}
-                  </FormField>
-                </FormGrid>
-
-                <FileUploadGrid>
-                  <FileUploadWrapper>
-                    <label htmlFor="resume">Resume/CV *</label>
-                    <FileInput
-                      type="file"
-                      id="resume"
-                      name="resume"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleChange}
-                      required
-                    />
-                    <FileNote>PDF, DOC, or DOCX (max 5MB)</FileNote>
-                    {formErrors.resume && <FieldError>{formErrors.resume}</FieldError>}
-                  </FileUploadWrapper>
-                  
-                  <FileUploadWrapper>
-                    <label htmlFor="coverLetter">Cover Letter (Optional)</label>
-                    <FileInput
-                      type="file"
-                      id="coverLetter"
-                      name="coverLetter"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleChange}
-                    />
-                    <FileNote>PDF, DOC, or DOCX (max 5MB)</FileNote>
-                    {formErrors.coverLetter && <FieldError>{formErrors.coverLetter}</FieldError>}
-                  </FileUploadWrapper>
-                </FileUploadGrid>
-
-                <FormField>
-                  <label htmlFor="message">Why are you interested in this role? *</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={6}
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Tell us about your interest in this position and what you'd bring to our team..."
-                    minLength={50}
-                    required
-                  />
-                  <MessageNote>Please provide at least 50 characters describing your interest</MessageNote>
-                  {formErrors.message && <FieldError>{formErrors.message}</FieldError>}
-                </FormField>
-
-                <SubmitBtn type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <span style={{ marginRight: '0.5rem' }}>📤</span>
-                      Submitting Application...
-                    </>
-                  ) : (
-                    'Submit Application'
-                  )}
-                </SubmitBtn>
-
-                <ContactInfoFooter>
-                  <p>Questions about the position? Contact us at <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a></p>
-                </ContactInfoFooter>
-                
-                <CompanyCommitment>
-                  <CommitmentTitle>Our Commitment to You</CommitmentTitle>
-                  <CommitmentText>
-                    At Precise Analytics, we believe every candidate deserves respect and transparency. 
-                    We commit to reviewing your application thoroughly, providing timely communication, 
-                    and offering constructive feedback regardless of the outcome. Your time and interest 
-                    in our company are valued, and we strive to make this process as positive as possible.
-                  </CommitmentText>
-                </CompanyCommitment>
-              </Form>
-            </FormWrapper>
-          </ApplicationSection>
+          {/* REMOVED: ApplicationSection - Now handled by dedicated /application page */}
         </Container>
       </PageWrapper>
     </>
@@ -791,6 +533,155 @@ const PageSubtitle = styled.p`
   text-align: center;
   margin-bottom: 6rem;
   color: rgb(var(--text), 0.8);
+`;
+
+// NEW: Welcome Section Styled Components
+const WelcomeSection = styled.section`
+  margin: 4rem 0 6rem 0;
+`;
+
+const WelcomeCard = styled.div`
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.05), rgba(255, 165, 0, 0.02));
+  border: 2px solid rgba(255, 125, 0, 0.2);
+  border-radius: 2rem;
+  padding: 4rem;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(255, 125, 0, 0.1);
+  ${mq('<=tablet', 'padding: 3rem 2rem;')}
+`;
+
+const WelcomeIcon = styled.div`
+  font-size: 4rem;
+  margin-bottom: 2rem;
+`;
+
+const WelcomeTitle = styled.h2`
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: rgb(255, 125, 0);
+  margin-bottom: 2rem;
+  ${mq('<=tablet', 'font-size: 2.8rem;')}
+`;
+
+const WelcomeText = styled.p`
+  font-size: 1.8rem;
+  line-height: 1.6;
+  color: rgb(var(--text), 0.8);
+  margin-bottom: 3rem;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  
+  strong {
+    color: rgb(255, 125, 0);
+    font-weight: 600;
+  }
+  
+  ${mq('<=tablet', 'font-size: 1.6rem;')}
+`;
+
+const WelcomeFeatures = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+  ${mq('<=tablet', 'grid-template-columns: 1fr; gap: 1.5rem;')}
+`;
+
+const FeatureItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(var(--cardBackground), 0.8);
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--text), 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 125, 0, 0.15);
+    border-color: rgba(255, 125, 0, 0.3);
+  }
+  
+  ${mq('<=tablet', 'flex-direction: column; text-align: center;')}
+`;
+
+const FeatureIcon = styled.div`
+  font-size: 2.4rem;
+  flex-shrink: 0;
+`;
+
+const FeatureText = styled.p`
+  margin: 0;
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  line-height: 1.4;
+  
+  strong {
+    color: rgb(var(--text));
+    font-weight: 600;
+  }
+  
+  ${mq('<=tablet', 'font-size: 1.5rem; text-align: center;')}
+`;
+
+const ApplicationProcess = styled.div`
+  background: rgba(var(--cardBackground), 0.6);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  border: 1px solid rgba(var(--text), 0.1);
+  ${mq('<=tablet', 'padding: 2rem;')}
+`;
+
+const ProcessTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+// RENAMED: First ProcessSteps to WelcomeProcessSteps to avoid conflict
+const WelcomeProcessSteps = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 2rem;
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
+`;
+
+const WelcomeProcessStep = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 125, 0, 0.1);
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 125, 0, 0.2);
+  
+  ${mq('<=tablet', 'justify-content: center; text-align: center;')}
+`;
+
+const WelcomeStepNumber = styled.div`
+  background: rgb(255, 125, 0);
+  color: white;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+`;
+
+const WelcomeStepText = styled.p`
+  margin: 0;
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  font-weight: 500;
+  line-height: 1.4;
 `;
 
 const PositionsSection = styled.section`
@@ -892,6 +783,210 @@ const NoPositionsText = styled.p`
   }
 `;
 
+// NEW: Job List Components
+const JobListContainer = styled.div`
+  background: rgba(var(--cardBackground), 0.9);
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(var(--text), 0.1);
+`;
+
+const JobListHeader = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 0.8fr;
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.1), rgba(255, 165, 0, 0.05));
+  border-bottom: 2px solid rgba(255, 125, 0, 0.2);
+  padding: 1.5rem 2rem;
+  font-weight: 700;
+  
+  ${mq('<=tablet', `
+    grid-template-columns: 1fr;
+    display: none;
+  `)}
+`;
+
+const HeaderCell = styled.div`
+  font-size: 1.4rem;
+  color: rgb(255, 125, 0);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.title { justify-self: start; }
+  &.department { justify-self: center; }
+  &.location { justify-self: center; }
+  &.type { justify-self: center; }
+  &.salary { justify-self: center; }
+  &.action { justify-self: end; }
+`;
+
+const JobListRow = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 0.8fr;
+  padding: 2rem;
+  border-bottom: 1px solid rgba(var(--text), 0.1);
+  align-items: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 125, 0, 0.03);
+    border-left: 4px solid rgb(255, 125, 0);
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  ${mq('<=tablet', `
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+    padding: 2rem 1.5rem;
+    border-left: none !important;
+    
+    &:hover {
+      background: rgba(255, 125, 0, 0.05);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 125, 0, 0.15);
+    }
+  `)}
+`;
+
+const JobCell = styled.div`
+  &.title { justify-self: start; }
+  &.department { justify-self: center; }
+  &.location { justify-self: center; }
+  &.type { justify-self: center; }
+  &.salary { justify-self: center; }
+  &.action { justify-self: end; }
+  
+  ${mq('<=tablet', `
+    justify-self: start !important;
+    width: 100%;
+  `)}
+`;
+
+const JobTitle = styled.h3`
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: rgb(255, 125, 0);
+  line-height: 1.3;
+  
+  ${mq('<=tablet', 'font-size: 2rem; margin-bottom: 0.8rem;')}
+`;
+
+const JobPreview = styled.p`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.7);
+  margin: 0;
+  line-height: 1.4;
+  
+  ${mq('<=tablet', `
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  `)}
+`;
+
+const DepartmentTag = styled.span`
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+  padding: 0.6rem 1.2rem;
+  border-radius: 2rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  white-space: nowrap;
+  
+  ${mq('<=tablet', `
+    font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+  `)}
+`;
+
+const LocationText = styled.span`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:before {
+    content: '📍';
+    margin-right: 0.5rem;
+  }
+  
+  ${mq('<=tablet', `
+    justify-content: flex-start;
+    font-size: 1.5rem;
+  `)}
+`;
+
+const TypeBadge = styled.span`
+  background: rgba(59, 130, 246, 0.1);
+  color: rgb(59, 130, 246);
+  padding: 0.6rem 1.2rem;
+  border-radius: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+  
+  ${mq('<=tablet', `
+    font-size: 1.3rem;
+    padding: 0.8rem 1.5rem;
+  `)}
+`;
+
+const SalaryText = styled.span`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.9);
+  font-weight: 600;
+  text-align: center;
+  
+  ${mq('<=tablet', `
+    text-align: left;
+    font-size: 1.5rem;
+  `)}
+`;
+
+const CompactApplyButton = styled.button`
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border: 2px solid rgb(255, 125, 0);
+  background: rgb(255, 125, 0);
+  color: white;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 10;
+
+  &:hover {
+    background: rgb(230, 100, 0);
+    border-color: rgb(230, 100, 0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  ${mq('<=tablet', `
+    width: 100%;
+    padding: 1.2rem 2rem;
+    font-size: 1.6rem;
+    min-height: 44px;
+    margin-top: 1rem;
+  `)}
+`;
+
+// KEPT: Original styled components for backward compatibility (even though ApplicationSection is removed)
 const JobCardsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(35rem, 1fr));
@@ -916,13 +1011,6 @@ const JobCardHeader = styled.div`
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid rgba(var(--text), 0.1);
-`;
-
-const JobTitle = styled.h3`
-  font-size: 2.4rem;
-  font-weight: 700;
-  margin-bottom: 0.8rem;
-  color: rgb(255, 125, 0);
 `;
 
 const JobLocation = styled.span`
@@ -1021,15 +1109,6 @@ const FormSubtitle = styled.p`
   color: rgb(var(--text), 0.7);
 `;
 
-const ApplicationProcess = styled.div`
-  background: linear-gradient(135deg, rgba(255, 125, 0, 0.05), rgba(255, 165, 0, 0.02));
-  border: 2px solid rgba(255, 125, 0, 0.2);
-  border-radius: 1.5rem;
-  padding: 2.5rem;
-  margin-bottom: 3rem;
-  box-shadow: 0 4px 15px rgba(255, 125, 0, 0.1);
-`;
-
 const ProcessHeader = styled.div`
   display: flex;
   align-items: center;
@@ -1047,14 +1126,7 @@ const ProcessIcon = styled.div`
   border: 2px solid rgba(255, 125, 0, 0.3);
 `;
 
-const ProcessTitle = styled.h3`
-  font-size: 2.2rem;
-  font-weight: 600;
-  color: rgb(255, 125, 0);
-  margin: 0;
-  ${mq('<=tablet', 'font-size: 2rem;')}
-`;
-
+// KEPT: Second ProcessSteps (this is the one used in other sections)
 const ProcessSteps = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;

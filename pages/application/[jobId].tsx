@@ -1,4 +1,4 @@
-// pages/application.tsx - Enhanced comprehensive application page
+// pages/application/[jobId].tsx - Fixed to use clean URLs and fetch job data
 /* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect } from 'react';
@@ -14,16 +14,18 @@ import { mq } from 'utils/media';
 // ATS API Configuration
 const ATS_BASE_URL = 'https://precise-analytics-ats.vercel.app';
 
-interface JobDetails {
-  jobId: string;
+// FIXED: Updated interface to handle UUID job IDs
+interface Position {
+  id: string; // Changed from number to string to handle UUIDs
   title: string;
   department: string;
   location: string;
-  employmentType: string;
+  employment_type: string;
   description: string;
   requirements: string[];
-  salaryRange: string;
-  benefits: string;
+  salary_min?: number;
+  salary_max?: number;
+  benefits?: string;
 }
 
 interface WorkExperience {
@@ -91,7 +93,13 @@ interface FormErrors {
 
 export default function ApplicationPage() {
   const router = useRouter();
-  const [jobDetails, setJobDetails] = useState<JobDetails | null>(null);
+  const { jobId } = router.query; // FIXED: Only get jobId from URL
+  
+  // FIXED: Clean state management
+  const [position, setPosition] = useState<Position | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -132,39 +140,109 @@ export default function ApplicationPage() {
     coverLetter: null,
   });
 
+  // FIXED: Enhanced job fetching with clean URL approach
   useEffect(() => {
-    // Parse job details from URL parameters
-    if (router.isReady && router.query) {
-      const {
-        jobId,
-        title,
-        department,
-        location,
-        employmentType,
-        description,
-        requirements,
-        salaryRange,
-        benefits
-      } = router.query;
-
-      if (jobId && title) {
-        setJobDetails({
-          jobId: jobId as string,
-          title: title as string,
-          department: department as string || '',
-          location: location as string || '',
-          employmentType: employmentType as string || '',
-          description: description as string || '',
-          requirements: requirements ? JSON.parse(requirements as string) : [],
-          salaryRange: salaryRange as string || '',
-          benefits: benefits as string || ''
-        });
-        
-        // Pre-populate position applying for
-        setFormData(prev => ({ ...prev, positionApplyingFor: title as string }));
-      }
+    if (router.isReady && jobId) {
+      console.log('🔍 Router ready, fetching job details for ID:', jobId);
+      fetchJobDetails(jobId as string);
     }
-  }, [router.isReady, router.query]);
+  }, [router.isReady, jobId]);
+
+  const fetchJobDetails = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log(`🔄 Fetching job details for ID: ${id}`);
+      
+      // Try different API endpoints to find the right one
+      const endpoints = [
+        `${ATS_BASE_URL}/api/jobs/${id}`,
+        `${ATS_BASE_URL}/api/job/${id}`,
+        `${ATS_BASE_URL}/api/jobs?id=${id}`,
+        `${ATS_BASE_URL}/api/jobs?job_id=${id}`,
+      ];
+      
+      let response;
+      let endpointUsed = '';
+      let data = null;
+      
+      for (const endpoint of endpoints) {
+        console.log(`🔍 Trying endpoint: ${endpoint}`);
+        try {
+          response = await fetch(endpoint);
+          endpointUsed = endpoint;
+          console.log(`📡 Response status for ${endpoint}:`, response.status);
+          
+          if (response.ok) {
+            data = await response.json();
+            console.log(`📊 API Response from ${endpoint}:`, data);
+            break; // Found working endpoint
+          }
+        } catch (err) {
+          console.log(`❌ Endpoint ${endpoint} failed:`, err);
+          continue;
+        }
+      }
+      
+      if (!response || !response.ok) {
+        throw new Error(`All API endpoints failed. Last status: ${response?.status || 'No response'}`);
+      }
+      
+      if (!data) {
+        throw new Error('No data received from API');
+      }
+      
+      let jobData = null;
+      
+      // Handle different response formats from your ATS API
+      if (data.success && data.job) {
+        jobData = data.job;
+      } else if (data.success && data.jobs && data.jobs.length > 0) {
+        jobData = data.jobs[0];
+      } else if (data.job) {
+        jobData = data.job;
+      } else if (Array.isArray(data) && data.length > 0) {
+        jobData = data[0];
+      } else if (data.id) {
+        jobData = data;
+      }
+      
+      if (!jobData) {
+        throw new Error('Job data not found in API response');
+      }
+
+      // Process the job data
+      const processedJob: Position = {
+        id: (jobData.id || id).toString(), // Ensure ID is string
+        title: jobData.title || 'Unknown Position',
+        department: jobData.department || '',
+        location: jobData.location || '',
+        employment_type: jobData.employment_type || '',
+        description: jobData.description || '',
+        requirements: typeof jobData.requirements === 'string' 
+          ? jobData.requirements.split('\n').filter((req: string) => req.trim()) 
+          : jobData.requirements || [],
+        salary_min: jobData.salary_min,
+        salary_max: jobData.salary_max,
+        benefits: jobData.benefits || ''
+      };
+
+      console.log('✅ Processed job data:', processedJob);
+      setPosition(processedJob);
+      
+      // Pre-populate position applying for
+      setFormData(prev => ({ 
+        ...prev, 
+        positionApplyingFor: processedJob.title 
+      }));
+      
+    } catch (error) {
+      console.error('❌ Error fetching job details:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load job details');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Work Experience Management
   const addWorkExperience = () => {
@@ -297,7 +375,7 @@ export default function ApplicationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm() || !jobDetails) {
+    if (!validateForm() || !position) {
       return;
     }
 
@@ -319,9 +397,9 @@ export default function ApplicationPage() {
         coverLetterUrl = await uploadFile(formData.coverLetter, 'cover_letter');
       }
 
-      // Prepare application data for ATS
+      // FIXED: Use position.id (now string) for application data
       const applicationData = {
-        job_id: jobDetails.jobId,
+        job_id: position.id, // This is now a string UUID
         first_name: formData.firstName.trim(),
         middle_name: formData.middleName.trim(),
         last_name: formData.lastName.trim(),
@@ -356,6 +434,8 @@ export default function ApplicationPage() {
         submission_date: new Date().toISOString(),
       };
 
+      console.log('📤 Submitting application data:', applicationData);
+
       const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
         method: 'POST',
         headers: {
@@ -375,8 +455,8 @@ export default function ApplicationPage() {
       // Analytics tracking
       if (typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'comprehensive_application_submitted', {
-          'job_position': jobDetails.title,
-          'job_id': jobDetails.jobId,
+          'job_position': position.title,
+          'job_id': position.id,
           'application_source': 'comprehensive_application_page',
           'application_id': result.application?.id,
           'work_experiences_count': workExperiences.length
@@ -404,18 +484,35 @@ export default function ApplicationPage() {
     }
   };
 
-  if (!jobDetails) {
+  // Debug info
+  useEffect(() => {
+    console.log('🐛 Debug info:', {
+      'router.isReady': router.isReady,
+      'router.query': router.query,
+      'jobId': jobId,
+      'position': position,
+      'loading': loading,
+      'error': error
+    });
+  }, [router.isReady, router.query, jobId, position, loading, error]);
+
+  // Loading state
+  if (loading) {
     return (
       <>
         <Head>
-          <title>{`${EnvVars.SITE_NAME} - Application`}</title>
+          <title>Loading Application - {EnvVars.SITE_NAME}</title>
         </Head>
         <AnimatedHeader />
         <PageWrapper>
           <Container>
             <LoadingContainer>
               <LoadingSpinner />
-              <LoadingText>Loading application form...</LoadingText>
+              <LoadingText>Loading job details...</LoadingText>
+              <DebugInfo>
+                <p><strong>JobId:</strong> {jobId}</p>
+                <p><strong>API Base:</strong> {ATS_BASE_URL}</p>
+              </DebugInfo>
             </LoadingContainer>
           </Container>
         </PageWrapper>
@@ -423,11 +520,48 @@ export default function ApplicationPage() {
     );
   }
 
+  // Error state
+  if (error || !position) {
+    return (
+      <>
+        <Head>
+          <title>Job Not Found - {EnvVars.SITE_NAME}</title>
+        </Head>
+        <AnimatedHeader />
+        <PageWrapper>
+          <Container>
+            <ErrorContainer>
+              <ErrorIcon>❌</ErrorIcon>
+              <ErrorTitle>Job Not Found</ErrorTitle>
+              <ErrorText>{error || 'The requested position could not be found.'}</ErrorText>
+              <DebugInfo>
+                <h4>Debug Information:</h4>
+                <p><strong>JobId:</strong> {jobId}</p>
+                <p><strong>API Base URL:</strong> {ATS_BASE_URL}</p>
+                <p><strong>Error:</strong> {error}</p>
+                <p><strong>Trying endpoints:</strong></p>
+                <ul>
+                  <li>{ATS_BASE_URL}/api/jobs/{jobId}</li>
+                  <li>{ATS_BASE_URL}/api/job/{jobId}</li>
+                  <li>{ATS_BASE_URL}/api/jobs?id={jobId}</li>
+                </ul>
+              </DebugInfo>
+              <BackButton onClick={() => router.push('/careers')}>
+                ← Back to Careers
+              </BackButton>
+            </ErrorContainer>
+          </Container>
+        </PageWrapper>
+      </>
+    );
+  }
+
+  // Success state
   if (submitSuccess) {
     return (
       <>
         <Head>
-          <title>{`${EnvVars.SITE_NAME} - Application Submitted`}</title>
+          <title>Application Submitted - {EnvVars.SITE_NAME}</title>
         </Head>
         <AnimatedHeader />
         <PageWrapper>
@@ -436,15 +570,15 @@ export default function ApplicationPage() {
               <SuccessIcon>✅</SuccessIcon>
               <SuccessTitle>Application Successfully Submitted!</SuccessTitle>
               <SuccessMessage>
-                Thank you for your comprehensive application for <strong>{jobDetails.title}</strong>. 
+                Thank you for your comprehensive application for <strong>{position.title}</strong>. 
                 We have received all your information and will review it carefully.
               </SuccessMessage>
               <SuccessDetails>
                 <p><strong>What happens next:</strong></p>
                 <ul>
-                  <li>You'll receive a confirmation email within 5 minutes</li>
+                  <li>You&apos;ll receive a confirmation email within 5 minutes</li>
                   <li>Our team will review your application within 1-3 business days</li>
-                  <li>We'll contact you with next steps within 5 business days</li>
+                  <li>We&apos;ll contact you with next steps within 5 business days</li>
                 </ul>
               </SuccessDetails>
               <ContactInfo>
@@ -460,11 +594,16 @@ export default function ApplicationPage() {
     );
   }
 
+  // FIXED: Create salary range display
+  const salaryRange = position.salary_min && position.salary_max 
+    ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
+    : '';
+
   return (
     <>
       <Head>
-        <title>{`${EnvVars.SITE_NAME} - Apply for ${jobDetails.title}`}</title>
-        <meta name="description" content={`Apply for ${jobDetails.title} position at Precise Analytics`} />
+        <title>Apply for {position.title} - {EnvVars.SITE_NAME}</title>
+        <meta name="description" content={`Apply for ${position.title} position at Precise Analytics`} />
       </Head>
 
       <AnimatedHeader />
@@ -474,22 +613,22 @@ export default function ApplicationPage() {
           {/* Job Details Header */}
           <JobDetailsSection>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <JobTitle>{jobDetails.title}</JobTitle>
+              <JobTitle>{position.title}</JobTitle>
               <JobMeta>
-                {jobDetails.department && (
-                  <JobMetaItem>🏢 {jobDetails.department}</JobMetaItem>
+                {position.department && (
+                  <JobMetaItem>🏢 {position.department}</JobMetaItem>
                 )}
-                {jobDetails.location && (
-                  <JobMetaItem>📍 {jobDetails.location}</JobMetaItem>
+                {position.location && (
+                  <JobMetaItem>📍 {position.location}</JobMetaItem>
                 )}
-                {jobDetails.employmentType && jobDetails.employmentType !== 'undefined' && (
-                  <JobMetaItem>💼 {jobDetails.employmentType.replace('_', ' ').toUpperCase()}</JobMetaItem>
+                {position.employment_type && (
+                  <JobMetaItem>💼 {position.employment_type.replace('_', ' ').toUpperCase()}</JobMetaItem>
                 )}
-                {jobDetails.salaryRange && jobDetails.salaryRange !== 'undefined' && (
-                  <JobMetaItem>💰 {jobDetails.salaryRange}</JobMetaItem>
+                {salaryRange && (
+                  <JobMetaItem>💰 {salaryRange}</JobMetaItem>
                 )}
               </JobMeta>
-              <JobDescription>{jobDetails.description}</JobDescription>
+              <JobDescription>{position.description}</JobDescription>
             </motion.div>
           </JobDetailsSection>
 
@@ -1179,6 +1318,65 @@ const LoadingText = styled.p`
   color: rgb(var(--text), 0.7);
 `;
 
+const DebugInfo = styled.div`
+  background: rgba(255, 125, 0, 0.1);
+  border: 1px solid rgba(255, 125, 0, 0.3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  text-align: left;
+  max-width: 50rem;
+  
+  h4 {
+    margin: 0 0 1rem 0;
+    color: rgb(255, 125, 0);
+  }
+  
+  p {
+    margin: 0.5rem 0;
+    font-size: 1.3rem;
+    font-family: monospace;
+    color: rgb(var(--text), 0.8);
+  }
+  
+  ul {
+    margin: 1rem 0;
+    padding-left: 2rem;
+    
+    li {
+      font-size: 1.2rem;
+      font-family: monospace;
+      color: rgb(var(--text), 0.7);
+      margin: 0.5rem 0;
+    }
+  }
+`;
+
+const ErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  gap: 2rem;
+`;
+
+const ErrorIcon = styled.div`
+  font-size: 4rem;
+`;
+
+const ErrorTitle = styled.h1`
+  font-size: 3rem;
+  color: rgb(var(--text));
+`;
+
+const ErrorText = styled.p`
+  font-size: 1.6rem;
+  color: rgb(var(--text), 0.7);
+  max-width: 50rem;
+`;
+
 const JobDetailsSection = styled.section`
   background: rgba(var(--cardBackground), 0.9);
   border-radius: 2rem;
@@ -1521,17 +1719,6 @@ const ErrorMessage = styled.div`
   padding: 2rem;
   margin-bottom: 2rem;
   text-align: center;
-`;
-
-const ErrorIcon = styled.div`
-  font-size: 2rem;
-  margin-bottom: 1rem;
-`;
-
-const ErrorText = styled.p`
-  color: rgb(220, 38, 38);
-  font-weight: 500;
-  margin-bottom: 1rem;
 `;
 
 const RetryButton = styled.button`

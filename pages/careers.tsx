@@ -90,6 +90,52 @@ export default function CareersPage() {
     checkExistingAuth(); // NEW: Check for existing authentication
   }, []);
 
+  useEffect(() => {
+  // Check for verification or error messages in URL
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const verified = urlParams.get('verified');
+    const error = urlParams.get('error');
+    
+    if (verified === 'success') {
+      setAuthSuccess('🎉 Email verified successfully! Welcome to Precise Analytics. You can now apply for positions.');
+      // Clear the URL parameters
+      window.history.replaceState({}, document.title, '/careers');
+      // Re-check authentication status to update UI
+      checkExistingAuth();
+    } else if (verified === 'already') {
+      setAuthSuccess('✅ Your email is already verified. You can sign in normally.');
+      window.history.replaceState({}, document.title, '/careers');
+    } else if (error) {
+      let errorMessage = 'Email verification failed. Please try again.';
+      
+      switch (error) {
+        case 'missing_token':
+          errorMessage = 'Invalid verification link - token missing.';
+          break;
+        case 'invalid_token':
+          errorMessage = 'Invalid or expired verification link. Please request a new verification email.';
+          break;
+        case 'invalid_link':
+          errorMessage = 'Invalid verification link format.';
+          break;
+        case 'user_not_found':
+          errorMessage = 'User account not found. Please create a new account.';
+          break;
+        case 'verification_failed':
+          errorMessage = 'Email verification failed. Please try again or contact support.';
+          break;
+        case 'server_error':
+          errorMessage = 'Server error during verification. Please try again later.';
+          break;
+      }
+      
+      setAuthError(errorMessage);
+      window.history.replaceState({}, document.title, '/careers');
+    }
+  }
+}, []);
+
   // NEW: Check for existing authentication using verify endpoint
   const checkExistingAuth = async () => {
     try {
@@ -581,8 +627,26 @@ export default function CareersPage() {
         </Container>
       </AuthHeaderExtension>
 
+
+
       <PageWrapper>
         <Container>
+          
+          {(authSuccess || authError) && (
+            <NotificationBanner success={!!authSuccess}>
+              <span style={{ fontSize: '2rem' }}>
+                {authSuccess ? '✅' : '⚠️'}
+              </span>
+              <span>{authSuccess || authError}</span>
+              <CloseNotification onClick={() => {
+                setAuthSuccess(null);
+                setAuthError(null);
+              }}>
+                ×
+              </CloseNotification>
+            </NotificationBanner>
+          )}  
+
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <PageTitle>Join Our Team</PageTitle>
             <PageSubtitle>Empowering missions through data—together.</PageSubtitle>
@@ -899,6 +963,37 @@ const AuthHeaderExtension = styled.div`
   background: linear-gradient(135deg, rgba(255, 125, 0, 0.05), rgba(255, 165, 0, 0.02));
   border-bottom: 1px solid rgba(255, 125, 0, 0.1);
   padding: 1rem 0;
+`;
+
+const NotificationBanner = styled.div`
+  background: ${props => props.success ? 'rgba(34, 197, 94, 0.1)' : 'rgba(220, 38, 38, 0.1)'};
+  border: 1px solid ${props => props.success ? 'rgba(34, 197, 94, 0.3)' : 'rgba(220, 38, 38, 0.3)'};
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: ${props => props.success ? 'rgb(34, 197, 94)' : 'rgb(220, 38, 38)'};
+  font-size: 1.5rem;
+  font-weight: 500;
+  position: relative;
+`;
+
+const CloseNotification = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 const AuthSection = styled.div`

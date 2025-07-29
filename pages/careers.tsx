@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+
+// pages/careers.tsx
+import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
-import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import styled from 'styled-components';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
@@ -95,57 +97,88 @@ export default function CareersPage() {
   }, []);
 
   useEffect(() => {
-  // Check for verification or error messages in URL
-  if (typeof window !== 'undefined') {
-    const urlParams = new URLSearchParams(window.location.search);
-    const verified = urlParams.get('verified');
-    const error = urlParams.get('error');
-    
-    if (verified === 'success') {
-      setAuthSuccess('🎉 Email verified successfully! Welcome to Precise Analytics. You can now apply for positions.');
-      // Clear the URL parameters
-      window.history.replaceState({}, document.title, '/careers');
-      // Re-check authentication status to update UI
-      checkExistingAuth();
-    } else if (verified === 'already') {
-      setAuthSuccess('✅ Your email is already verified. You can sign in normally.');
-      window.history.replaceState({}, document.title, '/careers');
-    } else if (error) {
-      let errorMessage = 'Email verification failed. Please try again.';
+    // Check for verification or error messages in URL
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const verified = urlParams.get('verified');
+      const error = urlParams.get('error');
       
-      switch (error) {
-        case 'missing_token':
-          errorMessage = 'Invalid verification link - token missing.';
-          break;
-        case 'invalid_token':
-          errorMessage = 'Invalid or expired verification link. Please request a new verification email.';
-          break;
-        case 'invalid_link':
-          errorMessage = 'Invalid verification link format.';
-          break;
-        case 'user_not_found':
-          errorMessage = 'User account not found. Please create a new account.';
-          break;
-        case 'verification_failed':
-          errorMessage = 'Email verification failed. Please try again or contact support.';
-          break;
-        case 'server_error':
-          errorMessage = 'Server error during verification. Please try again later.';
-          break;
+      if (verified === 'success') {
+        setAuthSuccess('🎉 Email verified successfully! Welcome to Precise Analytics. You can now apply for positions.');
+        window.history.replaceState({}, document.title, '/careers');
+        checkExistingAuth();
+      } else if (verified === 'already') {
+        setAuthSuccess('✅ Your email is already verified. You can sign in normally.');
+        window.history.replaceState({}, document.title, '/careers');
+      } else if (error) {
+        let errorMessage = 'Email verification failed. Please try again.';
+        
+        switch (error) {
+          case 'missing_token':
+            errorMessage = 'Invalid verification link - token missing.';
+            break;
+          case 'invalid_token':
+            errorMessage = 'Invalid or expired verification link. Please request a new verification email.';
+            break;
+          case 'invalid_link':
+            errorMessage = 'Invalid verification link format.';
+            break;
+          case 'user_not_found':
+            errorMessage = 'User account not found. Please create a new account.';
+            break;
+          case 'verification_failed':
+            errorMessage = 'Email verification failed. Please try again or contact support.';
+            break;
+          case 'server_error':
+            errorMessage = 'Server error during verification. Please try again later.';
+            break;
+        }
+        
+        setAuthError(errorMessage);
+        window.history.replaceState({}, document.title, '/careers');
       }
-      
-      setAuthError(errorMessage);
-      window.history.replaceState({}, document.title, '/careers');
     }
-  }
-}, []);
+  }, []);
 
-  // NEW: Check for existing authentication using verify endpoint
+  useEffect(() => {
+    if (user && typeof window !== 'undefined') {
+      const pendingApplication = sessionStorage.getItem('pendingApplication');
+      if (pendingApplication) {
+        try {
+          const { jobId, jobTitle, timestamp } = JSON.parse(pendingApplication);
+          
+          const thirtyMinutesAgo = Date.now() - (30 * 60 * 1000);
+          if (timestamp > thirtyMinutesAgo) {
+            console.log('🎯 Redirecting to pending application:', jobTitle);
+            
+            sessionStorage.removeItem('pendingApplication');
+            
+            const applicationUrl = `/application/${jobId}`;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+              window.location.href = applicationUrl;
+            } else {
+              window.open(applicationUrl, '_blank', 'noopener,noreferrer');
+            }
+            
+            setAuthSuccess(`Welcome back! Redirecting you to apply for ${jobTitle}...`);
+          } else {
+            sessionStorage.removeItem('pendingApplication');
+          }
+        } catch (error) {
+          console.error('Error processing pending application:', error);
+          sessionStorage.removeItem('pendingApplication');
+        }
+      }
+    }
+  }, [user]);
+
   const checkExistingAuth = async () => {
     try {
       const response = await fetch(`${ATS_BASE_URL}/api/auth/verify`, {
         method: 'POST',
-        credentials: 'include', // Include HTTP-only cookies
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         }
@@ -159,7 +192,7 @@ export default function CareersPage() {
             email: result.user.email,
             firstName: result.user.first_name || result.user.name?.split(' ')[0] || '',
             lastName: result.user.last_name || result.user.name?.split(' ')[1] || '',
-            token: 'cookie' // Indicate we're using cookies
+            token: 'cookie'
           });
         }
       }
@@ -168,7 +201,6 @@ export default function CareersPage() {
     }
   };
 
-  // NEW: Authentication Functions
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -209,7 +241,7 @@ export default function CareersPage() {
 
       const response = await fetch(`${ATS_BASE_URL}${endpoint}`, {
         method: 'POST',
-        credentials: 'include', // Include HTTP-only cookies
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -227,21 +259,18 @@ export default function CareersPage() {
         return;
       }
 
-      // Handle successful login/register
       const userData = {
         id: result.user.id,
         email: result.user.email,
         firstName: result.user.first_name || result.user.name?.split(' ')[0] || '',
         lastName: result.user.last_name || result.user.name?.split(' ')[1] || '',
-        token: 'cookie' // Indicate we're using HTTP-only cookies
+        token: 'cookie'
       };
 
       setUser(userData);
       
-      // Close modal
       setShowAuthModal(false);
       
-      // Reset form
       setAuthData({
         email: '',
         password: '',
@@ -250,7 +279,6 @@ export default function CareersPage() {
         lastName: ''
       });
 
-      // Show success message briefly
       if (authMode === 'register') {
         setAuthSuccess('Account created successfully! Welcome to Precise Analytics.');
       }
@@ -267,7 +295,7 @@ export default function CareersPage() {
     try {
       await fetch(`${ATS_BASE_URL}/api/auth/login`, {
         method: 'DELETE',
-        credentials: 'include', // Include HTTP-only cookies
+        credentials: 'include',
       });
     } catch (error) {
       console.error('Logout error:', error);
@@ -297,19 +325,16 @@ export default function CareersPage() {
     return authData.email.includes('@') && authData.password.length >= 6;
   };
 
-  // Fixed fetchPositions function for careers page
   const fetchPositions = async () => {
     try {
       setLoading(true);
       console.log('🔄 Fetching positions from ATS...');
       
-      // Add active_only parameter to get only active jobs
       const response = await fetch(`${ATS_BASE_URL}/api/jobs?active_only=true`);
       const data = await response.json();
       
-      console.log('📊 ATS API Response:', data); // Debug log
+      console.log('📊 ATS API Response:', data);
       
-      // Fix: Extract jobs array from API response
       const jobsArray = data.success ? data.jobs : (Array.isArray(data) ? data : []);
       
       const processedPositions = jobsArray.map((pos: any) => ({
@@ -319,7 +344,7 @@ export default function CareersPage() {
           : pos.requirements || []
       }));
 
-      console.log('✅ Processed positions:', processedPositions); // Debug log
+      console.log('✅ Processed positions:', processedPositions);
       setPositions(processedPositions);
       
     } catch (error) {
@@ -470,7 +495,6 @@ export default function CareersPage() {
     try {
       console.log('🚀 Starting application submission to ATS...');
       
-      // Upload files first
       let resumeUrl = '';
       let coverLetterFileUrl = '';
 
@@ -482,22 +506,20 @@ export default function CareersPage() {
         coverLetterFileUrl = await uploadFile(formData.coverLetter, 'cover_letter');
       }
 
-      // Submit to ATS API (MODIFIED to include user_id if logged in)
       const applicationData = {
-        job_id: formData.positionId,                      // ✅ Match API expectation
+        job_id: formData.positionId,
         first_name: formData.firstName.trim(),
         last_name: formData.lastName.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
         resume_url: resumeUrl,
-        cover_letter: coverLetterFileUrl,                 // ✅ Match API expectation
-        // NEW: Include user_id if logged in
+        cover_letter: coverLetterFileUrl,
         ...(user && { user_id: user.id })
       };
 
       const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
         method: 'POST',
-        credentials: 'include', // NEW: Include cookies for authentication
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -517,7 +539,6 @@ export default function CareersPage() {
         applicationId: result.application.id
       });
       
-      // Reset form
       setFormData({
         firstName: '',
         lastName: '',
@@ -532,7 +553,6 @@ export default function CareersPage() {
         portfolioUrl: '',
       });
 
-      // Clear file inputs
       const resumeInput = document.getElementById('resume') as HTMLInputElement;
       const coverLetterInput = document.getElementById('coverLetter') as HTMLInputElement;
       if (resumeInput) resumeInput.value = '';
@@ -543,7 +563,7 @@ export default function CareersPage() {
           'job_position': formData.position,
           'application_source': 'main_website',
           'application_id': result.application.id,
-          'user_authenticated': !!user // NEW: Track authentication status
+          'user_authenticated': !!user
         });
       }
 
@@ -570,32 +590,45 @@ export default function CareersPage() {
     }
   };
 
-  // FIXED: Only pass the job ID, not all the data
   const handleApplyClick = (position: Position) => {
-    // FIXED: Only pass the job ID, not all the data
-    const applicationUrl = `/application/${position.id}`;
-
-    // FIX: Use direct navigation instead of window.open for mobile compatibility
-    if (typeof window !== 'undefined') {
-      // Check if mobile device
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!user) {
+      console.log('🔐 User not authenticated, showing auth modal');
+      setShowAuthModal(true);
       
-      if (isMobile) {
-        // On mobile: navigate directly in same tab
-        window.location.href = applicationUrl;
-      } else {
-        // On desktop: open in new tab
-        window.open(applicationUrl, '_blank');
+      sessionStorage.setItem('pendingApplication', JSON.stringify({
+        jobId: position.id,
+        jobTitle: position.title,
+        timestamp: Date.now()
+      }));
+      
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'apply_blocked_auth_required', {
+          'job_position': position.title,
+          'job_id': position.id,
+        });
       }
+      return;
     }
 
-    // Analytics tracking (MODIFIED to include authentication status)
+    const applicationUrl = `/application/${position.id}`;
+    
+    console.log('✅ User authenticated, navigating to application');
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      window.location.href = applicationUrl;
+    } else {
+      window.open(applicationUrl, '_blank', 'noopener,noreferrer');
+    }
+    
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'apply_button_clicked', {
         'job_position': position.title,
         'job_id': position.id,
-        'application_source': 'careers_page_fixed_urls',
-        'user_authenticated': !!user // NEW: Track authentication status
+        'application_source': 'careers_page',
+        'user_authenticated': true,
+        'user_id': user.id
       });
     }
   };
@@ -609,7 +642,6 @@ export default function CareersPage() {
 
       <AnimatedHeader />
 
-      {/* NEW: Auth Header Extension */}
       <AuthHeaderExtension>
         <Container>
           <AuthSection>
@@ -630,12 +662,9 @@ export default function CareersPage() {
           </AuthSection>
         </Container>
       </AuthHeaderExtension>
-
-
-
+      
       <PageWrapper>
         <Container>
-
           {(authSuccess || authError) && (
             <NotificationBanner success={!!authSuccess}>
               <span style={{ fontSize: '2rem' }}>
@@ -656,7 +685,6 @@ export default function CareersPage() {
             <PageSubtitle>Empowering missions through data—together.</PageSubtitle>
           </motion.div>
 
-          {/* NEW: Welcome Section */}
           <WelcomeSection>
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
               <WelcomeCard>
@@ -738,7 +766,6 @@ export default function CareersPage() {
               </NoPositionsMessage>
             ) : (
               <JobListContainer>
-                {/* Header */}
                 <JobListHeader>
                   <HeaderCell className="title">Position</HeaderCell>
                   <HeaderCell className="department">Department</HeaderCell>
@@ -748,7 +775,6 @@ export default function CareersPage() {
                   <HeaderCell className="action">Apply</HeaderCell>
                 </JobListHeader>
 
-                {/* Job Rows */}
                 {positions.map((position) => (
                   <JobListRow key={position.id}>
                     <JobCell className="title">
@@ -789,12 +815,9 @@ export default function CareersPage() {
               </JobListContainer>
             )}
           </PositionsSection>
-
-          {/* REMOVED: ApplicationSection - Now handled by dedicated /application page */}
         </Container>
       </PageWrapper>
 
-      {/* NEW: Authentication Modal */}
       <AnimatePresence>
         {showAuthModal && (
           <ModalOverlay
@@ -969,7 +992,6 @@ const AuthHeaderExtension = styled.div`
   padding: 1rem 0;
 `;
 
-// Replace the NotificationBanner styled component with this:
 const NotificationBanner = styled.div<NotificationBannerProps>`
   background: ${props => props.success ? 'rgba(34, 197, 94, 0.1)' : 'rgba(220, 38, 38, 0.1)'};
   border: 1px solid ${props => props.success ? 'rgba(34, 197, 94, 0.3)' : 'rgba(220, 38, 38, 0.3)'};
@@ -1053,7 +1075,6 @@ const LogoutButton = styled.button`
   }
 `;
 
-// NEW: Modal Components
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -1069,12 +1090,11 @@ const ModalOverlay = styled(motion.div)`
   padding: 2rem;
 `;
 
-// REPLACE #1: ModalContent 
 const ModalContent = styled(motion.div)`
   background: rgba(var(--background), 0.98);
   border-radius: 2rem;
   padding: 0;
-  max-width: 65rem;  // CHANGED: from 50rem to 65rem
+  max-width: 65rem;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
@@ -1088,19 +1108,16 @@ const ModalContent = styled(motion.div)`
   `)}
 `;
 
-// REPLACE #2: ModalHeader 
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4rem 4rem 0 4rem;  // CHANGED: from 3rem to 4rem
-  margin-bottom: 3rem;        // CHANGED: from 2rem to 3rem
+  padding: 4rem 4rem 0 4rem;
+  margin-bottom: 3rem;
 `;
 
-
-// REPLACE #3: ModalTitle 
 const ModalTitle = styled.h2`
-  font-size: 3.2rem;          // CHANGED: from 2.8rem to 3.2rem
+  font-size: 3.2rem;
   font-weight: 700;
   color: rgb(var(--text));
   margin: 0;
@@ -1127,19 +1144,17 @@ const CloseButton = styled.button`
   }
 `;
 
-// REPLACE #4: AuthForm 
 const AuthForm = styled.form`
-  padding: 0 4rem 4rem 4rem;  // CHANGED: from 3rem to 4rem
+  padding: 0 4rem 4rem 4rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;                // CHANGED: from 2rem to 2.5rem
+  gap: 2.5rem;
 `;
 
-// REPLACE #5: NameFields 
 const NameFields = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;                  // CHANGED: from 1.5rem to 2rem
+  gap: 2rem;
   
   ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
@@ -1149,20 +1164,18 @@ const AuthField = styled.div`
   flex-direction: column;
 `;
 
-// REPLACE #6: AuthLabel 
 const AuthLabel = styled.label`
-  font-size: 1.5rem;          // CHANGED: from 1.4rem to 1.5rem
+  font-size: 1.5rem;
   font-weight: 600;
   color: rgb(var(--text), 0.8);
-  margin-bottom: 1rem;        // CHANGED: from 0.8rem to 1rem
+  margin-bottom: 1rem;
 `;
 
-// REPLACE #7: AuthInput 
 const AuthInput = styled.input`
-  padding: 2rem;              // CHANGED: from 1.5rem to 2rem
-  font-size: 1.7rem;          // CHANGED: from 1.6rem to 1.7rem
+  padding: 2rem;
+  font-size: 1.7rem;
   border: 2px solid rgba(var(--text), 0.2);
-  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
+  border-radius: 1.2rem;
   background: rgba(var(--background), 0.9);
   color: rgb(var(--text));
   transition: all 0.3s ease;
@@ -1170,7 +1183,7 @@ const AuthInput = styled.input`
   &:focus {
     outline: none;
     border-color: rgb(255, 125, 0);
-    box-shadow: 0 0 0 4px rgba(255, 125, 0, 0.1);  // CHANGED: from 3px to 4px
+    box-shadow: 0 0 0 4px rgba(255, 125, 0, 0.1);
   }
 
   &::placeholder {
@@ -1178,18 +1191,17 @@ const AuthInput = styled.input`
   }
 `;
 
-// REPLACE #8: AuthButton 
 const AuthButton = styled.button`
-  padding: 2.2rem;            // CHANGED: from 1.8rem to 2.2rem
-  font-size: 1.7rem;          // CHANGED: from 1.6rem to 1.7rem
+  padding: 2.2rem;
+  font-size: 1.7rem;
   font-weight: 600;
   background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
   border: none;
-  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
+  border-radius: 1.2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1.5rem;         // CHANGED: from 1rem to 1.5rem
+  margin-top: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1249,31 +1261,29 @@ const AuthDivider = styled.span`
   color: rgb(var(--text), 0.4);
 `;
 
-// REPLACE #9: ErrorAlert 
 const ErrorAlert = styled.div`
   background: rgba(220, 38, 38, 0.1);
   border: 1px solid rgba(220, 38, 38, 0.3);
-  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
-  padding: 2rem;              // CHANGED: from 1.5rem to 2rem
+  border-radius: 1.2rem;
+  padding: 2rem;
   display: flex;
   align-items: center;
-  gap: 1.2rem;                // CHANGED: from 1rem to 1.2rem
+  gap: 1.2rem;
   color: rgb(220, 38, 38);
-  font-size: 1.5rem;          // CHANGED: from 1.4rem to 1.5rem
+  font-size: 1.5rem;
   font-weight: 500;
 `;
 
-// REPLACE #10: SuccessAlert 
 const SuccessAlert = styled.div`
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
-  padding: 2rem;              // CHANGED: from 1.5rem to 2rem
+  border-radius: 1.2rem;
+  padding: 2rem;
   display: flex;
   align-items: center;
-  gap: 1.2rem;                // CHANGED: from 1rem to 1.2rem
+  gap: 1.2rem;
   color: rgb(34, 197, 94);
-  font-size: 1.5rem;          // CHANGED: from 1.4rem to 1.5rem
+  font-size: 1.5rem;
   font-weight: 500;
 `;
 
@@ -1285,7 +1295,6 @@ const SuccessIcon = styled.span`
   font-size: 1.8rem;
 `;
 
-// EXISTING: All your original styled components remain exactly the same
 const PageWrapper = styled.div`
   padding: 4rem 0;
 `;
@@ -1309,7 +1318,6 @@ const PageSubtitle = styled.p`
   color: rgb(var(--text), 0.8);
 `;
 
-// NEW: Welcome Section Styled Components
 const WelcomeSection = styled.section`
   margin: 4rem 0 6rem 0;
 `;
@@ -1416,7 +1424,6 @@ const ProcessTitle = styled.h3`
   text-align: center;
 `;
 
-// RENAMED: First ProcessSteps to WelcomeProcessSteps to avoid conflict
 const WelcomeProcessSteps = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
@@ -1557,7 +1564,6 @@ const NoPositionsText = styled.p`
   }
 `;
 
-// NEW: Job List Components
 const JobListContainer = styled.div`
   background: rgba(var(--cardBackground), 0.9);
   border-radius: 1.6rem;

@@ -1,7 +1,7 @@
 // pages/application/[jobId].tsx - Fixed to use clean URLs and fetch job data
 /* eslint-disable react/no-unescaped-entities */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import styled from 'styled-components';
@@ -14,9 +14,8 @@ import { mq } from 'utils/media';
 // ATS API Configuration
 const ATS_BASE_URL = 'https://precise-analytics-ats.vercel.app';
 
-// FIXED: Updated interface to handle UUID job IDs
 interface Position {
-  id: string; // Changed from number to string to handle UUIDs
+  id: string;
   title: string;
   department: string;
   location: string;
@@ -26,6 +25,14 @@ interface Position {
   salary_min?: number;
   salary_max?: number;
   benefits?: string;
+}
+
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  token: string;
 }
 
 interface WorkExperience {
@@ -39,7 +46,6 @@ interface WorkExperience {
 }
 
 interface ApplicationFormData {
-  // Personal Information
   firstName: string;
   middleName: string;
   lastName: string;
@@ -47,8 +53,6 @@ interface ApplicationFormData {
   phone: string;
   linkedinUrl: string;
   portfolioUrl: string;
-  
-  // Location & Work Eligibility
   address: string;
   city: string;
   state: string;
@@ -58,31 +62,19 @@ interface ApplicationFormData {
   visaSponsorship: string;
   openToRemote: string;
   preferredWorkLocation: string;
-  
-  // Employment Information
   totalExperience: string;
   highestEducation: string;
-  
-  // Job Preferences
   positionApplyingFor: string;
   availableStartDate: string;
   expectedSalaryRange: string;
   interviewAvailability: string;
-  
-  // Equal Opportunity (Optional)
   gender: string;
   raceEthnicity: string;
   veteranStatus: string;
   disabilityStatus: string;
-  
-  // Consent
   certificationConsent: boolean;
   signature: string;
-  
-  // Additional
   whyInterested: string;
-  
-  // Files
   resume: File | null;
   coverLetter: File | null;
 }
@@ -93,19 +85,20 @@ interface FormErrors {
 
 export default function ApplicationPage() {
   const router = useRouter();
-  const { jobId } = router.query; // FIXED: Only get jobId from URL
-  
-  // FIXED: Clean state management
+  const { jobId } = router.query;
+
   const [position, setPosition] = useState<Position | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>([]);
-  
+
   const [formData, setFormData] = useState<ApplicationFormData>({
     firstName: '',
     middleName: '',
@@ -140,21 +133,12 @@ export default function ApplicationPage() {
     coverLetter: null,
   });
 
-  // FIXED: Enhanced job fetching with clean URL approach
-  useEffect(() => {
-    if (router.isReady && jobId) {
-      console.log('🔍 Router ready, fetching job details for ID:', jobId);
-      fetchJobDetails(jobId as string);
-    }
-  }, [router.isReady, jobId]);
-
-  const fetchJobDetails = async (id: string) => {
+  const fetchJobDetails = useCallback(async (id: string) => {
     try {
       setLoading(true);
       setError(null);
       console.log(`🔄 Fetching job details for ID: ${id}`);
       
-      // Try different API endpoints to find the right one
       const endpoints = [
         `${ATS_BASE_URL}/api/jobs/${id}`,
         `${ATS_BASE_URL}/api/job/${id}`,
@@ -176,7 +160,7 @@ export default function ApplicationPage() {
           if (response.ok) {
             data = await response.json();
             console.log(`📊 API Response from ${endpoint}:`, data);
-            break; // Found working endpoint
+            break;
           }
         } catch (err) {
           console.log(`❌ Endpoint ${endpoint} failed:`, err);
@@ -194,7 +178,6 @@ export default function ApplicationPage() {
       
       let jobData = null;
       
-      // Handle different response formats from your ATS API
       if (data.success && data.job) {
         jobData = data.job;
       } else if (data.success && data.jobs && data.jobs.length > 0) {
@@ -211,9 +194,8 @@ export default function ApplicationPage() {
         throw new Error('Job data not found in API response');
       }
 
-      // Process the job data
       const processedJob: Position = {
-        id: (jobData.id || id).toString(), // Ensure ID is string
+        id: (jobData.id || id).toString(),
         title: jobData.title || 'Unknown Position',
         department: jobData.department || '',
         location: jobData.location || '',
@@ -230,11 +212,20 @@ export default function ApplicationPage() {
       console.log('✅ Processed job data:', processedJob);
       setPosition(processedJob);
       
-      // Pre-populate position applying for
-      setFormData(prev => ({ 
-        ...prev, 
-        positionApplyingFor: processedJob.title 
-      }));
+      if (user) {
+        setFormData(prev => ({ 
+          ...prev, 
+          positionApplyingFor: processedJob.title,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email
+        }));
+      } else {
+        setFormData(prev => ({ 
+          ...prev, 
+          positionApplyingFor: processedJob.title 
+        }));
+      }
       
     } catch (error) {
       console.error('❌ Error fetching job details:', error);
@@ -242,7 +233,61 @@ export default function ApplicationPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  const checkAuthenticationAndLoadJob = useCallback(async (id: string) => {
+    try {
+      setAuthLoading(true);
+      setAuthError(null);
+      
+      console.log('🔐 Checking authentication status...');
+      const authResponse = await fetch(`${ATS_BASE_URL}/api/auth/verify`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (authResponse.ok) {
+        const authResult = await authResponse.json();
+        if (authResult.success && authResult.user) {
+          const userData = {
+            id: authResult.user.id,
+            email: authResult.user.email,
+            firstName: authResult.user.first_name || authResult.user.name?.split(' ')[0] || '',
+            lastName: authResult.user.last_name || authResult.user.name?.split(' ')[1] || '',
+            token: 'cookie'
+          };
+          setUser(userData);
+          console.log('✅ User authenticated:', userData.email);
+        } else {
+          console.log('❌ Authentication failed, user needs to log in');
+          setAuthError('Please sign in to apply for this position.');
+          return;
+        }
+      } else {
+        console.log('❌ Authentication check failed');
+        setAuthError('Authentication required. Please sign in to continue.');
+        return;
+      }
+
+      await fetchJobDetails(id);
+      
+    } catch (error) {
+      console.error('❌ Error during authentication check:', error);
+      setAuthError('Unable to verify authentication. Please try refreshing the page.');
+    } finally {
+      setAuthLoading(false);
+    }
+  }, [fetchJobDetails]);
+
+  useEffect(() => {
+    if (router.isReady && jobId) {
+      console.log('🔍 Router ready, checking authentication and fetching job details');
+      checkAuthenticationAndLoadJob(jobId as string);
+    }
+  }, [router.isReady, jobId, checkAuthenticationAndLoadJob]);
 
   // Work Experience Management
   const addWorkExperience = () => {
@@ -397,9 +442,8 @@ export default function ApplicationPage() {
         coverLetterUrl = await uploadFile(formData.coverLetter, 'cover_letter');
       }
 
-      // FIXED: Use position.id (now string) for application data
       const applicationData = {
-        job_id: position.id, // This is now a string UUID
+        job_id: position.id,
         first_name: formData.firstName.trim(),
         middle_name: formData.middleName.trim(),
         last_name: formData.lastName.trim(),
@@ -432,12 +476,14 @@ export default function ApplicationPage() {
         cover_letter_url: coverLetterUrl,
         work_experiences: JSON.stringify(workExperiences),
         submission_date: new Date().toISOString(),
+        user_id: user?.id
       };
 
       console.log('📤 Submitting application data:', applicationData);
 
       const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -495,6 +541,67 @@ export default function ApplicationPage() {
       'error': error
     });
   }, [router.isReady, router.query, jobId, position, loading, error]);
+
+  // Authentication loading state
+  if (authLoading) {
+    return (
+      <>
+        <Head>
+          <title>Verifying Access - {EnvVars.SITE_NAME}</title>
+        </Head>
+        <AnimatedHeader />
+        <PageWrapper>
+          <Container>
+            <LoadingContainer>
+              <LoadingSpinner />
+              <LoadingText>Verifying your access...</LoadingText>
+            </LoadingContainer>
+          </Container>
+        </PageWrapper>
+      </>
+    );
+  }
+
+  // Authentication required state
+  if (authError || !user) {
+    return (
+      <>
+        <Head>
+          <title>Sign In Required - {EnvVars.SITE_NAME}</title>
+        </Head>
+        <AnimatedHeader />
+        <PageWrapper>
+          <Container>
+            <AuthRequiredContainer>
+              <AuthIcon>🔐</AuthIcon>
+              <AuthTitle>Authentication Required</AuthTitle>
+              <AuthText>
+                {authError || 'Please sign in to apply for this position.'}
+              </AuthText>
+              <AuthActions>
+                <BackToCareersButton onClick={() => window.close()}>
+                  ← Back to Careers
+                </BackToCareersButton>
+                <SignInButton onClick={() => {
+                  if (window.opener) {
+                    window.opener.focus();
+                    window.close();
+                  } else {
+                    router.push('/careers');
+                  }
+                }}>
+                  Sign In
+                </SignInButton>
+              </AuthActions>
+              <AuthNote>
+                If you just signed in, please try refreshing this page.
+              </AuthNote>
+            </AuthRequiredContainer>
+          </Container>
+        </PageWrapper>
+      </>
+    );
+  } 
 
   // Loading state
   if (loading) {
@@ -594,7 +701,6 @@ export default function ApplicationPage() {
     );
   }
 
-  // FIXED: Create salary range display
   const salaryRange = position.salary_min && position.salary_max 
     ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
     : '';
@@ -1284,7 +1390,7 @@ export default function ApplicationPage() {
   );
 }
 
-// Styled Components (keeping existing ones and adding new ones)
+// Styled Components
 const PageWrapper = styled.div`
   padding: 2rem 0 4rem 0;
   min-height: 100vh;
@@ -1828,4 +1934,89 @@ const BackButton = styled.button`
     background: rgb(230, 100, 0);
     transform: translateY(-2px);
   }
+`;
+
+const AuthRequiredContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  gap: 2rem;
+  background: rgba(var(--cardBackground), 0.9);
+  border-radius: 2rem;
+  padding: 4rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 60rem;
+  margin: 0 auto;
+`;
+
+const AuthIcon = styled.div`
+  font-size: 4rem;
+`;
+
+const AuthTitle = styled.h1`
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: rgb(255, 125, 0);
+  margin: 0;
+`;
+
+const AuthText = styled.p`
+  font-size: 1.8rem;
+  color: rgb(var(--text), 0.8);
+  margin: 0;
+  max-width: 50rem;
+  line-height: 1.5;
+`;
+
+const AuthActions = styled.div`
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  
+  ${mq('<=tablet', 'flex-direction: column; width: 100%;')}
+`;
+
+const BackToCareersButton = styled.button`
+  background: transparent;
+  color: rgb(var(--text), 0.7);
+  border: 2px solid rgba(var(--text), 0.3);
+  padding: 1.5rem 3rem;
+  border-radius: 1rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(var(--text), 0.1);
+    color: rgb(var(--text));
+    border-color: rgba(var(--text), 0.5);
+  }
+`;
+
+const SignInButton = styled.button`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  border: none;
+  padding: 1.5rem 3rem;
+  border-radius: 1rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 125, 0, 0.3);
+  }
+`;
+
+const AuthNote = styled.p`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.6);
+  margin: 1rem 0 0 0;
+  font-style: italic;
 `;

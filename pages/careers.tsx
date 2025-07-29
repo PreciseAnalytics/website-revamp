@@ -969,28 +969,38 @@ const ModalOverlay = styled(motion.div)`
   padding: 2rem;
 `;
 
+// REPLACE #1: ModalContent 
 const ModalContent = styled(motion.div)`
   background: rgba(var(--background), 0.98);
   border-radius: 2rem;
   padding: 0;
-  max-width: 50rem;
+  max-width: 65rem;  // CHANGED: from 50rem to 65rem
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(var(--text), 0.1);
+  
+  ${mq('<=tablet', `
+    max-width: 95vw;
+    margin: 1rem;
+    border-radius: 1.5rem;
+  `)}
 `;
 
+// REPLACE #2: ModalHeader 
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 3rem 3rem 0 3rem;
-  margin-bottom: 2rem;
+  padding: 4rem 4rem 0 4rem;  // CHANGED: from 3rem to 4rem
+  margin-bottom: 3rem;        // CHANGED: from 2rem to 3rem
 `;
 
+
+// REPLACE #3: ModalTitle 
 const ModalTitle = styled.h2`
-  font-size: 2.8rem;
+  font-size: 3.2rem;          // CHANGED: from 2.8rem to 3.2rem
   font-weight: 700;
   color: rgb(var(--text));
   margin: 0;
@@ -1017,18 +1027,19 @@ const CloseButton = styled.button`
   }
 `;
 
-// NEW: Form Components
+// REPLACE #4: AuthForm 
 const AuthForm = styled.form`
-  padding: 0 3rem 3rem 3rem;
+  padding: 0 4rem 4rem 4rem;  // CHANGED: from 3rem to 4rem
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;                // CHANGED: from 2rem to 2.5rem
 `;
 
+// REPLACE #5: NameFields 
 const NameFields = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 2rem;                  // CHANGED: from 1.5rem to 2rem
   
   ${mq('<=tablet', 'grid-template-columns: 1fr;')}
 `;
@@ -1038,18 +1049,20 @@ const AuthField = styled.div`
   flex-direction: column;
 `;
 
+// REPLACE #6: AuthLabel 
 const AuthLabel = styled.label`
-  font-size: 1.4rem;
+  font-size: 1.5rem;          // CHANGED: from 1.4rem to 1.5rem
   font-weight: 600;
   color: rgb(var(--text), 0.8);
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;        // CHANGED: from 0.8rem to 1rem
 `;
 
+// REPLACE #7: AuthInput 
 const AuthInput = styled.input`
-  padding: 1.5rem;
-  font-size: 1.6rem;
+  padding: 2rem;              // CHANGED: from 1.5rem to 2rem
+  font-size: 1.7rem;          // CHANGED: from 1.6rem to 1.7rem
   border: 2px solid rgba(var(--text), 0.2);
-  border-radius: 1rem;
+  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
   background: rgba(var(--background), 0.9);
   color: rgb(var(--text));
   transition: all 0.3s ease;
@@ -1057,7 +1070,7 @@ const AuthInput = styled.input`
   &:focus {
     outline: none;
     border-color: rgb(255, 125, 0);
-    box-shadow: 0 0 0 3px rgba(255, 125, 0, 0.1);
+    box-shadow: 0 0 0 4px rgba(255, 125, 0, 0.1);  // CHANGED: from 3px to 4px
   }
 
   &::placeholder {
@@ -1065,17 +1078,18 @@ const AuthInput = styled.input`
   }
 `;
 
+// REPLACE #8: AuthButton 
 const AuthButton = styled.button`
-  padding: 1.8rem;
-  font-size: 1.6rem;
+  padding: 2.2rem;            // CHANGED: from 1.8rem to 2.2rem
+  font-size: 1.7rem;          // CHANGED: from 1.6rem to 1.7rem
   font-weight: 600;
   background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
   border: none;
-  border-radius: 1rem;
+  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
+  margin-top: 1.5rem;         // CHANGED: from 1rem to 1.5rem
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1135,30 +1149,31 @@ const AuthDivider = styled.span`
   color: rgb(var(--text), 0.4);
 `;
 
-// NEW: Alert Components
+// REPLACE #9: ErrorAlert 
 const ErrorAlert = styled.div`
   background: rgba(220, 38, 38, 0.1);
   border: 1px solid rgba(220, 38, 38, 0.3);
-  border-radius: 1rem;
-  padding: 1.5rem;
+  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
+  padding: 2rem;              // CHANGED: from 1.5rem to 2rem
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;                // CHANGED: from 1rem to 1.2rem
   color: rgb(220, 38, 38);
-  font-size: 1.4rem;
+  font-size: 1.5rem;          // CHANGED: from 1.4rem to 1.5rem
   font-weight: 500;
 `;
 
+// REPLACE #10: SuccessAlert 
 const SuccessAlert = styled.div`
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: 1rem;
-  padding: 1.5rem;
+  border-radius: 1.2rem;      // CHANGED: from 1rem to 1.2rem
+  padding: 2rem;              // CHANGED: from 1.5rem to 2rem
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;                // CHANGED: from 1rem to 1.2rem
   color: rgb(34, 197, 94);
-  font-size: 1.4rem;
+  font-size: 1.5rem;          // CHANGED: from 1.4rem to 1.5rem
   font-weight: 500;
 `;
 

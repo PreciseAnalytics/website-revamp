@@ -45,6 +45,10 @@ interface AuthFormData {
   lastName: string;
 }
 
+interface NotificationBannerProps {
+  success?: boolean;
+}
+
 export default function CareersPage() {
   const [isClient, setIsClient] = useState(false);
   const [positions, setPositions] = useState<Position[]>([]);
@@ -631,7 +635,7 @@ export default function CareersPage() {
 
       <PageWrapper>
         <Container>
-          
+
           {(authSuccess || authError) && (
             <NotificationBanner success={!!authSuccess}>
               <span style={{ fontSize: '2rem' }}>
@@ -965,7 +969,8 @@ const AuthHeaderExtension = styled.div`
   padding: 1rem 0;
 `;
 
-const NotificationBanner = styled.div`
+// Replace the NotificationBanner styled component with this:
+const NotificationBanner = styled.div<NotificationBannerProps>`
   background: ${props => props.success ? 'rgba(34, 197, 94, 0.1)' : 'rgba(220, 38, 38, 0.1)'};
   border: 1px solid ${props => props.success ? 'rgba(34, 197, 94, 0.3)' : 'rgba(220, 38, 38, 0.3)'};
   border-radius: 1rem;

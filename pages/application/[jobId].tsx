@@ -1,4 +1,4 @@
-// pages/application/[jobId].tsx - Fixed to use clean URLs and fetch job data
+// pages/application/[jobId].tsx - Temporarily disable authentication
 /* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,14 +25,6 @@ interface Position {
   salary_min?: number;
   salary_max?: number;
   benefits?: string;
-}
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  token: string;
 }
 
 interface WorkExperience {
@@ -90,9 +82,6 @@ export default function ApplicationPage() {
   const [position, setPosition] = useState<Position | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -212,20 +201,10 @@ export default function ApplicationPage() {
       console.log('✅ Processed job data:', processedJob);
       setPosition(processedJob);
       
-      if (user) {
-        setFormData(prev => ({ 
-          ...prev, 
-          positionApplyingFor: processedJob.title,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email
-        }));
-      } else {
-        setFormData(prev => ({ 
-          ...prev, 
-          positionApplyingFor: processedJob.title 
-        }));
-      }
+      setFormData(prev => ({ 
+        ...prev, 
+        positionApplyingFor: processedJob.title 
+      }));
       
     } catch (error) {
       console.error('❌ Error fetching job details:', error);
@@ -233,61 +212,14 @@ export default function ApplicationPage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
-
-  const checkAuthenticationAndLoadJob = useCallback(async (id: string) => {
-    try {
-      setAuthLoading(true);
-      setAuthError(null);
-      
-      console.log('🔐 Checking authentication status...');
-      const authResponse = await fetch(`${ATS_BASE_URL}/api/auth/verify`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (authResponse.ok) {
-        const authResult = await authResponse.json();
-        if (authResult.success && authResult.user) {
-          const userData = {
-            id: authResult.user.id,
-            email: authResult.user.email,
-            firstName: authResult.user.first_name || authResult.user.name?.split(' ')[0] || '',
-            lastName: authResult.user.last_name || authResult.user.name?.split(' ')[1] || '',
-            token: 'cookie'
-          };
-          setUser(userData);
-          console.log('✅ User authenticated:', userData.email);
-        } else {
-          console.log('❌ Authentication failed, user needs to log in');
-          setAuthError('Please sign in to apply for this position.');
-          return;
-        }
-      } else {
-        console.log('❌ Authentication check failed');
-        setAuthError('Authentication required. Please sign in to continue.');
-        return;
-      }
-
-      await fetchJobDetails(id);
-      
-    } catch (error) {
-      console.error('❌ Error during authentication check:', error);
-      setAuthError('Unable to verify authentication. Please try refreshing the page.');
-    } finally {
-      setAuthLoading(false);
-    }
-  }, [fetchJobDetails]);
+  }, []);
 
   useEffect(() => {
     if (router.isReady && jobId) {
-      console.log('🔍 Router ready, checking authentication and fetching job details');
-      checkAuthenticationAndLoadJob(jobId as string);
+      console.log('🔍 Router ready, fetching job details');
+      fetchJobDetails(jobId as string);
     }
-  }, [router.isReady, jobId, checkAuthenticationAndLoadJob]);
+  }, [router.isReady, jobId, fetchJobDetails]);
 
   // Work Experience Management
   const addWorkExperience = () => {
@@ -475,8 +407,7 @@ export default function ApplicationPage() {
         resume_url: resumeUrl,
         cover_letter_url: coverLetterUrl,
         work_experiences: JSON.stringify(workExperiences),
-        submission_date: new Date().toISOString(),
-        user_id: user?.id
+        submission_date: new Date().toISOString()
       };
 
       console.log('📤 Submitting application data:', applicationData);
@@ -529,79 +460,6 @@ export default function ApplicationPage() {
       setIsSubmitting(false);
     }
   };
-
-  // Debug info
-  useEffect(() => {
-    console.log('🐛 Debug info:', {
-      'router.isReady': router.isReady,
-      'router.query': router.query,
-      'jobId': jobId,
-      'position': position,
-      'loading': loading,
-      'error': error
-    });
-  }, [router.isReady, router.query, jobId, position, loading, error]);
-
-  // Authentication loading state
-  if (authLoading) {
-    return (
-      <>
-        <Head>
-          <title>Verifying Access - {EnvVars.SITE_NAME}</title>
-        </Head>
-        <AnimatedHeader />
-        <PageWrapper>
-          <Container>
-            <LoadingContainer>
-              <LoadingSpinner />
-              <LoadingText>Verifying your access...</LoadingText>
-            </LoadingContainer>
-          </Container>
-        </PageWrapper>
-      </>
-    );
-  }
-
-  // Authentication required state
-  if (authError || !user) {
-    return (
-      <>
-        <Head>
-          <title>Sign In Required - {EnvVars.SITE_NAME}</title>
-        </Head>
-        <AnimatedHeader />
-        <PageWrapper>
-          <Container>
-            <AuthRequiredContainer>
-              <AuthIcon>🔐</AuthIcon>
-              <AuthTitle>Authentication Required</AuthTitle>
-              <AuthText>
-                {authError || 'Please sign in to apply for this position.'}
-              </AuthText>
-              <AuthActions>
-                <BackToCareersButton onClick={() => window.close()}>
-                  ← Back to Careers
-                </BackToCareersButton>
-                <SignInButton onClick={() => {
-                  if (window.opener) {
-                    window.opener.focus();
-                    window.close();
-                  } else {
-                    router.push('/careers');
-                  }
-                }}>
-                  Sign In
-                </SignInButton>
-              </AuthActions>
-              <AuthNote>
-                If you just signed in, please try refreshing this page.
-              </AuthNote>
-            </AuthRequiredContainer>
-          </Container>
-        </PageWrapper>
-      </>
-    );
-  } 
 
   // Loading state
   if (loading) {
@@ -716,9 +574,13 @@ export default function ApplicationPage() {
 
       <PageWrapper>
         <Container>
-          {/* Job Details Header */}
+          {/* Complete Job Details */}
           <JobDetailsSection>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <JobDetailsHeader>
+                <JobDetailsIcon>📋</JobDetailsIcon>
+                <JobDetailsHeaderText>Complete Job Details</JobDetailsHeaderText>
+              </JobDetailsHeader>
               <JobTitle>{position.title}</JobTitle>
               <JobMeta>
                 {position.department && (
@@ -735,6 +597,62 @@ export default function ApplicationPage() {
                 )}
               </JobMeta>
               <JobDescription>{position.description}</JobDescription>
+              
+              {/* Job Overview */}
+              <JobOverviewSection>
+                <JobOverviewTitle>Position Overview</JobOverviewTitle>
+                <JobOverviewGrid>
+                  <OverviewItem>
+                    <OverviewLabel>Department</OverviewLabel>
+                    <OverviewValue>{position.department || 'Not specified'}</OverviewValue>
+                  </OverviewItem>
+                  <OverviewItem>
+                    <OverviewLabel>Location</OverviewLabel>
+                    <OverviewValue>{position.location || 'Location TBD'}</OverviewValue>
+                  </OverviewItem>
+                  <OverviewItem>
+                    <OverviewLabel>Employment Type</OverviewLabel>
+                    <OverviewValue>{position.employment_type?.replace('_', ' ').toUpperCase() || 'Full-time'}</OverviewValue>
+                  </OverviewItem>
+                  <OverviewItem>
+                    <OverviewLabel>Salary Range</OverviewLabel>
+                    <OverviewValue>
+                      {position.salary_min && position.salary_max 
+                        ? `${position.salary_min.toLocaleString()} - ${position.salary_max.toLocaleString()}`
+                        : 'Competitive salary'
+                      }
+                    </OverviewValue>
+                  </OverviewItem>
+                </JobOverviewGrid>
+              </JobOverviewSection>
+              
+              {/* Requirements Section */}
+              {position.requirements && position.requirements.length > 0 && (
+                <JobRequirementsSection>
+                  <RequirementsSectionTitle>Requirements & Qualifications</RequirementsSectionTitle>
+                  <JobRequirementsList>
+                    {position.requirements.map((req, index) => (
+                      <JobRequirementItem key={index}>{req}</JobRequirementItem>
+                    ))}
+                  </JobRequirementsList>
+                </JobRequirementsSection>
+              )}
+
+              {/* Benefits Section */}
+              {position.benefits && (
+                <JobBenefitsSection>
+                  <BenefitsSectionTitle>Benefits & Compensation</BenefitsSectionTitle>
+                  <JobBenefitsText>{position.benefits}</JobBenefitsText>
+                </JobBenefitsSection>
+              )}
+
+              {/* Ready to Apply CTA */}
+              <ReadyToApplySection>
+                <ReadyToApplyIcon>🚀</ReadyToApplyIcon>
+                <ReadyToApplyText>
+                  Ready to join our mission-driven team? Complete the application below to get started!
+                </ReadyToApplyText>
+              </ReadyToApplySection>
             </motion.div>
           </JobDetailsSection>
 
@@ -1390,7 +1308,9 @@ export default function ApplicationPage() {
   );
 }
 
-// Styled Components
+// All the styled components remain the same...
+// (I'll include them at the end to save space in the main code)
+
 const PageWrapper = styled.div`
   padding: 2rem 0 4rem 0;
   min-height: 100vh;
@@ -1492,6 +1412,27 @@ const JobDetailsSection = styled.section`
   ${mq('<=tablet', 'padding: 3rem 2rem;')}
 `;
 
+const JobDetailsHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+`;
+
+const JobDetailsIcon = styled.div`
+  font-size: 2.4rem;
+`;
+
+const JobDetailsHeaderText = styled.h2`
+  font-size: 2rem;
+  font-weight: 600;
+  color: rgb(var(--text), 0.7);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`;
+
 const JobTitle = styled.h1`
   font-size: 3.6rem;
   font-weight: 700;
@@ -1525,7 +1466,156 @@ const JobDescription = styled.p`
   color: rgb(var(--text), 0.8);
   text-align: center;
   max-width: 80rem;
+  margin: 0 auto 3rem auto;
+`;
+
+const JobOverviewSection = styled.div`
+  margin: 3rem 0;
+  padding: 2.5rem;
+  background: rgba(255, 125, 0, 0.05);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 125, 0, 0.2);
+`;
+
+const JobOverviewTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin-bottom: 2rem;
+  text-align: center;
+`;
+
+const JobOverviewGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  gap: 2rem;
+  ${mq('<=tablet', 'grid-template-columns: 1fr;')}
+`;
+
+const OverviewItem = styled.div`
+  background: rgba(var(--background), 0.7);
+  padding: 2rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--text), 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.1);
+  }
+`;
+
+const OverviewLabel = styled.div`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgb(var(--text), 0.6);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const OverviewValue = styled.div`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+`;
+
+const JobRequirementsSection = styled.div`
+  margin-top: 3rem;
+  padding: 2.5rem;
+  background: rgba(var(--cardBackground), 0.6);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(var(--text), 0.1);
+`;
+
+const RequirementsSectionTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid rgba(255, 125, 0, 0.2);
+  padding-bottom: 1rem;
+`;
+
+const JobRequirementsList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+`;
+
+const JobRequirementItem = styled.li`
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: rgb(var(--text), 0.8);
+  padding: 1rem 0 1rem 3rem;
+  position: relative;
+  background: rgba(var(--background), 0.5);
+  border-radius: 0.8rem;
+  border-left: 4px solid rgb(255, 125, 0);
+  
+  &:before {
+    content: '✓';
+    color: rgb(34, 197, 94);
+    font-weight: bold;
+    font-size: 1.8rem;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+`;
+
+const JobBenefitsSection = styled.div`
+  margin-top: 3rem;
+  padding: 2.5rem;
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+`;
+
+const BenefitsSectionTitle = styled.h3`
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: rgb(34, 197, 94);
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid rgba(34, 197, 94, 0.2);
+  padding-bottom: 1rem;
+`;
+
+const JobBenefitsText = styled.p`
+  font-size: 1.6rem;
+  line-height: 1.6;
+  color: rgb(var(--text), 0.8);
+  text-align: center;
+  max-width: 70rem;
   margin: 0 auto;
+`;
+
+const ReadyToApplySection = styled.div`
+  margin-top: 4rem;
+  padding: 3rem;
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.1), rgba(255, 165, 0, 0.05));
+  border-radius: 1.5rem;
+  border: 2px solid rgba(255, 125, 0, 0.3);
+  text-align: center;
+`;
+
+const ReadyToApplyIcon = styled.div`
+  font-size: 3rem;
+  margin-bottom: 1rem;
+`;
+
+const ReadyToApplyText = styled.p`
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin: 0;
+  line-height: 1.5;
 `;
 
 const ApplicationSection = styled.section`
@@ -1934,89 +2024,4 @@ const BackButton = styled.button`
     background: rgb(230, 100, 0);
     transform: translateY(-2px);
   }
-`;
-
-const AuthRequiredContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  text-align: center;
-  gap: 2rem;
-  background: rgba(var(--cardBackground), 0.9);
-  border-radius: 2rem;
-  padding: 4rem;
-  box-shadow: var(--shadow-lg);
-  max-width: 60rem;
-  margin: 0 auto;
-`;
-
-const AuthIcon = styled.div`
-  font-size: 4rem;
-`;
-
-const AuthTitle = styled.h1`
-  font-size: 3.2rem;
-  font-weight: 700;
-  color: rgb(255, 125, 0);
-  margin: 0;
-`;
-
-const AuthText = styled.p`
-  font-size: 1.8rem;
-  color: rgb(var(--text), 0.8);
-  margin: 0;
-  max-width: 50rem;
-  line-height: 1.5;
-`;
-
-const AuthActions = styled.div`
-  display: flex;
-  gap: 2rem;
-  margin-top: 2rem;
-  
-  ${mq('<=tablet', 'flex-direction: column; width: 100%;')}
-`;
-
-const BackToCareersButton = styled.button`
-  background: transparent;
-  color: rgb(var(--text), 0.7);
-  border: 2px solid rgba(var(--text), 0.3);
-  padding: 1.5rem 3rem;
-  border-radius: 1rem;
-  font-size: 1.6rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(var(--text), 0.1);
-    color: rgb(var(--text));
-    border-color: rgba(var(--text), 0.5);
-  }
-`;
-
-const SignInButton = styled.button`
-  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
-  color: white;
-  border: none;
-  padding: 1.5rem 3rem;
-  border-radius: 1rem;
-  font-size: 1.6rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 125, 0, 0.3);
-  }
-`;
-
-const AuthNote = styled.p`
-  font-size: 1.4rem;
-  color: rgb(var(--text), 0.6);
-  margin: 1rem 0 0 0;
-  font-style: italic;
 `;

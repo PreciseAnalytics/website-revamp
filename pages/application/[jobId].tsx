@@ -123,78 +123,64 @@ export default function ApplicationPage() {
   });
 
   const fetchJobDetails = useCallback(async (id: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      console.log(`🔄 Fetching job details for ID: ${id}`);
-      
-      const endpoints = [
-        `${ATS_BASE_URL}/api/jobs/${id}`,
-        `${ATS_BASE_URL}/api/job/${id}`,
-        `${ATS_BASE_URL}/api/jobs?id=${id}`,
-        `${ATS_BASE_URL}/api/jobs?job_id=${id}`,
-      ];
-      
-      let response;
-      let endpointUsed = '';
-      let data = null;
-      
-      for (const endpoint of endpoints) {
-        console.log(`🔍 Trying endpoint: ${endpoint}`);
-        try {
-          response = await fetch(endpoint);
-          endpointUsed = endpoint;
-          console.log(`📡 Response status for ${endpoint}:`, response.status);
-          
-          if (response.ok) {
-            data = await response.json();
-            console.log(`📊 API Response from ${endpoint}:`, data);
-            break;
-          }
-        } catch (err) {
-          console.log(`❌ Endpoint ${endpoint} failed:`, err);
-          continue;
-        }
-      }
-      
-      if (!response || !response.ok) {
-        throw new Error(`All API endpoints failed. Last status: ${response?.status || 'No response'}`);
-      }
-      
-      if (!data) {
-        throw new Error('No data received from API');
-      }
+  try {
+    setLoading(true);
+    setError(null);
+    console.log(`🔄 Fetching job details for ID: ${id}`);
+    
+    // FIXED: Try individual job endpoint first, then fall back to all jobs
+    const endpoints = [
+      `${ATS_BASE_URL}/api/jobs/${id}`,  // NEW: Individual job endpoint
+      `${ATS_BASE_URL}/api/jobs`,        // Fallback to all jobs
+    ];
       
       let jobData = null;
-      
-      if (data.success && data.job) {
-        jobData = data.job;
-      } else if (data.success && data.jobs && data.jobs.length > 0) {
-        jobData = data.jobs[0];
-      } else if (data.job) {
-        jobData = data.job;
-      } else if (Array.isArray(data) && data.length > 0) {
-        jobData = data[0];
-      } else if (data.id) {
-        jobData = data;
+    
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`🔍 Trying endpoint: ${endpoint}`);
+        const response = await fetch(endpoint);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`📊 API Response from ${endpoint}:`, data);
+          
+          if (endpoint.includes(`/${id}`)) {
+            // Individual job endpoint response
+            if (data.success && data.job) {
+              jobData = data.job;
+              break;
+            }
+          } else {
+            // All jobs endpoint - find the specific job
+            const jobs = data.success ? data.jobs : (Array.isArray(data) ? data : []);
+            jobData = jobs.find((job: any) => job.id === id);
+            if (jobData) break;
+          }
+        }
+      } catch (err) {
+        console.log(`❌ Endpoint ${endpoint} failed:`, err);
+        continue;
       }
-      
-      if (!jobData) {
-        throw new Error('Job data not found in API response');
-      }
+    }
+    
+    if (!jobData) {
+      throw new Error('Job not found in any endpoint');
+    }
 
       const processedJob: Position = {
-        id: (jobData.id || id).toString(),
+        id: jobData.id,
         title: jobData.title || 'Unknown Position',
         department: jobData.department || '',
         location: jobData.location || '',
-        employment_type: jobData.employment_type || '',
+        employment_type: jobData.type || jobData.employment_type || 'full_time', // Handle both field names
         description: jobData.description || '',
         requirements: typeof jobData.requirements === 'string' 
           ? jobData.requirements.split('\n').filter((req: string) => req.trim()) 
           : jobData.requirements || [],
-        salary_min: jobData.salary_min,
-        salary_max: jobData.salary_max,
+        // FIXED: Parse salary_range string into min/max numbers
+        salary_min: parseSalaryRange(jobData.salary_range)?.min,
+        salary_max: parseSalaryRange(jobData.salary_range)?.max,
         benefits: jobData.benefits || ''
       };
 
@@ -302,6 +288,29 @@ export default function ApplicationPage() {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
+  // FIXED: Add this salary parser function
+  const parseSalaryRange = (salaryRange: string): { min: number; max: number } | null => {
+    if (!salaryRange) return null;
+    
+    // Extract numbers from strings like "$70,000 – $90,000/year" or "$110,000 – $140,000 per year (DOE)"
+    const numbers = salaryRange.match(/\$[\d,]+/g);
+    if (numbers && numbers.length >= 2) {
+      const min = parseInt(numbers[0].replace(/[$,]/g, ''));
+      const max = parseInt(numbers[1].replace(/[$,]/g, ''));
+      return { min, max };
+    }
+    
+    // Single number case
+    if (numbers && numbers.length === 1) {
+      const amount = parseInt(numbers[0].replace(/[$,]/g, ''));
+      return { min: amount, max: amount };
+    }
+    
+    return null;
+  };
+
+
 
   const uploadFile = async (file: File, type: string): Promise<string> => {
     const uploadFormData = new FormData();

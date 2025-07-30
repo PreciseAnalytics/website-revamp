@@ -13,16 +13,17 @@ const ATS_BASE_URL = 'https://precise-analytics-ats.vercel.app';
 
 // Dynamic positions interface
 interface Position {
-  id: number;
+  id: string; // API returns string ID, not number
   title: string;
   department: string;
   location: string;
-  employment_type: string;
+  employment_type: string; // Mapped from API 'type' field
   description: string;
   requirements: string[];
   salary_min?: number;
   salary_max?: number;
   benefits?: string;
+  salary_range?: string; // Keep original for display
 }
 
 export default function CareersPage() {
@@ -30,6 +31,27 @@ export default function CareersPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
+
+  // FIXED: Parse salary range string into min/max numbers
+const parseSalaryRange = (salaryRange: string): { min: number; max: number } | null => {
+  if (!salaryRange) return null;
+  
+  // Extract numbers from strings like "$70,000 – $90,000/year" or "$110,000 – $140,000 per year (DOE)"
+  const numbers = salaryRange.match(/\$[\d,]+/g);
+  if (numbers && numbers.length >= 2) {
+    const min = parseInt(numbers[0].replace(/[$,]/g, ''));
+    const max = parseInt(numbers[1].replace(/[$,]/g, ''));
+    return { min, max };
+  }
+  
+  // Single number case
+  if (numbers && numbers.length === 1) {
+    const amount = parseInt(numbers[0].replace(/[$,]/g, ''));
+    return { min: amount, max: amount };
+  }
+  
+  return null;
+};
 
   useEffect(() => {
     fetchPositions();
@@ -40,19 +62,41 @@ export default function CareersPage() {
       setLoading(true);
       console.log('🔄 Fetching positions from ATS...');
       
-      const response = await fetch(`${ATS_BASE_URL}/api/jobs?active_only=true`);
-      const data = await response.json();
+      const response = await fetch(`${ATS_BASE_URL}/api/jobs`);
       
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+      
+      const data = await response.json();
       console.log('📊 ATS API Response:', data);
       
-      const jobsArray = data.success ? data.jobs : (Array.isArray(data) ? data : []);
+      if (!data.success || !Array.isArray(data.jobs)) {
+        throw new Error('Invalid API response format');
+      }
       
-      const processedPositions = jobsArray.map((pos: any) => ({
-        ...pos,
-        requirements: typeof pos.requirements === 'string' 
-          ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
-          : pos.requirements || []
-      }));
+      // FIXED: Map database fields to application expected format
+      const processedPositions = data.jobs
+        .filter((job: any) => job.status === 'published')
+        .map((pos: any) => {
+          const salaryParsed = parseSalaryRange(pos.salary_range);
+          
+          return {
+            id: pos.id,
+            title: pos.title,
+            department: pos.department,
+            location: pos.location,
+            employment_type: pos.type || pos.employment_type || 'full_time', // Handle both field names
+            description: pos.description,
+            requirements: typeof pos.requirements === 'string' 
+              ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
+              : pos.requirements || [],
+            salary_min: salaryParsed?.min,
+            salary_max: salaryParsed?.max,
+            salary_range: pos.salary_range, // Keep original for display
+            benefits: pos.benefits
+          };
+        });
 
       console.log('✅ Processed positions:', processedPositions);
       setPositions(processedPositions);
@@ -238,9 +282,12 @@ export default function CareersPage() {
                     
                     <JobCell className="salary">
                       <SalaryText>
-                        {position.salary_min && position.salary_max 
+                        {/* FIXED: Display original salary_range or fall back to parsed min/max */}
+                        {position.salary_range || 
+                        (position.salary_min && position.salary_max 
                           ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
                           : 'Competitive'
+                        )
                         }
                       </SalaryText>
                     </JobCell>
@@ -290,10 +337,8 @@ export default function CareersPage() {
                   <JobModalMetaItem>🏢 {selectedPosition.department}</JobModalMetaItem>
                   <JobModalMetaItem>📍 {selectedPosition.location}</JobModalMetaItem>
                   <JobModalMetaItem>💼 {selectedPosition.employment_type?.replace('_', ' ').toUpperCase()}</JobModalMetaItem>
-                  {selectedPosition.salary_min && selectedPosition.salary_max && (
-                    <JobModalMetaItem>
-                      💰 ${selectedPosition.salary_min.toLocaleString()} - ${selectedPosition.salary_max.toLocaleString()}
-                    </JobModalMetaItem>
+                  {selectedPosition.salary_range && (
+                    <JobModalMetaItem>💰 {selectedPosition.salary_range}</JobModalMetaItem>
                   )}
                 </JobModalMeta>
 

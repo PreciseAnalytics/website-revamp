@@ -359,116 +359,124 @@ export default function ApplicationPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  if (!validateForm() || !position) {
+    return;
+  }
+
+  setIsSubmitting(true);
+  setSubmitError(null);
+
+  try {
+    console.log('🚀 Starting comprehensive application submission...');
     
-    if (!validateForm() || !position) {
-      return;
+    // Upload files
+    let resumeUrl = '';
+    let coverLetterUrl = '';
+
+    if (formData.resume) {
+      resumeUrl = await uploadFile(formData.resume, 'resume');
     }
 
-    setIsSubmitting(true);
-    setSubmitError(null);
+    if (formData.coverLetter) {
+      coverLetterUrl = await uploadFile(formData.coverLetter, 'cover_letter');
+    }
 
-    try {
-      console.log('🚀 Starting comprehensive application submission...');
-      
-      // Upload files
-      let resumeUrl = '';
-      let coverLetterUrl = '';
+    const applicationData = {
+      job_id: position.id,
+      first_name: formData.firstName.trim(),
+      middle_name: formData.middleName.trim(),
+      last_name: formData.lastName.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      linkedin_url: formData.linkedinUrl.trim(),
+      portfolio_url: formData.portfolioUrl.trim(),
+      address: formData.address.trim(),
+      city: formData.city.trim(),
+      state: formData.state.trim(),
+      zip_code: formData.zipCode.trim(),
+      country: formData.country.trim(),
+      work_authorized: formData.workAuthorized,
+      visa_sponsorship: formData.visaSponsorship,
+      open_to_remote: formData.openToRemote,
+      preferred_work_location: formData.preferredWorkLocation,
+      total_experience: formData.totalExperience,
+      highest_education: formData.highestEducation,
+      position_applying_for: formData.positionApplyingFor,
+      available_start_date: formData.availableStartDate,
+      expected_salary_range: formData.expectedSalaryRange,
+      interview_availability: formData.interviewAvailability,
+      gender: formData.gender,
+      race_ethnicity: formData.raceEthnicity,
+      veteran_status: formData.veteranStatus,
+      disability_status: formData.disabilityStatus,
+      signature: formData.signature.trim(),
+      why_interested: formData.whyInterested.trim(),
+      resume_url: resumeUrl,
+      cover_letter_url: coverLetterUrl,
+      work_experiences: JSON.stringify(workExperiences),
+      submission_date: new Date().toISOString()
+    };
 
-      if (formData.resume) {
-        resumeUrl = await uploadFile(formData.resume, 'resume');
-      }
+    console.log('📤 Submitting application data:', applicationData);
 
-      if (formData.coverLetter) {
-        coverLetterUrl = await uploadFile(formData.coverLetter, 'cover_letter');
-      }
+    // FIXED: Properly scope the response variable
+    const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
+      method: 'POST',
+      // credentials: 'include', // ❌ REMOVED for CORS fix
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(applicationData),
+    });
 
-      const applicationData = {
-        job_id: position.id,
-        first_name: formData.firstName.trim(),
-        middle_name: formData.middleName.trim(),
-        last_name: formData.lastName.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        linkedin_url: formData.linkedinUrl.trim(),
-        portfolio_url: formData.portfolioUrl.trim(),
-        address: formData.address.trim(),
-        city: formData.city.trim(),
-        state: formData.state.trim(),
-        zip_code: formData.zipCode.trim(),
-        country: formData.country.trim(),
-        work_authorized: formData.workAuthorized,
-        visa_sponsorship: formData.visaSponsorship,
-        open_to_remote: formData.openToRemote,
-        preferred_work_location: formData.preferredWorkLocation,
-        total_experience: formData.totalExperience,
-        highest_education: formData.highestEducation,
-        position_applying_for: formData.positionApplyingFor,
-        available_start_date: formData.availableStartDate,
-        expected_salary_range: formData.expectedSalaryRange,
-        interview_availability: formData.interviewAvailability,
-        gender: formData.gender,
-        race_ethnicity: formData.raceEthnicity,
-        veteran_status: formData.veteranStatus,
-        disability_status: formData.disabilityStatus,
-        signature: formData.signature.trim(),
-        why_interested: formData.whyInterested.trim(),
-        resume_url: resumeUrl,
-        cover_letter_url: coverLetterUrl,
-        work_experiences: JSON.stringify(workExperiences),
-        submission_date: new Date().toISOString()
-      };
+    // Check if response is ok before trying to parse JSON
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status} ${response.statusText}`);
+    }
 
-      console.log('📤 Submitting application data:', applicationData);
+    const result = await response.json();
 
-      const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(applicationData),
+    if (!result.success) {
+      throw new Error(result.error || 'Application submission failed');
+    }
+
+    setSubmitSuccess(true);
+    
+    // Analytics tracking
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'comprehensive_application_submitted', {
+        'job_position': position.title,
+        'job_id': position.id,
+        'application_source': 'comprehensive_application_page',
+        'application_id': result.application?.id,
+        'work_experiences_count': workExperiences.length
       });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || `Server error: ${response.status}`);
-      }
-
-      setSubmitSuccess(true);
-      
-      // Analytics tracking
-      if (typeof window !== 'undefined' && (window as any).gtag) {
-        (window as any).gtag('event', 'comprehensive_application_submitted', {
-          'job_position': position.title,
-          'job_id': position.id,
-          'application_source': 'comprehensive_application_page',
-          'application_id': result.application?.id,
-          'work_experiences_count': workExperiences.length
-        });
-      }
-
-    } catch (error) {
-      console.error('❌ Application submission error:', error);
-      
-      let errorMessage = 'An unexpected error occurred. Please try again or contact us directly.';
-      
-      if (error instanceof Error) {
-        if (error.message.includes('404')) {
-          errorMessage = 'The selected position is no longer available.';
-        } else if (error.message.includes('upload')) {
-          errorMessage = 'File upload failed. Please check your files and try again.';
-        } else {
-          errorMessage = error.message;
-        }
-      }
-      
-      setSubmitError(errorMessage);
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+
+  } catch (error) {
+    console.error('❌ Application submission error:', error);
+    
+    let errorMessage = 'An unexpected error occurred. Please try again or contact us directly.';
+    
+    if (error instanceof Error) {
+      if (error.message.includes('404')) {
+        errorMessage = 'The selected position is no longer available.';
+      } else if (error.message.includes('upload')) {
+        errorMessage = 'File upload failed. Please check your files and try again.';
+      } else if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+        errorMessage = 'Connection error. Please check your internet connection and try again.';
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
+    setSubmitError(errorMessage);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // Loading state
   if (loading) {

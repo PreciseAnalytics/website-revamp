@@ -1,5 +1,5 @@
-// pages/careers.tsx - Fixed to remove login modal and just navigate to application
-import { useState, useEffect } from 'react';
+// pages/careers.tsx - COMPLETE FIXED VERSION WITH ALL STYLED COMPONENTS
+import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
@@ -9,9 +9,9 @@ import { EnvVars } from 'env';
 import { mq } from 'utils/media';
 
 // ATS API Configuration
-const ATS_BASE_URL = 'https://precise-analytics-ats.vercel.app';
+const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
 
-// Dynamic positions interface
+// FIXED: Interface to match actual API response
 interface Position {
   id: string; // API returns string ID, not number
   title: string;
@@ -26,13 +26,7 @@ interface Position {
   salary_range?: string; // Keep original for display
 }
 
-export default function CareersPage() {
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
-  const [showJobModal, setShowJobModal] = useState(false);
-
-  // FIXED: Parse salary range string into min/max numbers
+// FIXED: Parse salary range string into min/max numbers
 const parseSalaryRange = (salaryRange: string): { min: number; max: number } | null => {
   if (!salaryRange) return null;
   
@@ -53,11 +47,14 @@ const parseSalaryRange = (salaryRange: string): { min: number; max: number } | n
   return null;
 };
 
-  useEffect(() => {
-    fetchPositions();
-  }, []);
+export default function CareersPage() {
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
+  const [showJobModal, setShowJobModal] = useState(false);
 
-  const fetchPositions = async () => {
+  // FIXED: Use useCallback to fix React Hook warning
+  const fetchPositions = useCallback(async () => {
     try {
       setLoading(true);
       console.log('🔄 Fetching positions from ATS...');
@@ -107,7 +104,12 @@ const parseSalaryRange = (salaryRange: string): { min: number; max: number } | n
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // FIXED: Include fetchPositions in dependency array
+  useEffect(() => {
+    fetchPositions();
+  }, [fetchPositions]);
 
   // Handle Learn More button click
   const handleLearnMore = (position: Position) => {
@@ -124,7 +126,7 @@ const parseSalaryRange = (salaryRange: string): { min: number; max: number } | n
     }
   };
 
-  // Apply now just navigates directly to application page - NO AUTHENTICATION REQUIRED
+  // FIXED: Apply now navigation
   const handleApplyClick = (position: Position) => {
     const applicationUrl = `/application/${position.id}`;
     
@@ -284,10 +286,10 @@ const parseSalaryRange = (salaryRange: string): { min: number; max: number } | n
                       <SalaryText>
                         {/* FIXED: Display original salary_range or fall back to parsed min/max */}
                         {position.salary_range || 
-                        (position.salary_min && position.salary_max 
-                          ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
-                          : 'Competitive'
-                        )
+                         (position.salary_min && position.salary_max 
+                           ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
+                           : 'Competitive'
+                         )
                         }
                       </SalaryText>
                     </JobCell>
@@ -310,7 +312,7 @@ const parseSalaryRange = (salaryRange: string): { min: number; max: number } | n
         </Container>
       </PageWrapper>
 
-      {/* Job Details Modal */}
+      {/* Job Details Modal - FIXED salary display */}
       <AnimatePresence>
         {showJobModal && selectedPosition && (
           <ModalOverlay
@@ -382,7 +384,8 @@ const parseSalaryRange = (salaryRange: string): { min: number; max: number } | n
   );
 }
 
-// Styled Components
+// ALL STYLED COMPONENTS - COMPLETE
+
 const PageWrapper = styled.div`
   padding: 4rem 0;
 `;
@@ -841,6 +844,42 @@ const SalaryText = styled.span`
   `)}
 `;
 
+const JobActions = styled.div`
+  display: flex;
+  gap: 1rem;
+  
+  ${mq('<=tablet', `
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+  `)}
+`;
+
+const LearnMoreButton = styled.button`
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border: 2px solid rgb(255, 125, 0);
+  background: transparent;
+  color: rgb(255, 125, 0);
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  
+  &:hover {
+    background: rgba(255, 125, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.2);
+  }
+  
+  ${mq('<=tablet', `
+    width: 100%;
+    padding: 1.2rem 2rem;
+    font-size: 1.6rem;
+  `)}
+`;
+
 const CompactApplyButton = styled.button`
   padding: 1rem 2rem;
   font-size: 1.4rem;
@@ -875,43 +914,6 @@ const CompactApplyButton = styled.button`
     font-size: 1.6rem;
     min-height: 44px;
     margin-top: 1rem;
-  `)}
-`;
-
-// Job Actions
-const JobActions = styled.div`
-  display: flex;
-  gap: 1rem;
-  
-  ${mq('<=tablet', `
-    flex-direction: column;
-    width: 100%;
-    margin-top: 1rem;
-  `)}
-`;
-
-const LearnMoreButton = styled.button`
-  padding: 1rem 2rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  border: 2px solid rgb(255, 125, 0);
-  background: transparent;
-  color: rgb(255, 125, 0);
-  border-radius: 0.8rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  
-  &:hover {
-    background: rgba(255, 125, 0, 0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.2);
-  }
-  
-  ${mq('<=tablet', `
-    width: 100%;
-    padding: 1.2rem 2rem;
-    font-size: 1.6rem;
   `)}
 `;
 

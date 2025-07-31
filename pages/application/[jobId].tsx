@@ -12,7 +12,7 @@ import { EnvVars } from 'env';
 import { mq } from 'utils/media';
 
 // ATS API Configuration
-const ATS_BASE_URL = 'https://precise-analytics-ats.vercel.app';
+const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
 
 interface Position {
   id: string;

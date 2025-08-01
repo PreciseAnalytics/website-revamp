@@ -74,26 +74,27 @@ export default function CareersPage() {
       
       // FIXED: Map database fields to application expected format
       const processedPositions = data.jobs
-        .filter((job: any) => job.status === 'published')
-        .map((pos: any) => {
-          const salaryParsed = parseSalaryRange(pos.salary_range);
-          
-          return {
-            id: pos.id,
-            title: pos.title || 'Untitled Position',
-            department: pos.department || 'General',
-            location: pos.location || 'Location TBD',
-            employment_type: pos.type || pos.employment_type || 'full_time',
-            description: pos.description || 'Job description coming soon.',  // ✅ Fix null description
-            requirements: typeof pos.requirements === 'string' 
-              ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
-              : pos.requirements || [],
-            salary_min: salaryParsed?.min,
-            salary_max: salaryParsed?.max,
-            salary_range: pos.salary_range || 'Competitive',  // ✅ Fix null salary_range
-            benefits: pos.benefits
-          };
-        });
+  .filter((job: any) => job.status === 'published')
+  .map((pos: any) => {
+    const salaryParsed = parseSalaryRange(pos.salary_range);
+    
+    return {
+      id: pos.id,
+      title: pos.title || 'Untitled Position',
+      department: pos.department || 'General',
+      location: pos.location || 'Location TBD',
+      employment_type: pos.type || pos.employment_type || 'full_time',
+      description: pos.description || 'Job description coming soon.',  // ✅ Fix null description
+      requirements: typeof pos.requirements === 'string' 
+        ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
+        : pos.requirements || [],
+      salary_min: salaryParsed?.min,
+      salary_max: salaryParsed?.max,
+      salary_range: pos.salary_range || 'Competitive',  // ✅ Fix null salary_range
+      benefits: pos.benefits || ''
+    };
+  });
+
 
       console.log('✅ Processed positions:', processedPositions);
       setPositions(processedPositions);

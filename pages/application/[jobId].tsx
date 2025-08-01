@@ -1,4 +1,4 @@
-// pages/application/[jobId].tsx - Temporarily disable authentication
+// pages/application/[jobId].tsx - Fixed scroll behavior
 /* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -121,6 +121,19 @@ export default function ApplicationPage() {
     resume: null,
     coverLetter: null,
   });
+
+  // FIXED: Moved useEffect after state declarations and improved scroll behavior
+  useEffect(() => {
+    if (submitSuccess && typeof window !== 'undefined') {
+      // Scroll to top smoothly with a slight delay to ensure DOM updates
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        });
+      }, 100);
+    }
+  }, [submitSuccess]);
 
   const fetchJobDetails = useCallback(async (id: string) => {
   try {
@@ -310,8 +323,6 @@ export default function ApplicationPage() {
     return null;
   };
 
-
-
   const uploadFile = async (file: File, type: string): Promise<string> => {
     const uploadFormData = new FormData();
     uploadFormData.append('file', file);
@@ -424,7 +435,6 @@ export default function ApplicationPage() {
     // FIXED: Properly scope the response variable
     const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
       method: 'POST',
-      // credentials: 'include', // ❌ REMOVED for CORS fix
       headers: {
         'Content-Type': 'application/json',
       },
@@ -442,6 +452,7 @@ export default function ApplicationPage() {
       throw new Error(result.error || 'Application submission failed');
     }
 
+    // FIXED: Set success state which will trigger the scroll useEffect
     setSubmitSuccess(true);
     
     // Analytics tracking
@@ -473,6 +484,16 @@ export default function ApplicationPage() {
     }
     
     setSubmitError(errorMessage);
+    
+    // FIXED: Scroll to top to show error message
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        });
+      }, 100);
+    }
   } finally {
     setIsSubmitting(false);
   }
@@ -1325,9 +1346,7 @@ export default function ApplicationPage() {
   );
 }
 
-// All the styled components remain the same...
-// (I'll include them at the end to save space in the main code)
-
+// Styled Components
 const PageWrapper = styled.div`
   padding: 2rem 0 4rem 0;
   min-height: 100vh;

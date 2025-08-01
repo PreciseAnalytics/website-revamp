@@ -80,17 +80,17 @@ export default function CareersPage() {
           
           return {
             id: pos.id,
-            title: pos.title,
-            department: pos.department,
-            location: pos.location,
-            employment_type: pos.type || pos.employment_type || 'full_time', // Handle both field names
-            description: pos.description,
+            title: pos.title || 'Untitled Position',
+            department: pos.department || 'General',
+            location: pos.location || 'Location TBD',
+            employment_type: pos.type || pos.employment_type || 'full_time',
+            description: pos.description || 'Job description coming soon.',  // ✅ Fix null description
             requirements: typeof pos.requirements === 'string' 
               ? pos.requirements.split('\n').filter((req: string) => req.trim()) 
               : pos.requirements || [],
             salary_min: salaryParsed?.min,
             salary_max: salaryParsed?.max,
-            salary_range: pos.salary_range, // Keep original for display
+            salary_range: pos.salary_range || 'Competitive',  // ✅ Fix null salary_range
             benefits: pos.benefits
           };
         });
@@ -265,7 +265,7 @@ export default function CareersPage() {
                       <JobTitle onClick={() => handleApplyClick(position)}>
                         {position.title}
                       </JobTitle>
-                      <JobPreview>{position.description.substring(0, 120)}...</JobPreview>
+                      <JobPreview>{(position.description || '').substring(0, 120)}...</JobPreview>
                     </JobCell>
                     
                     <JobCell className="department">

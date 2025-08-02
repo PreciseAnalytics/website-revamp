@@ -1,4 +1,4 @@
-// pages/application/[jobId].tsx - Fixed scroll behavior
+// pages/application/[jobId].tsx - Updated with login integration and better UX
 /* eslint-disable react/no-unescaped-entities */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -10,6 +10,8 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { mq } from 'utils/media';
+import { PreciseAnalyticsLogo } from '../../components/PreciseAnalyticsLogo';
+import { Loader2, AlertCircle, CheckCircle, Link, User, ArrowLeft } from 'lucide-react';
 
 // ATS API Configuration
 const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
@@ -75,6 +77,12 @@ interface FormErrors {
   [key: string]: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function ApplicationPage() {
   const router = useRouter();
   const { jobId } = router.query;
@@ -87,6 +95,8 @@ export default function ApplicationPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [formData, setFormData] = useState<ApplicationFormData>({
     firstName: '',
@@ -122,10 +132,70 @@ export default function ApplicationPage() {
     coverLetter: null,
   });
 
-  // FIXED: Moved useEffect after state declarations and improved scroll behavior
+  // Check for login state from URL or localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      // First, check URL parameters for user data
+      const urlParams = new URLSearchParams(window.location.search);
+      const userParam = urlParams.get('user');
+      const tokenParam = urlParams.get('token');
+      
+      if (userParam && tokenParam) {
+        const userData = JSON.parse(decodeURIComponent(userParam));
+        const token = decodeURIComponent(tokenParam);
+        
+        console.log('✅ User data from URL:', userData);
+        setUser(userData);
+        setIsLoggedIn(true);
+        
+        // Pre-populate form fields
+        const nameParts = userData.name.split(' ');
+        setFormData(prev => ({
+          ...prev,
+          firstName: nameParts[0] || '',
+          lastName: nameParts[nameParts.length - 1] || '',
+          middleName: nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : '',
+          email: userData.email || '',
+          signature: userData.name || ''
+        }));
+        
+        // Clean up URL to remove sensitive data
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+        
+      } else {
+        // Fall back to localStorage
+        const localUserData = localStorage.getItem('user');
+        const localToken = localStorage.getItem('token');
+        
+        if (localUserData && localToken) {
+          const userData = JSON.parse(localUserData);
+          console.log('✅ User data from localStorage:', userData);
+          setUser(userData);
+          setIsLoggedIn(true);
+          
+          // Pre-populate form fields
+          const nameParts = userData.name.split(' ');
+          setFormData(prev => ({
+            ...prev,
+            firstName: nameParts[0] || '',
+            lastName: nameParts[nameParts.length - 1] || '',
+            middleName: nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : '',
+            email: userData.email || '',
+            signature: userData.name || ''
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+    }
+  }, []);
+
+  // Scroll to top on success
   useEffect(() => {
     if (submitSuccess && typeof window !== 'undefined') {
-      // Scroll to top smoothly with a slight delay to ensure DOM updates
       setTimeout(() => {
         window.scrollTo({ 
           top: 0, 
@@ -136,62 +206,58 @@ export default function ApplicationPage() {
   }, [submitSuccess]);
 
   const fetchJobDetails = useCallback(async (id: string) => {
-  try {
-    setLoading(true);
-    setError(null);
-    console.log(`🔄 Fetching job details for ID: ${id}`);
-    
-    // FIXED: Try individual job endpoint first, then fall back to all jobs
-    const endpoints = [
-      `${ATS_BASE_URL}/api/jobs/${id}`,  // NEW: Individual job endpoint
-      `${ATS_BASE_URL}/api/jobs`,        // Fallback to all jobs
-    ];
+    try {
+      setLoading(true);
+      setError(null);
+      console.log(`🔄 Fetching job details for ID: ${id}`);
       
-      let jobData = null;
-    
-    for (const endpoint of endpoints) {
-      try {
-        console.log(`🔍 Trying endpoint: ${endpoint}`);
-        const response = await fetch(endpoint);
+      const endpoints = [
+        `${ATS_BASE_URL}/api/jobs/${id}`,
+        `${ATS_BASE_URL}/api/jobs`,
+      ];
         
-        if (response.ok) {
-          const data = await response.json();
-          console.log(`📊 API Response from ${endpoint}:`, data);
+      let jobData = null;
+      
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`🔍 Trying endpoint: ${endpoint}`);
+          const response = await fetch(endpoint);
           
-          if (endpoint.includes(`/${id}`)) {
-            // Individual job endpoint response
-            if (data.success && data.job) {
-              jobData = data.job;
-              break;
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`📊 API Response from ${endpoint}:`, data);
+            
+            if (endpoint.includes(`/${id}`)) {
+              if (data.success && data.job) {
+                jobData = data.job;
+                break;
+              }
+            } else {
+              const jobs = data.success ? data.jobs : (Array.isArray(data) ? data : []);
+              jobData = jobs.find((job: any) => job.id === id);
+              if (jobData) break;
             }
-          } else {
-            // All jobs endpoint - find the specific job
-            const jobs = data.success ? data.jobs : (Array.isArray(data) ? data : []);
-            jobData = jobs.find((job: any) => job.id === id);
-            if (jobData) break;
           }
+        } catch (err) {
+          console.log(`❌ Endpoint ${endpoint} failed:`, err);
+          continue;
         }
-      } catch (err) {
-        console.log(`❌ Endpoint ${endpoint} failed:`, err);
-        continue;
       }
-    }
-    
-    if (!jobData) {
-      throw new Error('Job not found in any endpoint');
-    }
+      
+      if (!jobData) {
+        throw new Error('Job not found in any endpoint');
+      }
 
       const processedJob: Position = {
         id: jobData.id,
         title: jobData.title || 'Unknown Position',
         department: jobData.department || '',
         location: jobData.location || '',
-        employment_type: jobData.type || jobData.employment_type || 'full_time', // Handle both field names
+        employment_type: jobData.type || jobData.employment_type || 'full_time',
         description: jobData.description || '',
         requirements: typeof jobData.requirements === 'string' 
           ? jobData.requirements.split('\n').filter((req: string) => req.trim()) 
           : jobData.requirements || [],
-        // FIXED: Parse salary_range string into min/max numbers
         salary_min: parseSalaryRange(jobData.salary_range)?.min,
         salary_max: parseSalaryRange(jobData.salary_range)?.max,
         benefits: jobData.benefits || ''
@@ -256,7 +322,6 @@ export default function ApplicationPage() {
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
 
-    // Required fields validation
     if (!formData.firstName.trim()) errors.firstName = 'First name is required';
     if (!formData.lastName.trim()) errors.lastName = 'Last name is required';
     if (!formData.email.trim()) {
@@ -302,11 +367,9 @@ export default function ApplicationPage() {
     return Object.keys(errors).length === 0;
   };
 
-  // FIXED: Add this salary parser function
   const parseSalaryRange = (salaryRange: string): { min: number; max: number } | null => {
     if (!salaryRange) return null;
     
-    // Extract numbers from strings like "$70,000 – $90,000/year" or "$110,000 – $140,000 per year (DOE)"
     const numbers = salaryRange.match(/\$[\d,]+/g);
     if (numbers && numbers.length >= 2) {
       const min = parseInt(numbers[0].replace(/[$,]/g, ''));
@@ -314,7 +377,6 @@ export default function ApplicationPage() {
       return { min, max };
     }
     
-    // Single number case
     if (numbers && numbers.length === 1) {
       const amount = parseInt(numbers[0].replace(/[$,]/g, ''));
       return { min: amount, max: amount };
@@ -363,141 +425,144 @@ export default function ApplicationPage() {
       setFormData({ ...formData, [name]: processedValue });
     }
 
-    // Clear error for this field
     if (formErrors[name]) {
       setFormErrors({ ...formErrors, [name]: '' });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (!validateForm() || !position) {
-    return;
-  }
-
-  setIsSubmitting(true);
-  setSubmitError(null);
-
-  try {
-    console.log('🚀 Starting comprehensive application submission...');
+    e.preventDefault();
     
-    // Upload files
-    let resumeUrl = '';
-    let coverLetterUrl = '';
-
-    if (formData.resume) {
-      resumeUrl = await uploadFile(formData.resume, 'resume');
+    if (!validateForm() || !position) {
+      return;
     }
 
-    if (formData.coverLetter) {
-      coverLetterUrl = await uploadFile(formData.coverLetter, 'cover_letter');
-    }
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    const applicationData = {
-      job_id: position.id,
-      first_name: formData.firstName.trim(),
-      middle_name: formData.middleName.trim(),
-      last_name: formData.lastName.trim(),
-      email: formData.email.trim(),
-      phone: formData.phone.trim(),
-      linkedin_url: formData.linkedinUrl.trim(),
-      portfolio_url: formData.portfolioUrl.trim(),
-      address: formData.address.trim(),
-      city: formData.city.trim(),
-      state: formData.state.trim(),
-      zip_code: formData.zipCode.trim(),
-      country: formData.country.trim(),
-      work_authorized: formData.workAuthorized,
-      visa_sponsorship: formData.visaSponsorship,
-      open_to_remote: formData.openToRemote,
-      preferred_work_location: formData.preferredWorkLocation,
-      total_experience: formData.totalExperience,
-      highest_education: formData.highestEducation,
-      position_applying_for: formData.positionApplyingFor,
-      available_start_date: formData.availableStartDate,
-      expected_salary_range: formData.expectedSalaryRange,
-      interview_availability: formData.interviewAvailability,
-      gender: formData.gender,
-      race_ethnicity: formData.raceEthnicity,
-      veteran_status: formData.veteranStatus,
-      disability_status: formData.disabilityStatus,
-      signature: formData.signature.trim(),
-      why_interested: formData.whyInterested.trim(),
-      resume_url: resumeUrl,
-      cover_letter_url: coverLetterUrl,
-      work_experiences: JSON.stringify(workExperiences),
-      submission_date: new Date().toISOString()
-    };
+    try {
+      console.log('🚀 Starting comprehensive application submission...');
+      
+      let resumeUrl = '';
+      let coverLetterUrl = '';
 
-    console.log('📤 Submitting application data:', applicationData);
-
-    // FIXED: Properly scope the response variable
-    const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(applicationData),
-    });
-
-    // Check if response is ok before trying to parse JSON
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status} ${response.statusText}`);
-    }
-
-    const result = await response.json();
-
-    if (!result.success) {
-      throw new Error(result.error || 'Application submission failed');
-    }
-
-    // FIXED: Set success state which will trigger the scroll useEffect
-    setSubmitSuccess(true);
-    
-    // Analytics tracking
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'comprehensive_application_submitted', {
-        'job_position': position.title,
-        'job_id': position.id,
-        'application_source': 'comprehensive_application_page',
-        'application_id': result.application?.id,
-        'work_experiences_count': workExperiences.length
-      });
-    }
-
-  } catch (error) {
-    console.error('❌ Application submission error:', error);
-    
-    let errorMessage = 'An unexpected error occurred. Please try again or contact us directly.';
-    
-    if (error instanceof Error) {
-      if (error.message.includes('404')) {
-        errorMessage = 'The selected position is no longer available.';
-      } else if (error.message.includes('upload')) {
-        errorMessage = 'File upload failed. Please check your files and try again.';
-      } else if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
-        errorMessage = 'Connection error. Please check your internet connection and try again.';
-      } else {
-        errorMessage = error.message;
+      if (formData.resume) {
+        resumeUrl = await uploadFile(formData.resume, 'resume');
       }
-    }
-    
-    setSubmitError(errorMessage);
-    
-    // FIXED: Scroll to top to show error message
-    if (typeof window !== 'undefined') {
-      setTimeout(() => {
-        window.scrollTo({ 
-          top: 0, 
-          behavior: 'smooth' 
+
+      if (formData.coverLetter) {
+        coverLetterUrl = await uploadFile(formData.coverLetter, 'cover_letter');
+      }
+
+      const applicationData = {
+        job_id: position.id,
+        first_name: formData.firstName.trim(),
+        middle_name: formData.middleName.trim(),
+        last_name: formData.lastName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        linkedin_url: formData.linkedinUrl.trim(),
+        portfolio_url: formData.portfolioUrl.trim(),
+        address: formData.address.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        zip_code: formData.zipCode.trim(),
+        country: formData.country.trim(),
+        work_authorized: formData.workAuthorized,
+        visa_sponsorship: formData.visaSponsorship,
+        open_to_remote: formData.openToRemote,
+        preferred_work_location: formData.preferredWorkLocation,
+        total_experience: formData.totalExperience,
+        highest_education: formData.highestEducation,
+        position_applying_for: formData.positionApplyingFor,
+        available_start_date: formData.availableStartDate,
+        expected_salary_range: formData.expectedSalaryRange,
+        interview_availability: formData.interviewAvailability,
+        gender: formData.gender,
+        race_ethnicity: formData.raceEthnicity,
+        veteran_status: formData.veteranStatus,
+        disability_status: formData.disabilityStatus,
+        signature: formData.signature.trim(),
+        why_interested: formData.whyInterested.trim(),
+        resume_url: resumeUrl,
+        cover_letter_url: coverLetterUrl,
+        work_experiences: JSON.stringify(workExperiences),
+        submission_date: new Date().toISOString(),
+        user_id: user?.id || null // Include user ID if logged in
+      };
+
+      console.log('📤 Submitting application data:', applicationData);
+
+      const response = await fetch(`${ATS_BASE_URL}/api/applications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(applicationData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Application submission failed');
+      }
+
+      setSubmitSuccess(true);
+      
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'comprehensive_application_submitted', {
+          'job_position': position.title,
+          'job_id': position.id,
+          'application_source': 'comprehensive_application_page',
+          'application_id': result.application?.id,
+          'work_experiences_count': workExperiences.length,
+          'user_logged_in': isLoggedIn
         });
-      }, 100);
+      }
+
+    } catch (error) {
+      console.error('❌ Application submission error:', error);
+      
+      let errorMessage = 'An unexpected error occurred. Please try again or contact us directly.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('404')) {
+          errorMessage = 'The selected position is no longer available.';
+        } else if (error.message.includes('upload')) {
+          errorMessage = 'File upload failed. Please check your files and try again.';
+        } else if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+          errorMessage = 'Connection error. Please check your internet connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setSubmitError(errorMessage);
+      
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          window.scrollTo({ 
+            top: 0, 
+            behavior: 'smooth' 
+          });
+        }, 100);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
+
+  const handleBackToCareers = () => {
+    window.close(); // Close if opened in new tab
+    // Fallback to navigate back if close doesn't work
+    setTimeout(() => {
+      window.location.href = '/careers';
+    }, 100);
+  };
 
   // Loading state
   if (loading) {
@@ -506,93 +571,134 @@ export default function ApplicationPage() {
         <Head>
           <title>Loading Application - {EnvVars.SITE_NAME}</title>
         </Head>
-        <AnimatedHeader />
-        <PageWrapper>
-          <Container>
-            <LoadingContainer>
-              <LoadingSpinner />
-              <LoadingText>Loading job details...</LoadingText>
-              <DebugInfo>
-                <p><strong>JobId:</strong> {jobId}</p>
-                <p><strong>API Base:</strong> {ATS_BASE_URL}</p>
-              </DebugInfo>
-            </LoadingContainer>
-          </Container>
-        </PageWrapper>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+          <header className="bg-white shadow-sm border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <PreciseAnalyticsLogo clickable={true} onClick={() => window.location.href = '/'} />
+            </div>
+          </header>
+          <main className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
+              <p className="mt-4 text-lg text-gray-600">Loading job details...</p>
+            </div>
+          </main>
+        </div>
       </>
     );
   }
 
-  // Error state
   if (error || !position) {
     return (
       <>
         <Head>
           <title>Job Not Found - {EnvVars.SITE_NAME}</title>
         </Head>
-        <AnimatedHeader />
-        <PageWrapper>
-          <Container>
-            <ErrorContainer>
-              <ErrorIcon>❌</ErrorIcon>
-              <ErrorTitle>Job Not Found</ErrorTitle>
-              <ErrorText>{error || 'The requested position could not be found.'}</ErrorText>
-              <DebugInfo>
-                <h4>Debug Information:</h4>
-                <p><strong>JobId:</strong> {jobId}</p>
-                <p><strong>API Base URL:</strong> {ATS_BASE_URL}</p>
-                <p><strong>Error:</strong> {error}</p>
-                <p><strong>Trying endpoints:</strong></p>
-                <ul>
-                  <li>{ATS_BASE_URL}/api/jobs/{jobId}</li>
-                  <li>{ATS_BASE_URL}/api/job/{jobId}</li>
-                  <li>{ATS_BASE_URL}/api/jobs?id={jobId}</li>
-                </ul>
-              </DebugInfo>
-              <BackButton onClick={() => router.push('/careers')}>
-                ← Back to Careers
-              </BackButton>
-            </ErrorContainer>
-          </Container>
-        </PageWrapper>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+          <header className="bg-white shadow-sm border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <PreciseAnalyticsLogo clickable={true} onClick={() => window.location.href = '/'} />
+            </div>
+          </header>
+          <main className="flex items-center justify-center min-h-[50vh]">
+            <div className="text-center">
+              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Job Not Found</h1>
+              <p className="text-lg text-gray-600 mb-4">{error || 'The requested position could not be found.'}</p>
+              <button
+                onClick={handleBackToCareers}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Careers
+              </button>
+            </div>
+          </main>
+        </div>
       </>
     );
   }
 
-  // Success state
   if (submitSuccess) {
     return (
       <>
         <Head>
           <title>Application Submitted - {EnvVars.SITE_NAME}</title>
         </Head>
-        <AnimatedHeader />
-        <PageWrapper>
-          <Container>
-            <SuccessContainer>
-              <SuccessIcon>✅</SuccessIcon>
-              <SuccessTitle>Application Successfully Submitted!</SuccessTitle>
-              <SuccessMessage>
-                Thank you for your comprehensive application for <strong>{position.title}</strong>. 
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+          <header className="bg-white shadow-sm border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <PreciseAnalyticsLogo clickable={true} onClick={() => window.location.href = '/'} />
+            </div>
+          </header>
+          <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+              <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-6" />
+              <h1 className="text-4xl font-bold text-green-600 mb-4">Application Successfully Submitted!</h1>
+              <p className="text-lg text-gray-600 mb-6">
+                Thank you for your comprehensive application for <strong className="text-blue-600">{position.title}</strong>.
                 We have received all your information and will review it carefully.
-              </SuccessMessage>
-              <SuccessDetails>
-                <p><strong>What happens next:</strong></p>
-                <ul>
-                  <li>You&apos;ll receive a confirmation email within 5 minutes</li>
-                  <li>Our team will review your application within 1-3 business days</li>
-                  <li>We&apos;ll contact you with next steps within 5 business days</li>
+              </p>
+              
+              {isLoggedIn && user && (
+                <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
+                  <div className="flex items-center gap-2 mb-2">
+                    <User className="w-5 h-5 text-blue-600" />
+                    <p className="font-semibold text-blue-800">Application submitted as: {user.name}</p>
+                  </div>
+                  <p className="text-sm text-blue-700">
+                    You can track your application status by logging into the careers portal.
+                  </p>
+                </div>
+              )}
+              
+              <div className="bg-gray-50 rounded-lg p-6 mb-6 text-left">
+                <p className="font-semibold text-gray-800 mb-3">What happens next:</p>
+                <ul className="list-none space-y-3">
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3 mt-1">✓</span>
+                    <span>You'll receive a confirmation email within 5 minutes</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3 mt-1">✓</span>
+                    <span>Our team will review your application within 1-3 business days</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3 mt-1">✓</span>
+                    <span>We'll contact you with next steps within 5 business days</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-600 mr-3 mt-1">✓</span>
+                    <span>If selected, we'll schedule an initial interview</span>
+                  </li>
                 </ul>
-              </SuccessDetails>
-              <ContactInfo>
-                Questions? Contact us at <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a>
-              </ContactInfo>
-              <BackButton onClick={() => window.close()}>
-                Close Window
-              </BackButton>
-            </SuccessContainer>
-          </Container>
-        </PageWrapper>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Questions? Contact us at{' '}
+                <a href="mailto:careers@preciseanalytics.io" className="text-blue-600 hover:underline">
+                  careers@preciseanalytics.io
+                </a>
+              </p>
+              
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={handleBackToCareers}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Careers
+                </button>
+                <button
+                  onClick={() => window.close()}
+                  className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Close Window
+                </button>
+              </div>
+            </div>
+          </main>
+        </div>
       </>
     );
   }
@@ -612,12 +718,28 @@ export default function ApplicationPage() {
 
       <PageWrapper>
         <Container>
+          {/* Enhanced Header with Login Status */}
+          <ApplicationHeaderSection>
+            <HeaderNav>
+              <BackButton onClick={handleBackToCareers}>
+                <ArrowLeft className="w-4 h-4" />
+                Back to Careers
+              </BackButton>
+              {isLoggedIn && user && (
+                <UserStatus>
+                  <User className="w-4 h-4" />
+                  <span>Logged in as: {user.name}</span>
+                </UserStatus>
+              )}
+            </HeaderNav>
+          </ApplicationHeaderSection>
+
           {/* Complete Job Details */}
           <JobDetailsSection>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <JobDetailsHeader>
                 <JobDetailsIcon>📋</JobDetailsIcon>
-                <JobDetailsHeaderText>Complete Job Details</JobDetailsHeaderText>
+                <JobDetailsHeaderText>Position Details</JobDetailsHeaderText>
               </JobDetailsHeader>
               <JobTitle>{position.title}</JobTitle>
               <JobMeta>
@@ -690,6 +812,12 @@ export default function ApplicationPage() {
                 <ReadyToApplyText>
                   Ready to join our mission-driven team? Complete the application below to get started!
                 </ReadyToApplyText>
+                {isLoggedIn && (
+                  <LoginBenefit>
+                    <CheckCircle className="w-5 h-5" />
+                    <span>Some fields have been pre-filled from your account</span>
+                  </LoginBenefit>
+                )}
               </ReadyToApplySection>
             </motion.div>
           </JobDetailsSection>
@@ -700,6 +828,12 @@ export default function ApplicationPage() {
             <FormSubtitle>
               Please fill out all required fields marked with an asterisk (*). 
               We review every application personally and will respond within 5 business days.
+              {isLoggedIn && (
+                <LoginHint>
+                  <User className="w-4 h-4" />
+                  Some fields have been pre-filled from your account
+                </LoginHint>
+              )}
             </FormSubtitle>
 
             {submitError && (
@@ -715,6 +849,7 @@ export default function ApplicationPage() {
               <SectionHeader>
                 <SectionIcon>👤</SectionIcon>
                 <SectionTitle>1. Personal Information</SectionTitle>
+                {isLoggedIn && <PreFilledBadge>Pre-filled</PreFilledBadge>}
               </SectionHeader>
               
               <FormGrid>
@@ -1321,7 +1456,7 @@ export default function ApplicationPage() {
               <SubmitButton type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
-                    <span style={{ marginRight: '0.5rem' }}>📤</span>
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
                     Submitting Application...
                   </>
                 ) : (
@@ -1352,91 +1487,49 @@ const PageWrapper = styled.div`
   min-height: 100vh;
 `;
 
-const LoadingContainer = styled.div`
+const ApplicationHeaderSection = styled.header`
+  margin-bottom: 2rem;
+`;
+
+const HeaderNav = styled.div`
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  gap: 2rem;
+  padding: 1rem 0;
+  ${mq('<=tablet', 'flex-direction: column; align-items: flex-start; gap: 1rem;')}
 `;
 
-const LoadingSpinner = styled.div`
-  width: 4rem;
-  height: 4rem;
-  border: 3px solid rgba(255, 125, 0, 0.1);
-  border-top: 3px solid rgb(255, 125, 0);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-
-const LoadingText = styled.p`
-  font-size: 1.8rem;
-  color: rgb(var(--text), 0.7);
-`;
-
-const DebugInfo = styled.div`
+const BackButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
   background: rgba(255, 125, 0, 0.1);
-  border: 1px solid rgba(255, 125, 0, 0.3);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  margin-top: 2rem;
-  text-align: left;
-  max-width: 50rem;
+  color: rgb(255, 125, 0);
+  border: 2px solid rgba(255, 125, 0, 0.3);
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
   
-  h4 {
-    margin: 0 0 1rem 0;
-    color: rgb(255, 125, 0);
-  }
-  
-  p {
-    margin: 0.5rem 0;
-    font-size: 1.3rem;
-    font-family: monospace;
-    color: rgb(var(--text), 0.8);
-  }
-  
-  ul {
-    margin: 1rem 0;
-    padding-left: 2rem;
-    
-    li {
-      font-size: 1.2rem;
-      font-family: monospace;
-      color: rgb(var(--text), 0.7);
-      margin: 0.5rem 0;
-    }
+  &:hover {
+    background: rgba(255, 125, 0, 0.2);
+    border-color: rgb(255, 125, 0);
+    transform: translateY(-1px);
   }
 `;
 
-const ErrorContainer = styled.div`
+const UserStatus = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  text-align: center;
-  gap: 2rem;
-`;
-
-const ErrorIcon = styled.div`
-  font-size: 4rem;
-`;
-
-const ErrorTitle = styled.h1`
-  font-size: 3rem;
-  color: rgb(var(--text));
-`;
-
-const ErrorText = styled.p`
-  font-size: 1.6rem;
-  color: rgb(var(--text), 0.7);
-  max-width: 50rem;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 500;
 `;
 
 const JobDetailsSection = styled.section`
@@ -1650,8 +1743,18 @@ const ReadyToApplyText = styled.p`
   font-size: 1.8rem;
   font-weight: 600;
   color: rgb(255, 125, 0);
-  margin: 0;
+  margin: 0 0 1rem 0;
   line-height: 1.5;
+`;
+
+const LoginBenefit = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.4rem;
+  color: rgb(34, 197, 94);
+  font-weight: 500;
 `;
 
 const ApplicationSection = styled.section`
@@ -1670,7 +1773,7 @@ const FormTitle = styled.h2`
   color: rgb(var(--text));
 `;
 
-const FormSubtitle = styled.p`
+const FormSubtitle = styled.div`
   font-size: 1.6rem;
   text-align: center;
   margin-bottom: 4rem;
@@ -1680,6 +1783,20 @@ const FormSubtitle = styled.p`
   margin-right: auto;
 `;
 
+const LoginHint = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 0.8rem;
+  color: rgb(34, 197, 94);
+  font-size: 1.4rem;
+  font-weight: 500;
+`;
+
 const SectionHeader = styled.div`
   display: flex;
   align-items: center;
@@ -1687,7 +1804,7 @@ const SectionHeader = styled.div`
   margin: 3rem 0 2rem 0;
   padding-bottom: 1rem;
   border-bottom: 2px solid rgba(255, 125, 0, 0.2);
-  ${mq('<=tablet', 'justify-content: center; text-align: center;')}
+  ${mq('<=tablet', 'justify-content: center; text-align: center; flex-wrap: wrap;')}
 `;
 
 const SectionIcon = styled.div`
@@ -1703,6 +1820,16 @@ const SectionTitle = styled.h3`
   font-weight: 600;
   color: rgb(255, 125, 0);
   margin: 0;
+`;
+
+const PreFilledBadge = styled.span`
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.3);
 `;
 
 const ApplicationForm = styled.form`
@@ -1908,6 +2035,9 @@ const SubmitButton = styled.button`
   border-radius: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -1953,6 +2083,18 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const ErrorIcon = styled.div`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+`;
+
+const ErrorText = styled.p`
+  font-size: 1.6rem;
+  color: rgb(220, 38, 38);
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+`;
+
 const RetryButton = styled.button`
   background: rgb(255, 125, 0);
   color: white;
@@ -1960,104 +2102,10 @@ const RetryButton = styled.button`
   padding: 1rem 2rem;
   border-radius: 0.5rem;
   cursor: pointer;
-  
-  &:hover {
-    background: rgb(230, 100, 0);
-  }
-`;
-
-const SuccessContainer = styled.div`
-  text-align: center;
-  padding: 6rem 2rem;
-  background: rgba(var(--cardBackground), 0.9);
-  border-radius: 2rem;
-  box-shadow: var(--shadow-lg);
-  max-width: 60rem;
-  margin: 0 auto;
-`;
-
-const SuccessIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 2rem;
-`;
-
-const SuccessTitle = styled.h1`
-  font-size: 3.2rem;
-  font-weight: 700;
-  color: rgb(34, 197, 94);
-  margin-bottom: 2rem;
-`;
-
-const SuccessMessage = styled.p`
-  font-size: 1.8rem;
-  color: rgb(var(--text));
-  margin-bottom: 2rem;
-  
-  strong {
-    color: rgb(255, 125, 0);
-  }
-`;
-
-const SuccessDetails = styled.div`
-  background: rgba(34, 197, 94, 0.1);
-  border-radius: 1rem;
-  padding: 2rem;
-  margin: 2rem 0;
-  text-align: left;
-  
-  p {
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-    
-    li {
-      padding: 0.5rem 0;
-      position: relative;
-      padding-left: 2rem;
-      
-      &:before {
-        content: '✓';
-        color: rgb(34, 197, 94);
-        font-weight: bold;
-        position: absolute;
-        left: 0;
-      }
-    }
-  }
-`;
-
-const ContactInfo = styled.p`
   font-size: 1.4rem;
-  color: rgb(var(--text), 0.7);
-  margin: 2rem 0;
-  
-  a {
-    color: rgb(255, 125, 0);
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
-
-const BackButton = styled.button`
-  background: rgb(255, 125, 0);
-  color: white;
-  border: none;
-  padding: 1.5rem 3rem;
-  border-radius: 1rem;
-  font-size: 1.6rem;
   font-weight: 600;
-  cursor: pointer;
-  margin-top: 2rem;
   
   &:hover {
     background: rgb(230, 100, 0);
-    transform: translateY(-2px);
   }
 `;

@@ -45,7 +45,7 @@
     "resend": "^4.7.0",
     "schema-dts": "^1.1.2",
     "styled-components": "^6.1.19",
-    "swiper": "^11.1.4",
+    "swiper": "^11.2.10",
     "tinacms": "^2.1.1",
     "url-loader": "^4.1.1",
     "use-clipboard-copy": "^0.2.0",

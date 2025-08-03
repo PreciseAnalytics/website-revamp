@@ -1,4 +1,4 @@
-// pages/careers.tsx - Fixed version with better error handling and debugging
+// pages/careers.tsx - Fixed version with proper authentication validation
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -9,12 +9,108 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { mq } from 'utils/media';
-import { Loader2, AlertCircle, CheckCircle, Link } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle, Link, Eye, EyeOff } from 'lucide-react';
 import { PreciseAnalyticsLogo } from 'components/PreciseAnalyticsLogo';
 
-// ATS API Configuration - FIXED
+// ATS API Configuration
 const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
+
+// Enhanced validation utilities
+const ValidationUtils = {
+  email: {
+    validate: (email: string): { isValid: boolean; error?: string } => {
+      if (!email.trim()) {
+        return { isValid: false, error: 'Email is required' };
+      }
+      
+      const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+      
+      if (!emailRegex.test(email)) {
+        return { isValid: false, error: 'Please enter a valid email address' };
+      }
+      
+      if (email.length > 254) {
+        return { isValid: false, error: 'Email address is too long' };
+      }
+      
+      return { isValid: true };
+    }
+  },
+  
+  password: {
+    validate: (password: string): { isValid: boolean; errors: string[]; strength: 'weak' | 'medium' | 'strong' } => {
+      const errors: string[] = [];
+      let strength: 'weak' | 'medium' | 'strong' = 'weak';
+      
+      if (!password) {
+        return { isValid: false, errors: ['Password is required'], strength: 'weak' };
+      }
+      
+      if (password.length < 8) {
+        errors.push('Password must be at least 8 characters long');
+      }
+      
+      if (!/[a-z]/.test(password)) {
+        errors.push('Password must contain at least one lowercase letter');
+      }
+      
+      if (!/[A-Z]/.test(password)) {
+        errors.push('Password must contain at least one uppercase letter');
+      }
+      
+      if (!/\d/.test(password)) {
+        errors.push('Password must contain at least one number');
+      }
+      
+      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        errors.push('Password must contain at least one special character');
+      }
+      
+      if (password.length >= 12 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        strength = 'strong';
+      } else if (password.length >= 8 && errors.length <= 2) {
+        strength = 'medium';
+      }
+      
+      return {
+        isValid: errors.length === 0,
+        errors,
+        strength
+      };
+    },
+    
+    checkCommonPasswords: (password: string): boolean => {
+      const commonPasswords = [
+        'password', '123456', '123456789', 'qwerty', 'abc123', 'password1',
+        'admin', 'letmein', 'welcome', '123123', 'Password1', 'password123'
+      ];
+      return !commonPasswords.includes(password.toLowerCase());
+    }
+  },
+  
+  name: {
+    validate: (name: string): { isValid: boolean; error?: string } => {
+      if (!name.trim()) {
+        return { isValid: false, error: 'Name is required' };
+      }
+      
+      if (name.trim().length < 2) {
+        return { isValid: false, error: 'Name must be at least 2 characters long' };
+      }
+      
+      if (name.trim().length > 50) {
+        return { isValid: false, error: 'Name must be less than 50 characters' };
+      }
+      
+      if (!/^[a-zA-Z\s'-]+$/.test(name)) {
+        return { isValid: false, error: 'Name can only contain letters, spaces, hyphens, and apostrophes' };
+      }
+      
+      return { isValid: true };
+    }
+  }
+};
 
 // Enhanced mock data for development/fallback
 const MOCK_POSITIONS = [
@@ -77,39 +173,145 @@ const MOCK_POSITIONS = [
   }
 ];
 
-// Enhanced development mode authentication with better error handling
+// Enhanced development mode authentication with proper validation
 const mockAuthForDevelopment = {
+  registeredUsers: new Map<string, { id: string; name: string; email: string; password: string; verified: boolean; createdAt: Date }>(),
+  
   login: async (email: string, password: string) => {
     console.log('🔄 Mock login attempt:', { email, password: password ? '[REDACTED]' : '' });
-    if (email && password) {
-      const mockUser = {
-        id: 'dev-user-' + Date.now(),
-        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        email: email
-      };
-      const mockToken = 'dev-token-' + Date.now();
-      console.log('✅ Mock login successful:', mockUser);
-      return { success: true, user: mockUser, token: mockToken };
+    
+    // Validate email format
+    const emailValidation = ValidationUtils.email.validate(email);
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.error || 'Invalid email format');
     }
-    throw new Error('Please enter valid credentials');
+    
+    // Validate password
+    if (!password || password.trim().length === 0) {
+      throw new Error('Password is required');
+    }
+    
+    // Check if user exists and password matches
+    const user = mockAuthForDevelopment.registeredUsers.get(email.toLowerCase());
+    if (!user) {
+      throw new Error('No account found with this email address');
+    }
+    
+    if (user.password !== password) {
+      throw new Error('Incorrect password');
+    }
+    
+    if (!user.verified) {
+      throw new Error('Please verify your email before logging in. Check your inbox for the verification link.');
+    }
+    
+    const mockToken = 'dev-token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    console.log('✅ Mock login successful:', { id: user.id, name: user.name, email: user.email });
+    
+    return { 
+      success: true, 
+      user: { id: user.id, name: user.name, email: user.email }, 
+      token: mockToken 
+    };
   },
   
   register: async (firstName: string, lastName: string, email: string, password: string) => {
     console.log('🔄 Mock registration attempt:', { firstName, lastName, email });
-    if (firstName && lastName && email && password) {
-      console.log('✅ Mock registration successful');
-      return { success: true, message: 'Registration successful! You can now login.' };
+    
+    // Validate first name
+    const firstNameValidation = ValidationUtils.name.validate(firstName);
+    if (!firstNameValidation.isValid) {
+      throw new Error(`First name error: ${firstNameValidation.error}`);
     }
-    throw new Error('Please fill in all required fields');
+    
+    // Validate last name
+    const lastNameValidation = ValidationUtils.name.validate(lastName);
+    if (!lastNameValidation.isValid) {
+      throw new Error(`Last name error: ${lastNameValidation.error}`);
+    }
+    
+    // Validate email
+    const emailValidation = ValidationUtils.email.validate(email);
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.error || 'Invalid email format');
+    }
+    
+    // Validate password
+    const passwordValidation = ValidationUtils.password.validate(password);
+    if (!passwordValidation.isValid) {
+      throw new Error(`Password requirements not met: ${passwordValidation.errors.join(', ')}`);
+    }
+    
+    // Check for common passwords
+    if (!ValidationUtils.password.checkCommonPasswords(password)) {
+      throw new Error('Please choose a less common password');
+    }
+    
+    // Check if user already exists
+    if (mockAuthForDevelopment.registeredUsers.has(email.toLowerCase())) {
+      throw new Error('An account with this email already exists');
+    }
+    
+    // Create user
+    const userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const fullName = `${firstName.trim()} ${lastName.trim()}`;
+    
+    mockAuthForDevelopment.registeredUsers.set(email.toLowerCase(), {
+      id: userId,
+      name: fullName,
+      email: email.toLowerCase(),
+      password: password,
+      verified: IS_DEVELOPMENT, // Auto-verify in development, require verification in production
+      createdAt: new Date()
+    });
+    
+    console.log('✅ Mock registration successful');
+    console.log('📧 Registered users:', Array.from(mockAuthForDevelopment.registeredUsers.keys()));
+    
+    return { 
+      success: true, 
+      message: IS_DEVELOPMENT 
+        ? 'Registration successful! You can now login.' 
+        : 'Registration successful! Please check your email to verify your account before logging in.'
+    };
   },
   
   resetPassword: async (email: string) => {
     console.log('🔄 Mock password reset attempt:', { email });
-    if (email) {
-      console.log('✅ Mock password reset successful');
-      return { success: true, message: 'Password reset link sent!' };
+    
+    // Validate email
+    const emailValidation = ValidationUtils.email.validate(email);
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.error || 'Invalid email format');
     }
-    throw new Error('Please enter a valid email address');
+    
+    // Check if user exists
+    const user = mockAuthForDevelopment.registeredUsers.get(email.toLowerCase());
+    if (!user) {
+      // Don't reveal whether email exists for security
+      console.log('⚠️ Password reset requested for non-existent email:', email);
+    }
+    
+    console.log('✅ Mock password reset successful');
+    return { 
+      success: true, 
+      message: 'If an account with this email exists, you will receive a password reset link shortly.' 
+    };
+  },
+  
+  verifyEmail: async (email: string, token: string) => {
+    console.log('🔄 Mock email verification attempt:', { email, token });
+    
+    const user = mockAuthForDevelopment.registeredUsers.get(email.toLowerCase());
+    if (!user) {
+      throw new Error('Invalid verification link');
+    }
+    
+    // In real implementation, you'd verify the token
+    user.verified = true;
+    console.log('✅ Mock email verification successful');
+    
+    return { success: true, message: 'Email verified successfully! You can now login.' };
   }
 };
 
@@ -130,6 +332,14 @@ interface Position {
   posted?: boolean;
 }
 
+interface ValidationState {
+  email: { isValid: boolean; error?: string };
+  password: { isValid: boolean; errors: string[]; strength?: 'weak' | 'medium' | 'strong' };
+  firstName: { isValid: boolean; error?: string };
+  lastName: { isValid: boolean; error?: string };
+  confirmPassword: { isValid: boolean; error?: string };
+}
+
 export default function CareersPage() {
   const router = useRouter();
   const [positions, setPositions] = useState<Position[]>([]);
@@ -144,26 +354,37 @@ export default function CareersPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>(''); // Added for debugging
+  const [debugInfo, setDebugInfo] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [registerData, setRegisterData] = useState({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+  const [registerData, setRegisterData] = useState({ 
+    firstName: '', 
+    lastName: '', 
+    email: '', 
+    password: '', 
+    confirmPassword: '' 
+  });
   const [resetEmail, setResetEmail] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [validationState, setValidationState] = useState<ValidationState>({
+    email: { isValid: true },
+    password: { isValid: true, errors: [] },
+    firstName: { isValid: true },
+    lastName: { isValid: true },
+    confirmPassword: { isValid: true }
+  });
+  const [passwordStrength, setPasswordStrength] = useState<'weak' | 'medium' | 'strong'>('weak');
   const positionsSectionRef = useRef<HTMLDivElement>(null);
   const departmentCounterRef = useRef<HTMLDivElement>(null);
-
-  // Initialize positions on component mount - FIXED
-  useEffect(() => {
-    console.log('🚀 Careers page mounted, starting position fetch...');
-    fetchPositions();
-  }, []);
 
   // Parse salary range
   const parseSalaryRange = (salaryRange: string | undefined): { min: number; max: number } | null => {
@@ -180,25 +401,6 @@ export default function CareersPage() {
     }
     return null;
   };
-
-  // Check login status
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const userData = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    if (userData && token) {
-      try {
-        const parsed = JSON.parse(userData);
-        setIsLoggedIn(true);
-        setUser(parsed);
-        console.log('✅ User logged in:', parsed);
-      } catch (error) {
-        console.error('Invalid user data:', error);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-      }
-    }
-  }, []);
 
   // Enhanced fetch positions with better error handling and fallbacks
   const fetchPositions = useCallback(async () => {
@@ -222,7 +424,6 @@ export default function CareersPage() {
       try {
         setDebugInfo('Attempting API connection...');
         
-        // Try the API with enhanced error handling
         const response = await fetch(`${ATS_BASE_URL}/api/jobs?status=published`, {
           method: 'GET',
           headers: { 
@@ -239,13 +440,11 @@ export default function CareersPage() {
         clearTimeout(timeoutId);
 
         console.log('📡 API Response status:', response.status, response.statusText);
-        console.log('📡 API Response headers:', Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
           throw new Error(`API request failed: ${response.status} ${response.statusText}`);
         }
 
-        // Check if response is actually JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           console.warn('⚠️ API returned non-JSON response:', contentType);
@@ -280,7 +479,6 @@ export default function CareersPage() {
         
         clearTimeout(timeoutId);
         
-        // If it's an abort error, don't fallback
         if (fetchError.name === 'AbortError') {
           throw new Error('Request timed out. Please check your connection and try again.');
         }
@@ -290,7 +488,6 @@ export default function CareersPage() {
       let processedPositions: Position[] = [];
 
       if (apiResponse && apiResponse.jobs) {
-        // Process real API data
         processedPositions = apiResponse.jobs.map((job: any) => {
           const salaryParsed = parseSalaryRange(job.salary_range);
           return {
@@ -318,7 +515,6 @@ export default function CareersPage() {
         setDebugInfo(`✅ Loaded ${processedPositions.length} positions from API`);
 
       } else {
-        // Use mock data as fallback
         console.log('🔄 Using mock data as fallback');
         processedPositions = MOCK_POSITIONS.map(pos => ({
           ...pos,
@@ -327,7 +523,6 @@ export default function CareersPage() {
         
         setDebugInfo(`🔄 Using mock data: ${processedPositions.length} positions (API unavailable)`);
         
-        // Show user-friendly message about mock data
         if (IS_DEVELOPMENT) {
           console.log('🏗️ Development mode: Using mock data for better UX');
         } else {
@@ -379,7 +574,6 @@ export default function CareersPage() {
       setError(error.message || 'Failed to load job listings. Please try again later.');
       setDebugInfo(`❌ Error: ${error.message}`);
       
-      // Even on error, provide some basic structure
       setPositions([]);
       setFilteredPositions([]);
       setDepartments(['All']);
@@ -391,7 +585,32 @@ export default function CareersPage() {
     }
   }, []);
 
-  // Apply filters - FIXED
+  // Initialize positions on component mount
+  useEffect(() => {
+    console.log('🚀 Careers page mounted, starting position fetch...');
+    fetchPositions();
+  }, [fetchPositions]);
+
+  // Check login status
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const userData = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (userData && token) {
+      try {
+        const parsed = JSON.parse(userData);
+        setIsLoggedIn(true);
+        setUser(parsed);
+        console.log('✅ User logged in:', parsed);
+      } catch (error) {
+        console.error('Invalid user data:', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
+    }
+  }, []);
+
+  // Apply filters
   useEffect(() => {
     console.log('🔍 Applying filters:', filters);
     let result = [...positions];
@@ -417,6 +636,42 @@ export default function CareersPage() {
     console.log('🔍 Filtered results:', result.length, 'positions');
     setFilteredPositions(result);
   }, [filters, positions]);
+
+  // Real-time validation for registration form
+  const validateField = (field: string, value: string) => {
+    let newValidationState = { ...validationState };
+    
+    switch (field) {
+      case 'email':
+        newValidationState.email = ValidationUtils.email.validate(value);
+        break;
+      case 'password':
+        const passwordValidation = ValidationUtils.password.validate(value);
+        newValidationState.password = passwordValidation;
+        setPasswordStrength(passwordValidation.strength);
+        
+        // Also validate confirm password if it exists
+        if (registerData.confirmPassword) {
+          newValidationState.confirmPassword = value === registerData.confirmPassword 
+            ? { isValid: true }
+            : { isValid: false, error: 'Passwords do not match' };
+        }
+        break;
+      case 'firstName':
+        newValidationState.firstName = ValidationUtils.name.validate(value);
+        break;
+      case 'lastName':
+        newValidationState.lastName = ValidationUtils.name.validate(value);
+        break;
+      case 'confirmPassword':
+        newValidationState.confirmPassword = value === registerData.password 
+          ? { isValid: true }
+          : { isValid: false, error: 'Passwords do not match' };
+        break;
+    }
+    
+    setValidationState(newValidationState);
+  };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     console.log('🔄 Filter changed:', key, '=', value);
@@ -465,11 +720,22 @@ export default function CareersPage() {
     return acc;
   }, {} as Record<string, Position[]>);
 
-  // Enhanced login with better error handling
+  // Enhanced login with proper validation
   const handleLogin = async () => {
     try {
       setAuthError(null);
+      setAuthLoading(true);
       console.log('🔐 Login attempt for:', loginData.email);
+      
+      // Client-side validation
+      const emailValidation = ValidationUtils.email.validate(loginData.email);
+      if (!emailValidation.isValid) {
+        throw new Error(emailValidation.error);
+      }
+      
+      if (!loginData.password.trim()) {
+        throw new Error('Password is required');
+      }
       
       try {
         // Try real API first
@@ -525,29 +791,46 @@ export default function CareersPage() {
     } catch (error: any) {
       console.error('❌ Login error:', error);
       setAuthError(error.message || 'Login failed');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
-  // Enhanced registration with better error handling
+  // Enhanced registration with comprehensive validation
   const handleRegister = async () => {
-    if (registerData.password !== registerData.confirmPassword) {
-      setAuthError('Passwords do not match');
-      return;
-    }
-    
-    if (!registerData.firstName.trim()) {
-      setAuthError('First name is required');
-      return;
-    }
-    
-    if (!registerData.lastName.trim()) {
-      setAuthError('Last name is required');
-      return;
-    }
-    
     try {
       setAuthError(null);
+      setAuthLoading(true);
       console.log('📝 Registration attempt for:', registerData.email);
+      
+      // Comprehensive client-side validation
+      const firstNameValidation = ValidationUtils.name.validate(registerData.firstName);
+      if (!firstNameValidation.isValid) {
+        throw new Error(`First name: ${firstNameValidation.error}`);
+      }
+      
+      const lastNameValidation = ValidationUtils.name.validate(registerData.lastName);
+      if (!lastNameValidation.isValid) {
+        throw new Error(`Last name: ${lastNameValidation.error}`);
+      }
+      
+      const emailValidation = ValidationUtils.email.validate(registerData.email);
+      if (!emailValidation.isValid) {
+        throw new Error(emailValidation.error);
+      }
+      
+      const passwordValidation = ValidationUtils.password.validate(registerData.password);
+      if (!passwordValidation.isValid) {
+        throw new Error(`Password requirements: ${passwordValidation.errors.join(', ')}`);
+      }
+      
+      if (!ValidationUtils.password.checkCommonPasswords(registerData.password)) {
+        throw new Error('Please choose a less common password for better security');
+      }
+      
+      if (registerData.password !== registerData.confirmPassword) {
+        throw new Error('Passwords do not match');
+      }
       
       const fullName = `${registerData.firstName.trim()} ${registerData.lastName.trim()}`;
       
@@ -580,8 +863,15 @@ export default function CareersPage() {
         setShowRegisterModal(false);
         setShowLoginModal(true);
         setRegisterData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+        setValidationState({
+          email: { isValid: true },
+          password: { isValid: true, errors: [] },
+          firstName: { isValid: true },
+          lastName: { isValid: true },
+          confirmPassword: { isValid: true }
+        });
         console.log('✅ API Registration successful');
-        alert('Registration successful! Please login with your credentials.');
+        alert('Registration successful! Please check your email to verify your account before logging in.');
         
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'sign_up', { method: 'email' });
@@ -601,25 +891,37 @@ export default function CareersPage() {
         setShowRegisterModal(false);
         setShowLoginModal(true);
         setRegisterData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+        setValidationState({
+          email: { isValid: true },
+          password: { isValid: true, errors: [] },
+          firstName: { isValid: true },
+          lastName: { isValid: true },
+          confirmPassword: { isValid: true }
+        });
         console.log('✅ Mock registration successful');
         
-        if (IS_DEVELOPMENT) {
-          alert('✅ Development Mode: Registration successful! You can now login. (Using mock authentication)');
-        } else {
-          alert('Registration successful! You can now login.');
-        }
+        alert(mockResult.message);
       }
     } catch (error: any) {
       console.error('❌ Registration error:', error);
       setAuthError(error.message || 'Registration failed');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
-  // Enhanced password reset with better error handling
+  // Enhanced password reset with validation
   const handleResetPassword = async () => {
     try {
       setAuthError(null);
+      setAuthLoading(true);
       console.log('🔑 Password reset attempt for:', resetEmail);
+      
+      // Validate email
+      const emailValidation = ValidationUtils.email.validate(resetEmail);
+      if (!emailValidation.isValid) {
+        throw new Error(emailValidation.error);
+      }
       
       try {
         // Try real API first
@@ -646,7 +948,7 @@ export default function CareersPage() {
         setShowResetModal(false);
         setResetEmail('');
         console.log('✅ API Password reset successful');
-        alert('Password reset link sent to your email.');
+        alert('Password reset instructions have been sent to your email.');
         
       } catch (apiError: any) {
         console.log('🔄 API password reset failed, trying mock auth:', apiError.message);
@@ -657,15 +959,13 @@ export default function CareersPage() {
         setResetEmail('');
         console.log('✅ Mock password reset successful');
         
-        if (IS_DEVELOPMENT) {
-          alert('✅ Development Mode: Password reset link sent! (Using mock authentication)');
-        } else {
-          alert('Password reset link sent to your email.');
-        }
+        alert(mockResult.message);
       }
     } catch (error: any) {
       console.error('❌ Password reset error:', error);
       setAuthError(error.message || 'Password reset failed');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -701,7 +1001,6 @@ export default function CareersPage() {
     
     const baseApplicationUrl = `/application/${position.id}`;
     
-    // Add user context if logged in
     const applicationUrl = isLoggedIn && user 
       ? `${baseApplicationUrl}?user=${encodeURIComponent(JSON.stringify(user))}&token=${encodeURIComponent(localStorage.getItem('token') || '')}`
       : baseApplicationUrl;
@@ -731,6 +1030,16 @@ export default function CareersPage() {
     setError(null);
     setDebugInfo('Manual refresh started...');
     fetchPositions();
+  };
+
+  // Helper function to get password strength color
+  const getPasswordStrengthColor = (strength: 'weak' | 'medium' | 'strong') => {
+    switch (strength) {
+      case 'weak': return '#ef4444';
+      case 'medium': return '#f59e0b';
+      case 'strong': return '#10b981';
+      default: return '#ef4444';
+    }
   };
 
   return (
@@ -1059,7 +1368,7 @@ export default function CareersPage() {
                     <JobModalSectionTitle>Requirements & Qualifications</JobModalSectionTitle>
                     <RequirementsList>
                       {selectedPosition.requirements.map((req, index) => (
-                        <RequirementItem key={index}>{req}</RequirementItem>
+                        <JobRequirementItem key={index}>{req}</JobRequirementItem>
                       ))}
                     </RequirementsList>
                   </JobModalSection>
@@ -1082,7 +1391,7 @@ export default function CareersPage() {
         )}
       </AnimatePresence>
 
-      {/* Login Modal */}
+      {/* Enhanced Login Modal */}
       <AnimatePresence>
         {showLoginModal && (
           <ModalOverlay
@@ -1102,33 +1411,60 @@ export default function CareersPage() {
                 <CloseButton onClick={() => setShowLoginModal(false)}>×</CloseButton>
               </AuthModalHeader>
               <AuthModalBody>
-                {authError && <ErrorText>{authError}</ErrorText>}
+                {authError && <ErrorMessage>{authError}</ErrorMessage>}
                 <InputGroup>
-                  <InputLabel>Email</InputLabel>
+                  <InputLabel>Email Address</InputLabel>
                   <Input
                     type="email"
                     value={loginData.email}
                     onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                    placeholder="Enter your email"
+                    placeholder="Enter your email address"
+                    disabled={authLoading}
                   />
                 </InputGroup>
                 <InputGroup>
                   <InputLabel>Password</InputLabel>
-                  <Input
-                    type="password"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    placeholder="Enter your password"
-                  />
+                  <PasswordInputContainer>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      placeholder="Enter your password"
+                      disabled={authLoading}
+                    />
+                    <PasswordToggle
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={authLoading}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </PasswordToggle>
+                  </PasswordInputContainer>
                 </InputGroup>
-                <AuthLink onClick={() => { setShowLoginModal(false); setShowResetModal(true); }}>
+                <AuthLink onClick={() => { setShowLoginModal(false); setShowResetModal(true); setAuthError(null); }}>
                   Forgot Password?
                 </AuthLink>
                 <AuthModalActions>
-                  <SecondaryButton onClick={() => setShowLoginModal(false)}>Cancel</SecondaryButton>
-                  <PrimaryButton onClick={handleLogin}>Login</PrimaryButton>
+                  <SecondaryButton 
+                    onClick={() => setShowLoginModal(false)}
+                    disabled={authLoading}
+                  >
+                    Cancel
+                  </SecondaryButton>
+                  <PrimaryButton 
+                    onClick={handleLogin}
+                    disabled={authLoading || !loginData.email.trim() || !loginData.password.trim()}
+                  >
+                    {authLoading ? (
+                      <>
+                        <Loader2 size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />
+                        Logging in...
+                      </>
+                    ) : (
+                      'Login'
+                    )}
+                  </PrimaryButton>
                 </AuthModalActions>
-                <AuthLink onClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }}>
+                <AuthLink onClick={() => { setShowLoginModal(false); setShowRegisterModal(true); setAuthError(null); }}>
                   Don&apos;t have an account? Register here
                 </AuthLink>
               </AuthModalBody>
@@ -1137,7 +1473,7 @@ export default function CareersPage() {
         )}
       </AnimatePresence>
 
-      {/* Registration Modal */}
+      {/* Enhanced Registration Modal */}
       <AnimatePresence>
         {showRegisterModal && (
           <ModalOverlay
@@ -1153,61 +1489,179 @@ export default function CareersPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <AuthModalHeader>
-                <AuthModalTitle>Register</AuthModalTitle>
+                <AuthModalTitle>Create Account</AuthModalTitle>
                 <CloseButton onClick={() => setShowRegisterModal(false)}>×</CloseButton>
               </AuthModalHeader>
               <AuthModalBody>
-                {authError && <ErrorText>{authError}</ErrorText>}
+                {authError && <ErrorMessage>{authError}</ErrorMessage>}
                 <InputGroup>
                   <InputLabel>First Name</InputLabel>
                   <Input
                     type="text"
                     value={registerData.firstName}
-                    onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
+                    onChange={(e) => {
+                      setRegisterData({ ...registerData, firstName: e.target.value });
+                      validateField('firstName', e.target.value);
+                    }}
                     placeholder="Enter your first name"
+                    disabled={authLoading}
+                    $hasError={!validationState.firstName.isValid}
                   />
+                  {!validationState.firstName.isValid && (
+                    <ValidationError>{validationState.firstName.error}</ValidationError>
+                  )}
                 </InputGroup>
                 <InputGroup>
                   <InputLabel>Last Name</InputLabel>
                   <Input
                     type="text"
                     value={registerData.lastName}
-                    onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
+                    onChange={(e) => {
+                      setRegisterData({ ...registerData, lastName: e.target.value });
+                      validateField('lastName', e.target.value);
+                    }}
                     placeholder="Enter your last name"
+                    disabled={authLoading}
+                    $hasError={!validationState.lastName.isValid}
                   />
+                  {!validationState.lastName.isValid && (
+                    <ValidationError>{validationState.lastName.error}</ValidationError>
+                  )}
                 </InputGroup>
                 <InputGroup>
-                  <InputLabel>Email</InputLabel>
+                  <InputLabel>Email Address</InputLabel>
                   <Input
                     type="email"
                     value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                    placeholder="Enter your email"
+                    onChange={(e) => {
+                      setRegisterData({ ...registerData, email: e.target.value });
+                      validateField('email', e.target.value);
+                    }}
+                    placeholder="Enter your email address"
+                    disabled={authLoading}
+                    $hasError={!validationState.email.isValid}
                   />
+                  {!validationState.email.isValid && (
+                    <ValidationError>{validationState.email.error}</ValidationError>
+                  )}
                 </InputGroup>
                 <InputGroup>
                   <InputLabel>Password</InputLabel>
-                  <Input
-                    type="password"
-                    value={registerData.password}
-                    onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                    placeholder="Enter your password"
-                  />
+                  <PasswordInputContainer>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={registerData.password}
+                      onChange={(e) => {
+                        setRegisterData({ ...registerData, password: e.target.value });
+                        validateField('password', e.target.value);
+                      }}
+                      placeholder="Create a strong password"
+                      disabled={authLoading}
+                      $hasError={!validationState.password.isValid}
+                    />
+                    <PasswordToggle
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={authLoading}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </PasswordToggle>
+                  </PasswordInputContainer>
+                  {registerData.password && (
+                    <PasswordStrengthIndicator>
+                      <PasswordStrengthBar 
+                        strength={passwordStrength}
+                        color={getPasswordStrengthColor(passwordStrength)}
+                      />
+                      <PasswordStrengthText color={getPasswordStrengthColor(passwordStrength)}>
+                        Password strength: {passwordStrength.toUpperCase()}
+                      </PasswordStrengthText>
+                    </PasswordStrengthIndicator>
+                  )}
+                  {!validationState.password.isValid && (
+                    <ValidationErrorList>
+                      {validationState.password.errors.map((error, index) => (
+                        <ValidationError key={index}>• {error}</ValidationError>
+                      ))}
+                    </ValidationErrorList>
+                  )}
+                  <PasswordRequirements>
+                    <RequirementTitle>Password must contain:</RequirementTitle>
+                    <PasswordRequirementItem $met={registerData.password.length >= 8}>
+                      At least 8 characters
+                    </PasswordRequirementItem>
+                    <PasswordRequirementItem $met={/[a-z]/.test(registerData.password)}>
+                      One lowercase letter
+                    </PasswordRequirementItem>
+                    <PasswordRequirementItem $met={/[A-Z]/.test(registerData.password)}>
+                      One uppercase letter
+                    </PasswordRequirementItem>
+                    <PasswordRequirementItem $met={/\d/.test(registerData.password)}>
+                      One number
+                    </PasswordRequirementItem>
+                    <PasswordRequirementItem $met={/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(registerData.password)}>
+                      One special character
+                    </PasswordRequirementItem>
+                  </PasswordRequirements>
                 </InputGroup>
                 <InputGroup>
                   <InputLabel>Confirm Password</InputLabel>
-                  <Input
-                    type="password"
-                    value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                    placeholder="Confirm your password"
-                  />
+                  <PasswordInputContainer>
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={registerData.confirmPassword}
+                      onChange={(e) => {
+                        setRegisterData({ ...registerData, confirmPassword: e.target.value });
+                        validateField('confirmPassword', e.target.value);
+                      }}
+                      placeholder="Confirm your password"
+                      disabled={authLoading}
+                      $hasError={!validationState.confirmPassword.isValid}
+                    />
+                    <PasswordToggle
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={authLoading}
+                    >
+                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </PasswordToggle>
+                  </PasswordInputContainer>
+                  {!validationState.confirmPassword.isValid && (
+                    <ValidationError>{validationState.confirmPassword.error}</ValidationError>
+                  )}
                 </InputGroup>
                 <AuthModalActions>
-                  <SecondaryButton onClick={() => setShowRegisterModal(false)}>Cancel</SecondaryButton>
-                  <PrimaryButton onClick={handleRegister}>Register</PrimaryButton>
+                  <SecondaryButton 
+                    onClick={() => setShowRegisterModal(false)}
+                    disabled={authLoading}
+                  >
+                    Cancel
+                  </SecondaryButton>
+                  <PrimaryButton 
+                    onClick={handleRegister}
+                    disabled={
+                      authLoading || 
+                      !validationState.firstName.isValid ||
+                      !validationState.lastName.isValid ||
+                      !validationState.email.isValid ||
+                      !validationState.password.isValid ||
+                      !validationState.confirmPassword.isValid ||
+                      !registerData.firstName.trim() ||
+                      !registerData.lastName.trim() ||
+                      !registerData.email.trim() ||
+                      !registerData.password.trim() ||
+                      !registerData.confirmPassword.trim()
+                    }
+                  >
+                    {authLoading ? (
+                      <>
+                        <Loader2 size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />
+                        Creating Account...
+                      </>
+                    ) : (
+                      'Create Account'
+                    )}
+                  </PrimaryButton>
                 </AuthModalActions>
-                <AuthLink onClick={() => { setShowRegisterModal(false); setShowLoginModal(true); }}>
+                <AuthLink onClick={() => { setShowRegisterModal(false); setShowLoginModal(true); setAuthError(null); }}>
                   Already have an account? Login here
                 </AuthLink>
               </AuthModalBody>
@@ -1216,7 +1670,7 @@ export default function CareersPage() {
         )}
       </AnimatePresence>
 
-      {/* Password Reset Modal */}
+      {/* Enhanced Password Reset Modal */}
       <AnimatePresence>
         {showResetModal && (
           <ModalOverlay
@@ -1236,21 +1690,42 @@ export default function CareersPage() {
                 <CloseButton onClick={() => setShowResetModal(false)}>×</CloseButton>
               </AuthModalHeader>
               <AuthModalBody>
-                {authError && <ErrorText>{authError}</ErrorText>}
+                {authError && <ErrorMessage>{authError}</ErrorMessage>}
+                <ResetPasswordInfo>
+                  Enter your email address and we&apos;ll send you instructions to reset your password.
+                </ResetPasswordInfo>
                 <InputGroup>
-                  <InputLabel>Email</InputLabel>
+                  <InputLabel>Email Address</InputLabel>
                   <Input
                     type="email"
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    placeholder="Enter your email address"
+                    disabled={authLoading}
                   />
                 </InputGroup>
                 <AuthModalActions>
-                  <SecondaryButton onClick={() => setShowResetModal(false)}>Cancel</SecondaryButton>
-                  <PrimaryButton onClick={handleResetPassword}>Send Reset Link</PrimaryButton>
+                  <SecondaryButton 
+                    onClick={() => setShowResetModal(false)}
+                    disabled={authLoading}
+                  >
+                    Cancel
+                  </SecondaryButton>
+                  <PrimaryButton 
+                    onClick={handleResetPassword}
+                    disabled={authLoading || !resetEmail.trim()}
+                  >
+                    {authLoading ? (
+                      <>
+                        <Loader2 size={16} style={{ marginRight: '8px', animation: 'spin 1s linear infinite' }} />
+                        Sending...
+                      </>
+                    ) : (
+                      'Send Reset Instructions'
+                    )}
+                  </PrimaryButton>
                 </AuthModalActions>
-                <AuthLink onClick={() => { setShowResetModal(false); setShowLoginModal(true); }}>
+                <AuthLink onClick={() => { setShowResetModal(false); setShowLoginModal(true); setAuthError(null); }}>
                   Back to Login
                 </AuthLink>
               </AuthModalBody>
@@ -1262,49 +1737,9 @@ export default function CareersPage() {
   );
 }
 
-// Enhanced Styled Components with new debug styles
+// Enhanced Styled Components with validation styles
 const PageWrapper = styled.div`
   padding: 4rem 0;
-`;
-
-// New Debug Panel Styles
-const DebugPanel = styled.div`
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-  padding: 1.5rem 2rem;
-  border-radius: 1rem;
-  margin-bottom: 3rem;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
-`;
-
-const DebugTitle = styled.h3`
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-`;
-
-const DebugInfo = styled.p`
-  font-size: 1.4rem;
-  margin: 0.5rem 0;
-  font-family: 'Courier New', monospace;
-`;
-
-const RefreshButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid white;
-  padding: 0.8rem 1.6rem;
-  border-radius: 0.8rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-  }
 `;
 
 const DebugText = styled.p`
@@ -1485,7 +1920,6 @@ const WelcomeFeatures = styled.div`
   ${mq('<=tablet', 'grid-template-columns: 1fr; gap: 1.5rem;')}
 `;
 
-
 const FeatureItem = styled.div`
   display: flex;
   align-items: center;
@@ -1576,7 +2010,6 @@ const WelcomeStepText = styled.p`
   line-height: 1.4;
 `;
 
-// NEW: Department Counter Section Styles
 const DepartmentCounterSection = styled.section`
   margin: 6rem 0 4rem 0;
   padding: 0 2rem;
@@ -2055,7 +2488,7 @@ const NoPositionsText = styled.p`
   }
 `;
 
-// Modal Styled Components (unchanged)
+// Modal Styled Components
 const ModalOverlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -2175,7 +2608,7 @@ const RequirementsList = styled.ul`
   margin: 0;
 `;
 
-const RequirementItem = styled.li`
+const JobRequirementItem = styled.li`
   font-size: 1.6rem;
   line-height: 1.6;
   color: rgb(var(--text), 0.8);
@@ -2209,11 +2642,22 @@ const PrimaryButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   flex: 1;
-  &:hover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover:not(:disabled) {
     background: rgb(230, 100, 0);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
   }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
   ${mq('<=tablet', 'width: 100%;')}
 `;
 
@@ -2228,11 +2672,22 @@ const SecondaryButton = styled.button`
   cursor: pointer;
   transition: all 0.3s ease;
   flex: 1;
-  &:hover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover:not(:disabled) {
     background: rgba(255, 125, 0, 0.1);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 125, 0, 0.2);
   }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
   ${mq('<=tablet', 'width: 100%;')}
 `;
 
@@ -2242,6 +2697,8 @@ const AuthModalContent = styled(motion.div)`
   padding: 3rem;
   max-width: 50rem;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(var(--text), 0.1);
   ${mq('<=tablet', 'max-width: 95vw; margin: 1rem; padding: 2rem;')}
@@ -2278,19 +2735,141 @@ const InputLabel = styled.label`
   color: rgb(var(--text));
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ $hasError?: boolean }>`
   padding: 1rem;
   font-size: 1.4rem;
-  border: 2px solid rgba(255, 125, 0, 0.3);
+  border: 2px solid ${props => props.$hasError ? '#ef4444' : 'rgba(255, 125, 0, 0.3)'};
   border-radius: 0.8rem;
   background: rgba(var(--cardBackground), 0.8);
   color: rgb(var(--text));
   transition: all 0.3s ease;
+  
   &:focus {
     outline: none;
-    border-color: rgb(255, 125, 0);
-    box-shadow: 0 0 8px rgba(255, 125, 0, 0.3);
+    border-color: ${props => props.$hasError ? '#ef4444' : 'rgb(255, 125, 0)'};
+    box-shadow: 0 0 8px ${props => props.$hasError ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 125, 0, 0.3)'};
   }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+const PasswordInputContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+const PasswordToggle = styled.button`
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: rgb(var(--text), 0.6);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    color: rgb(var(--text));
+  }
+  
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+`;
+
+const ValidationError = styled.p`
+  font-size: 1.2rem;
+  color: #ef4444;
+  margin: 0.5rem 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const ValidationErrorList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+`;
+
+const ErrorMessage = styled.div`
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 1rem 1.5rem;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  text-align: center;
+`;
+
+const PasswordStrengthIndicator = styled.div`
+  margin-top: 0.8rem;
+`;
+
+const PasswordStrengthBar = styled.div<{ strength: string; color: string }>`
+  height: 4px;
+  border-radius: 2px;
+  background: ${props => props.color};
+  width: ${props => 
+    props.strength === 'weak' ? '33%' : 
+    props.strength === 'medium' ? '66%' : '100%'
+  };
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+`;
+
+const PasswordStrengthText = styled.p<{ color: string }>`
+  font-size: 1.2rem;
+  color: ${props => props.color};
+  margin: 0;
+  font-weight: 600;
+`;
+
+const PasswordRequirements = styled.div`
+  background: rgba(var(--cardBackground), 0.8);
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+`;
+
+const RequirementTitle = styled.h4`
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin: 0 0 1rem 0;
+`;
+
+const PasswordRequirementItem = styled.div<{ $met: boolean }>`
+  font-size: 1.2rem;
+  color: ${props => props.$met ? '#10b981' : 'rgb(var(--text), 0.6)'};
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &:before {
+    content: ${props => props.$met ? '"✓"' : '"○"'};
+    font-weight: bold;
+    color: ${props => props.$met ? '#10b981' : 'rgb(var(--text), 0.4)'};
+  }
+`;
+
+const ResetPasswordInfo = styled.p`
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.8);
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
 `;
 
 const AuthLink = styled.button`
@@ -2301,9 +2880,16 @@ const AuthLink = styled.button`
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
-  &:hover {
+  padding: 0.5rem;
+  
+  &:hover:not(:disabled) {
     text-decoration: underline;
     color: rgb(230, 100, 0);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 

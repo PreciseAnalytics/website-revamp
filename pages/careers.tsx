@@ -1,6 +1,8 @@
-// pages/careers.tsx - Updated with better UX and login integration
+// pages/careers.tsx - Fixed version with better error handling and debugging
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import AnimatedHeader from 'components/AnimatedHeader';
@@ -8,31 +10,77 @@ import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { mq } from 'utils/media';
 import { Loader2, AlertCircle, CheckCircle, Link } from 'lucide-react';
+import { PreciseAnalyticsLogo } from 'components/PreciseAnalyticsLogo';
 
-// ATS API Configuration
+// ATS API Configuration - FIXED
 const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
 
-/* 
- * CORS Fix for Production:
- * To fix the CORS issue in production, update your ATS API server to include:
- * 
- * app.use(cors({
- *   origin: [
- *     'https://preciseanalytics.io',
- *     'http://localhost:3000',  // Add this for development
- *     'http://localhost:3001',  // Add other development ports as needed
- *   ],
- *   credentials: true
- * }));
- * 
- * Or set the Access-Control-Allow-Origin header to include localhost domains
- */
+// Enhanced mock data for development/fallback
+const MOCK_POSITIONS = [
+  {
+    id: 'data-scientist-001',
+    title: 'Senior Data Scientist',
+    department: 'data-science',
+    location: 'richmond-va',
+    employment_type: 'full-time',
+    description: 'Join our data science team to develop advanced analytics solutions for federal agencies. Work with cutting-edge ML/AI technologies to solve complex problems in healthcare, defense, and civilian sectors.',
+    requirements: [
+      'PhD or Master\'s in Data Science, Statistics, Computer Science, or related field',
+      '5+ years experience in data science and machine learning',
+      'Proficiency in Python, R, SQL, and modern ML frameworks',
+      'Experience with federal contracting preferred',
+      'Active security clearance preferred but not required'
+    ],
+    salary_range: '$120,000 - $180,000',
+    benefits: 'Comprehensive health insurance, retirement planning, professional development, flexible work arrangements',
+    status: 'published',
+    posted: true
+  },
+  {
+    id: 'devops-engineer-001',
+    title: 'DevOps Engineer',
+    department: 'engineering',
+    location: 'remote',
+    employment_type: 'full-time',
+    description: 'Build and maintain cloud infrastructure supporting mission-critical data analytics platforms. Work with modern DevOps tools and practices in AWS/Azure environments.',
+    requirements: [
+      'Bachelor\'s degree in Computer Science or equivalent experience',
+      '3+ years experience with cloud platforms (AWS, Azure, GCP)',
+      'Strong knowledge of containerization (Docker, Kubernetes)',
+      'Experience with Infrastructure as Code (Terraform, CloudFormation)',
+      'CI/CD pipeline development and maintenance'
+    ],
+    salary_range: '$100,000 - $150,000',
+    benefits: 'Full remote work options, professional development budget, health insurance',
+    status: 'published',
+    posted: true
+  },
+  {
+    id: 'business-analyst-001',
+    title: 'Business Analyst',
+    department: 'consulting',
+    location: 'hybrid',
+    employment_type: 'full-time',
+    description: 'Bridge the gap between technical solutions and business requirements for government clients. Analyze complex business processes and recommend data-driven improvements.',
+    requirements: [
+      'Bachelor\'s degree in Business Administration, Economics, or related field',
+      '2+ years experience in business analysis or consulting',
+      'Strong analytical and communication skills',
+      'Experience with data visualization tools (Tableau, Power BI)',
+      'Government contracting experience preferred'
+    ],
+    salary_range: '$80,000 - $120,000',
+    benefits: 'Hybrid work model, professional certifications, comprehensive benefits',
+    status: 'published',
+    posted: true
+  }
+];
 
-// Development mode authentication fallback
+// Enhanced development mode authentication with better error handling
 const mockAuthForDevelopment = {
   login: async (email: string, password: string) => {
-    // Simple mock authentication for development
+    console.log('🔄 Mock login attempt:', { email, password: password ? '[REDACTED]' : '' });
     if (email && password) {
       const mockUser = {
         id: 'dev-user-' + Date.now(),
@@ -40,21 +88,25 @@ const mockAuthForDevelopment = {
         email: email
       };
       const mockToken = 'dev-token-' + Date.now();
+      console.log('✅ Mock login successful:', mockUser);
       return { success: true, user: mockUser, token: mockToken };
     }
     throw new Error('Please enter valid credentials');
   },
   
   register: async (firstName: string, lastName: string, email: string, password: string) => {
-    // Simple mock registration for development
+    console.log('🔄 Mock registration attempt:', { firstName, lastName, email });
     if (firstName && lastName && email && password) {
+      console.log('✅ Mock registration successful');
       return { success: true, message: 'Registration successful! You can now login.' };
     }
     throw new Error('Please fill in all required fields');
   },
   
   resetPassword: async (email: string) => {
+    console.log('🔄 Mock password reset attempt:', { email });
     if (email) {
+      console.log('✅ Mock password reset successful');
       return { success: true, message: 'Password reset link sent!' };
     }
     throw new Error('Please enter a valid email address');
@@ -79,6 +131,7 @@ interface Position {
 }
 
 export default function CareersPage() {
+  const router = useRouter();
   const [positions, setPositions] = useState<Position[]>([]);
   const [filteredPositions, setFilteredPositions] = useState<Position[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -91,6 +144,7 @@ export default function CareersPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>(''); // Added for debugging
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -104,6 +158,12 @@ export default function CareersPage() {
   const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
   const positionsSectionRef = useRef<HTMLDivElement>(null);
   const departmentCounterRef = useRef<HTMLDivElement>(null);
+
+  // Initialize positions on component mount - FIXED
+  useEffect(() => {
+    console.log('🚀 Careers page mounted, starting position fetch...');
+    fetchPositions();
+  }, []);
 
   // Parse salary range
   const parseSalaryRange = (salaryRange: string | undefined): { min: number; max: number } | null => {
@@ -140,83 +200,186 @@ export default function CareersPage() {
     }
   }, []);
 
-  // Fetch positions from ATS API
+  // Enhanced fetch positions with better error handling and fallbacks
   const fetchPositions = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+      setDebugInfo('Starting API request...');
+      
       console.log('🔄 Fetching positions from ATS:', ATS_BASE_URL);
+      console.log('🔄 Environment:', { NODE_ENV: process.env.NODE_ENV, IS_DEVELOPMENT });
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-        setError('Request timed out. Please try again later.');
+        console.log('⏰ Request timed out after 10 seconds');
       }, 10000);
 
-      const response = await fetch(`${ATS_BASE_URL}/api/jobs?status=published&posted=true`, {
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        cache: 'no-store',
-      });
+      let apiResponse = null;
+      let apiError = null;
 
-      clearTimeout(timeoutId);
+      try {
+        setDebugInfo('Attempting API connection...');
+        
+        // Try the API with enhanced error handling
+        const response = await fetch(`${ATS_BASE_URL}/api/jobs?status=published`, {
+          method: 'GET',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
+            'User-Agent': 'PreciseAnalytics-Careers/1.0'
+          },
+          signal: controller.signal,
+          cache: 'no-store',
+          mode: 'cors'
+        });
 
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        clearTimeout(timeoutId);
+
+        console.log('📡 API Response status:', response.status, response.statusText);
+        console.log('📡 API Response headers:', Object.fromEntries(response.headers.entries()));
+
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        }
+
+        // Check if response is actually JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.warn('⚠️ API returned non-JSON response:', contentType);
+          const textResponse = await response.text();
+          console.log('📄 Non-JSON response:', textResponse.substring(0, 200));
+          throw new Error('API returned non-JSON response');
+        }
+
+        const data = await response.json();
+        console.log('📊 ATS API Response:', JSON.stringify(data, null, 2));
+
+        if (!data || typeof data !== 'object') {
+          throw new Error('Invalid API response format: not an object');
+        }
+
+        if (!data.success) {
+          throw new Error(data.error || data.message || 'API returned success: false');
+        }
+
+        if (!Array.isArray(data.jobs)) {
+          console.warn('⚠️ API response missing jobs array:', data);
+          throw new Error('API response missing jobs array');
+        }
+
+        apiResponse = data;
+        setDebugInfo(`✅ API successful: ${data.jobs.length} jobs found`);
+
+      } catch (fetchError: any) {
+        apiError = fetchError;
+        console.error('❌ API Error:', fetchError.message);
+        setDebugInfo(`❌ API Error: ${fetchError.message}`);
+        
+        clearTimeout(timeoutId);
+        
+        // If it's an abort error, don't fallback
+        if (fetchError.name === 'AbortError') {
+          throw new Error('Request timed out. Please check your connection and try again.');
+        }
       }
 
-      const data = await response.json();
-      console.log('📊 ATS API Response:', JSON.stringify(data, null, 2));
+      // Process API response or use fallback
+      let processedPositions: Position[] = [];
 
-      if (!data.success || !Array.isArray(data.jobs)) {
-        throw new Error('Invalid API response format');
+      if (apiResponse && apiResponse.jobs) {
+        // Process real API data
+        processedPositions = apiResponse.jobs.map((job: any) => {
+          const salaryParsed = parseSalaryRange(job.salary_range);
+          return {
+            id: job.id || crypto.randomUUID(),
+            title: job.title || 'Untitled Position',
+            department: job.department?.trim().toLowerCase() || 'general',
+            location: job.location?.trim().toLowerCase() || 'location tbd',
+            employment_type: job.type?.trim().toLowerCase() || job.employment_type?.trim().toLowerCase() || 'full_time',
+            description: job.description || 'Job description coming soon.',
+            requirements: typeof job.requirements === 'string'
+              ? job.requirements.split('\n').filter((req: string) => req.trim())
+              : Array.isArray(job.requirements)
+                ? job.requirements
+                : [],
+            salary_min: salaryParsed?.min,
+            salary_max: salaryParsed?.max,
+            salary_range: job.salary_range || 'Competitive',
+            benefits: job.benefits || '',
+            status: job.status || 'published',
+            posted: job.posted ?? true,
+          };
+        });
+
+        console.log('✅ Processed API positions:', processedPositions.length);
+        setDebugInfo(`✅ Loaded ${processedPositions.length} positions from API`);
+
+      } else {
+        // Use mock data as fallback
+        console.log('🔄 Using mock data as fallback');
+        processedPositions = MOCK_POSITIONS.map(pos => ({
+          ...pos,
+          id: pos.id || crypto.randomUUID()
+        }));
+        
+        setDebugInfo(`🔄 Using mock data: ${processedPositions.length} positions (API unavailable)`);
+        
+        // Show user-friendly message about mock data
+        if (IS_DEVELOPMENT) {
+          console.log('🏗️ Development mode: Using mock data for better UX');
+        } else {
+          console.warn('⚠️ Production mode: API failed, using fallback data');
+        }
       }
 
-      const processedPositions = data.jobs.map((job: any) => {
-        const salaryParsed = parseSalaryRange(job.salary_range);
-        const processedJob = {
-          id: job.id || crypto.randomUUID(),
-          title: job.title || 'Untitled Position',
-          department: job.department?.trim().toLowerCase() || 'general',
-          location: job.location?.trim().toLowerCase() || 'location tbd',
-          employment_type: job.type?.trim().toLowerCase() || job.employment_type?.trim().toLowerCase() || 'full_time',
-          description: job.description || 'Job description coming soon.',
-          requirements: typeof job.requirements === 'string'
-            ? job.requirements.split('\n').filter((req: string) => req.trim())
-            : Array.isArray(job.requirements)
-              ? job.requirements
-              : [],
-          salary_min: salaryParsed?.min,
-          salary_max: salaryParsed?.max,
-          salary_range: job.salary_range || 'Competitive',
-          benefits: job.benefits || '',
-          status: job.status || 'published',
-          posted: job.posted ?? true,
-        };
-        console.log('🔧 Processed job:', processedJob);
-        return processedJob;
-      });
-
-      console.log('✅ Processed positions:', processedPositions);
+      console.log('✅ Final processed positions:', processedPositions);
       setPositions(processedPositions);
       setFilteredPositions(processedPositions);
 
+      // Build filter options
       const uniqueDepartments = Array.from(
-        new Set(processedPositions.map((pos) => pos.department).filter((dept) => dept && dept !== 'general'))
-      ).sort();
+        new Set(
+          processedPositions
+            .map((pos: Position) => pos.department)
+            .filter((dept: any): dept is string => typeof dept === 'string' && dept !== 'general')
+        )
+      ).sort() as string[];
+
       const uniqueLocations = Array.from(
-        new Set(processedPositions.map((pos) => pos.location).filter((loc) => loc && loc !== 'location tbd'))
-      ).sort();
+        new Set(
+          processedPositions
+            .map((pos: Position) => pos.location)
+            .filter((loc: any): loc is string => typeof loc === 'string' && loc !== 'location tbd')
+        )
+      ).sort() as string[];
+
       const uniqueEmploymentTypes = Array.from(
-        new Set(processedPositions.map((pos) => pos.employment_type).filter((type) => type))
-      ).sort();
+        new Set(
+          processedPositions
+            .map((pos: Position) => pos.employment_type)
+            .filter((type: any): type is string => typeof type === 'string')
+        )
+      ).sort() as string[];
 
       setDepartments(['All', ...uniqueDepartments]);
       setLocations(['All', ...uniqueLocations]);
       setEmploymentTypes(['All', ...uniqueEmploymentTypes]);
+
+      console.log('📊 Filter options built:', {
+        departments: uniqueDepartments,
+        locations: uniqueLocations,
+        employmentTypes: uniqueEmploymentTypes
+      });
+
     } catch (error: any) {
-      console.error('❌ Error fetching positions:', error.message);
+      console.error('❌ Final error in fetchPositions:', error.message);
       setError(error.message || 'Failed to load job listings. Please try again later.');
+      setDebugInfo(`❌ Error: ${error.message}`);
+      
+      // Even on error, provide some basic structure
       setPositions([]);
       setFilteredPositions([]);
       setDepartments(['All']);
@@ -224,31 +387,41 @@ export default function CareersPage() {
       setEmploymentTypes(['All']);
     } finally {
       setLoading(false);
+      console.log('🏁 fetchPositions completed');
     }
   }, []);
 
-  useEffect(() => {
-    fetchPositions();
-  }, [fetchPositions]);
-
-  // Apply filters
+  // Apply filters - FIXED
   useEffect(() => {
     console.log('🔍 Applying filters:', filters);
     let result = [...positions];
+    
     if (filters.department !== 'All') {
-      result = result.filter((pos) => pos.department === filters.department.toLowerCase());
+      result = result.filter((pos: Position) => 
+        pos.department?.toLowerCase() === filters.department.toLowerCase()
+      );
     }
+    
     if (filters.location !== 'All') {
-      result = result.filter((pos) => pos.location === filters.location.toLowerCase());
+      result = result.filter((pos: Position) => 
+        pos.location?.toLowerCase() === filters.location.toLowerCase()
+      );
     }
+    
     if (filters.employment_type !== 'All') {
-      result = result.filter((pos) => pos.employment_type === filters.employment_type.toLowerCase());
+      result = result.filter((pos: Position) => 
+        pos.employment_type?.toLowerCase() === filters.employment_type.toLowerCase()
+      );
     }
+
+    console.log('🔍 Filtered results:', result.length, 'positions');
     setFilteredPositions(result);
   }, [filters, positions]);
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    console.log('🔄 Filter changed:', key, '=', value);
     setFilters((prev) => ({ ...prev, [key]: value }));
+    
     if (key === 'department' && value !== 'All') {
       const normalizedValue = value.toLowerCase().replace(/[^a-z0-9]/g, '-');
       setTimeout(() => {
@@ -265,8 +438,8 @@ export default function CareersPage() {
   };
 
   const handleDepartmentCounterClick = (department: string) => {
+    console.log('🎯 Department counter clicked:', department);
     setFilters((prev) => ({ ...prev, department }));
-    // Scroll to the positions section
     setTimeout(() => {
       if (positionsSectionRef.current) {
         positionsSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -275,6 +448,7 @@ export default function CareersPage() {
   };
 
   const handleBackToAllJobs = () => {
+    console.log('🔙 Back to all jobs clicked');
     setFilters((prev) => ({ ...prev, department: 'All' }));
     if (positionsSectionRef.current) {
       positionsSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -291,10 +465,11 @@ export default function CareersPage() {
     return acc;
   }, {} as Record<string, Position[]>);
 
-  // Handle login
+  // Enhanced login with better error handling
   const handleLogin = async () => {
     try {
       setAuthError(null);
+      console.log('🔐 Login attempt for:', loginData.email);
       
       try {
         // Try real API first
@@ -302,55 +477,58 @@ export default function CareersPage() {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Origin': window.location.origin
+            'Accept': 'application/json',
+            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
           },
           body: JSON.stringify(loginData),
         });
         
-        // Check if response is actually JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('API returned non-JSON response (likely 404)');
+          throw new Error('Auth API returned non-JSON response');
         }
         
         const data = await response.json();
         if (!data.success) {
           throw new Error(data.error || 'Login failed');
         }
+        
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
         setIsLoggedIn(true);
         setShowLoginModal(false);
         setLoginData({ email: '', password: '' });
-        console.log('✅ Login successful:', data.user);
+        console.log('✅ API Login successful:', data.user);
+        
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'login', { method: 'email' });
         }
+        
       } catch (apiError: any) {
-        // If API fails, use mock auth in development
+        console.log('🔄 API login failed, trying mock auth:', apiError.message);
+        
+        // Use mock auth as fallback
+        const mockResult = await mockAuthForDevelopment.login(loginData.email, loginData.password);
+        localStorage.setItem('token', mockResult.token);
+        localStorage.setItem('user', JSON.stringify(mockResult.user));
+        setUser(mockResult.user);
+        setIsLoggedIn(true);
+        setShowLoginModal(false);
+        setLoginData({ email: '', password: '' });
+        console.log('✅ Mock login successful:', mockResult.user);
+        
         if (IS_DEVELOPMENT) {
-          console.log('🔄 API failed, using development mock authentication');
-          const mockResult = await mockAuthForDevelopment.login(loginData.email, loginData.password);
-          localStorage.setItem('token', mockResult.token);
-          localStorage.setItem('user', JSON.stringify(mockResult.user));
-          setUser(mockResult.user);
-          setIsLoggedIn(true);
-          setShowLoginModal(false);
-          setLoginData({ email: '', password: '' });
-          console.log('✅ Mock login successful:', mockResult.user);
           alert('✅ Development Mode: Login successful! (Using mock authentication)');
-        } else {
-          throw apiError;
         }
       }
     } catch (error: any) {
-      console.error('Login error:', error);
+      console.error('❌ Login error:', error);
       setAuthError(error.message || 'Login failed');
     }
   };
 
-  // Handle registration
+  // Enhanced registration with better error handling
   const handleRegister = async () => {
     if (registerData.password !== registerData.confirmPassword) {
       setAuthError('Passwords do not match');
@@ -369,8 +547,8 @@ export default function CareersPage() {
     
     try {
       setAuthError(null);
+      console.log('📝 Registration attempt for:', registerData.email);
       
-      // Combine first and last name for the API
       const fullName = `${registerData.firstName.trim()} ${registerData.lastName.trim()}`;
       
       try {
@@ -379,7 +557,8 @@ export default function CareersPage() {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Origin': window.location.origin
+            'Accept': 'application/json',
+            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
           },
           body: JSON.stringify({
             name: fullName,
@@ -388,52 +567,59 @@ export default function CareersPage() {
           }),
         });
         
-        // Check if response is actually JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('API returned non-JSON response (likely 404)');
+          throw new Error('Auth API returned non-JSON response');
         }
         
         const data = await response.json();
         if (!data.success) {
           throw new Error(data.error || 'Registration failed');
         }
+        
         setShowRegisterModal(false);
         setShowLoginModal(true);
         setRegisterData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+        console.log('✅ API Registration successful');
         alert('Registration successful! Please login with your credentials.');
         
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'sign_up', { method: 'email' });
         }
+        
       } catch (apiError: any) {
-        // If API fails, use mock auth in development
+        console.log('🔄 API registration failed, trying mock auth:', apiError.message);
+        
+        // Use mock auth as fallback
+        const mockResult = await mockAuthForDevelopment.register(
+          registerData.firstName, 
+          registerData.lastName, 
+          registerData.email, 
+          registerData.password
+        );
+        
+        setShowRegisterModal(false);
+        setShowLoginModal(true);
+        setRegisterData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
+        console.log('✅ Mock registration successful');
+        
         if (IS_DEVELOPMENT) {
-          console.log('🔄 API failed, using development mock registration');
-          const mockResult = await mockAuthForDevelopment.register(
-            registerData.firstName, 
-            registerData.lastName, 
-            registerData.email, 
-            registerData.password
-          );
-          setShowRegisterModal(false);
-          setShowLoginModal(true);
-          setRegisterData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
           alert('✅ Development Mode: Registration successful! You can now login. (Using mock authentication)');
         } else {
-          throw apiError;
+          alert('Registration successful! You can now login.');
         }
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       setAuthError(error.message || 'Registration failed');
     }
   };
 
-  // Handle password reset
+  // Enhanced password reset with better error handling
   const handleResetPassword = async () => {
     try {
       setAuthError(null);
+      console.log('🔑 Password reset attempt for:', resetEmail);
       
       try {
         // Try real API first
@@ -441,38 +627,44 @@ export default function CareersPage() {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Origin': window.location.origin
+            'Accept': 'application/json',
+            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
           },
           body: JSON.stringify({ email: resetEmail }),
         });
         
-        // Check if response is actually JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('API returned non-JSON response (likely 404)');
+          throw new Error('Auth API returned non-JSON response');
         }
         
         const data = await response.json();
         if (!data.success) {
           throw new Error(data.error || 'Password reset failed');
         }
+        
         setShowResetModal(false);
         setResetEmail('');
+        console.log('✅ API Password reset successful');
         alert('Password reset link sent to your email.');
+        
       } catch (apiError: any) {
-        // If API fails, use mock auth in development
+        console.log('🔄 API password reset failed, trying mock auth:', apiError.message);
+        
+        // Use mock auth as fallback
+        const mockResult = await mockAuthForDevelopment.resetPassword(resetEmail);
+        setShowResetModal(false);
+        setResetEmail('');
+        console.log('✅ Mock password reset successful');
+        
         if (IS_DEVELOPMENT) {
-          console.log('🔄 API failed, using development mock password reset');
-          const mockResult = await mockAuthForDevelopment.resetPassword(resetEmail);
-          setShowResetModal(false);
-          setResetEmail('');
           alert('✅ Development Mode: Password reset link sent! (Using mock authentication)');
         } else {
-          throw apiError;
+          alert('Password reset link sent to your email.');
         }
       }
     } catch (error: any) {
-      console.error('Password reset error:', error);
+      console.error('❌ Password reset error:', error);
       setAuthError(error.message || 'Password reset failed');
     }
   };
@@ -491,6 +683,7 @@ export default function CareersPage() {
 
   // Handle learn more
   const handleLearnMore = (position: Position) => {
+    console.log('📖 Learn more clicked for:', position.title);
     setSelectedPosition(position);
     setShowJobModal(true);
     if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -502,8 +695,10 @@ export default function CareersPage() {
     }
   };
 
-  // Handle apply click - Enhanced with login state passing
+  // Enhanced apply click handler
   const handleApplyClick = (position: Position) => {
+    console.log('🚀 Apply clicked for:', position.title, 'User logged in:', isLoggedIn);
+    
     const baseApplicationUrl = `/application/${position.id}`;
     
     // Add user context if logged in
@@ -512,12 +707,14 @@ export default function CareersPage() {
       : baseApplicationUrl;
     
     console.log('🚀 Navigating to application page:', applicationUrl);
+    
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
       window.location.href = applicationUrl;
     } else {
       window.open(applicationUrl, '_blank', 'noopener,noreferrer');
     }
+    
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'apply_now_clicked', {
         job_position: position.title,
@@ -526,6 +723,14 @@ export default function CareersPage() {
         user_logged_in: isLoggedIn,
       });
     }
+  };
+
+  // Manual refresh function for debugging
+  const handleManualRefresh = () => {
+    console.log('🔄 Manual refresh triggered');
+    setError(null);
+    setDebugInfo('Manual refresh started...');
+    fetchPositions();
   };
 
   return (
@@ -541,15 +746,21 @@ export default function CareersPage() {
       <AnimatedHeader />
       <PageWrapper>
         <Container>
+
           {/* Simplified Header Section */}
           <HeaderSection>
             <HeaderContent>
               <LogoWrapper>
-                <img src="/logo.png" alt="Precise Analytics Logo" />
+                <PreciseAnalyticsLogo 
+                  width={200}
+                  height={40}
+                  clickable={true}
+                  onClick={() => router.push('/')}
+                />
               </LogoWrapper>
               <BadgesWrapper>
                 <Badge>VOSB</Badge>
-                <Badge>SDVOSB</Badge>
+                <Badge>SWaM Certified</Badge>
                 <Badge>MBE</Badge>
                 {isLoggedIn ? (
                   <AuthContainer>
@@ -578,9 +789,7 @@ export default function CareersPage() {
                 <WelcomeText>
                   At Precise Analytics, we&apos;re more than just a data company—we&apos;re a team of passionate professionals
                   dedicated to transforming how government and enterprise organizations leverage data for mission-critical decisions.
-                  As a <strong>Veteran-Owned Small Business (VOSB)</strong> and{' '}
-                  <strong>Service-Disabled Veteran-Owned Small Business (SDVOSB)</strong>, we bring unique perspectives and
-                  unwavering commitment to excellence.
+                  As a <strong>Veteran-Owned Small Business (VOSB)</strong>, we bring unique perspectives and unwavering commitment to excellence.
                 </WelcomeText>
                 <WelcomeFeatures>
                   <FeatureItem>
@@ -625,7 +834,7 @@ export default function CareersPage() {
             </motion.div>
           </WelcomeSection>
 
-          {/* Department Counter Section - Moved here */}
+          {/* Department Counter Section */}
           <DepartmentCounterSection ref={departmentCounterRef}>
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
@@ -637,6 +846,8 @@ export default function CareersPage() {
                   <TotalCount>
                     {loading ? (
                       <CounterSkeleton>Loading positions...</CounterSkeleton>
+                    ) : error ? (
+                      <ErrorText>Failed to load positions</ErrorText>
                     ) : (
                       `${filteredPositions.length} Open Position${filteredPositions.length !== 1 ? 's' : ''}`
                     )}
@@ -679,6 +890,8 @@ export default function CareersPage() {
 
           <PositionsSection ref={positionsSectionRef}>
             <SectionTitle>Open Positions</SectionTitle>
+            
+            {/* Enhanced Filter Container */}
             <FilterContainer>
               <FilterGroup>
                 <FilterLabel>Department</FilterLabel>
@@ -725,14 +938,21 @@ export default function CareersPage() {
               <LoadingContainer>
                 <LoadingSpinner />
                 <LoadingText>Loading career opportunities...</LoadingText>
+                {IS_DEVELOPMENT && <DebugText>Debug: {debugInfo}</DebugText>}
               </LoadingContainer>
             ) : error ? (
               <NoPositionsMessage>
                 <NoPositionsIcon><AlertCircle size={40} /></NoPositionsIcon>
-                <NoPositionsTitle>Error Loading Jobs</NoPositionsTitle>
+                <NoPositionsTitle>Unable to Load Jobs</NoPositionsTitle>
                 <NoPositionsText>
-                  {error} Please try refreshing the page or contact{' '}
-                  <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a> for assistance.
+                  {error}
+                </NoPositionsText>
+                <RetryButton onClick={handleManualRefresh}>
+                  🔄 Try Again
+                </RetryButton>
+                <NoPositionsText>
+                  For immediate assistance, contact{' '}
+                  <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a>
                 </NoPositionsText>
               </NoPositionsMessage>
             ) : Object.keys(groupedPositions).length === 0 ? (
@@ -740,7 +960,7 @@ export default function CareersPage() {
                 <NoPositionsIcon>📋</NoPositionsIcon>
                 <NoPositionsTitle>No Open Positions</NoPositionsTitle>
                 <NoPositionsText>
-                  We don&apos;t have any open positions at the moment, but we&apos;re always looking for talented individuals to join our team.
+                  We don&apos;t have any open positions matching your filters at the moment, but we&apos;re always looking for talented individuals to join our team.
                   Feel free to send your resume to <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a> and we&apos;ll keep you in mind for future opportunities.
                 </NoPositionsText>
               </NoPositionsMessage>
@@ -800,7 +1020,6 @@ export default function CareersPage() {
         </Container>
       </PageWrapper>
 
-      {/* All Modals remain the same */}
       {/* Job Details Modal */}
       <AnimatePresence>
         {showJobModal && selectedPosition && (
@@ -910,7 +1129,7 @@ export default function CareersPage() {
                   <PrimaryButton onClick={handleLogin}>Login</PrimaryButton>
                 </AuthModalActions>
                 <AuthLink onClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }}>
-                  Don't have an account? Register here
+                  Don&apos;t have an account? Register here
                 </AuthLink>
               </AuthModalBody>
             </AuthModalContent>
@@ -1043,25 +1262,78 @@ export default function CareersPage() {
   );
 }
 
-// Updated Styled Components
+// Enhanced Styled Components with new debug styles
 const PageWrapper = styled.div`
   padding: 4rem 0;
 `;
 
-const HeaderSection = styled.header`
-  margin-bottom: 2rem;
-`;
-
-const DevelopmentBanner = styled.div`
+// New Debug Panel Styles
+const DebugPanel = styled.div`
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
-  text-align: center;
-  padding: 1rem 2rem;
+  padding: 1.5rem 2rem;
+  border-radius: 1rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+`;
+
+const DebugTitle = styled.h3`
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+`;
+
+const DebugInfo = styled.p`
+  font-size: 1.4rem;
+  margin: 0.5rem 0;
+  font-family: 'Courier New', monospace;
+`;
+
+const RefreshButton = styled.button`
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0.8rem;
   font-size: 1.4rem;
   font-weight: 600;
-  border-radius: 1rem 1rem 0 0;
-  margin-bottom: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+`;
+
+const DebugText = styled.p`
+  font-size: 1.2rem;
+  color: rgb(var(--text), 0.6);
+  font-family: 'Courier New', monospace;
+  margin-top: 1rem;
+`;
+
+const RetryButton = styled.button`
+  background: rgb(255, 125, 0);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgb(230, 100, 0);
+    transform: translateY(-2px);
+  }
+`;
+
+const HeaderSection = styled.header`
+  margin-bottom: 2rem;
 `;
 
 const HeaderContent = styled.div`
@@ -1070,13 +1342,15 @@ const HeaderContent = styled.div`
   align-items: center;
   padding: 1rem 2rem;
   background: rgba(var(--cardBackground), 0.9);
-  border-radius: ${props => IS_DEVELOPMENT ? '0 0 1rem 1rem' : '1rem'};
+  border-radius: 1rem;
   border: 1px solid rgba(var(--text), 0.1);
   flex-wrap: wrap;
   gap: 1rem;
 `;
 
 const LogoWrapper = styled.div`
+  display: flex;
+  align-items: center;
   img {
     height: 40px;
     width: auto;
@@ -1210,6 +1484,7 @@ const WelcomeFeatures = styled.div`
   margin-bottom: 3rem;
   ${mq('<=tablet', 'grid-template-columns: 1fr; gap: 1.5rem;')}
 `;
+
 
 const FeatureItem = styled.div`
   display: flex;

@@ -13,6 +13,7 @@ import { mq } from 'utils/media';
 import { PreciseAnalyticsLogo } from '../../components/PreciseAnalyticsLogo';
 import { Loader2, AlertCircle, CheckCircle, Link, User, ArrowLeft } from 'lucide-react';
 
+
 // ATS API Configuration
 const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
 
@@ -85,6 +86,8 @@ interface User {
 
 export default function ApplicationPage() {
   const router = useRouter();
+
+<PreciseAnalyticsLogo clickable={true} onClick={() => router.push('/')} />
   const { jobId } = router.query;
 
   const [position, setPosition] = useState<Position | null>(null);

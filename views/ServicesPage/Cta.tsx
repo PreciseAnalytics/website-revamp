@@ -105,8 +105,14 @@ const ContentStack = styled.div`
 `;
 
 const StyledSectionTitle = styled(SectionTitle)`
-  color: white;
+  color: rgb(255, 125, 0);
   margin-bottom: 2rem;
+  font-size: 3.2rem;
+  font-weight: 700;
+  
+  ${media.tablet(`
+    font-size: 2.4rem;
+  `)}
 `;
 
 const Description = styled.p`

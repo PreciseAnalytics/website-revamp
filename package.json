@@ -52,7 +52,7 @@
     "use-resize-observer": "^9.1.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.24.7",
+    "@babel/eslint-parser": "^7.28.4",
     "@fec/remark-a11y-emoji": "^4.0.2",
     "@next/bundle-analyzer": "^14.2.4",
     "@types/formidable": "^3.4.5",

@@ -205,7 +205,7 @@ const mockAuthForDevelopment = {
       throw new Error('Please verify your email before logging in. Check your inbox for the verification link.');
     }
     
-    const mockToken = 'dev-token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const mockToken = 'dev-token-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
     console.log('✅ Mock login successful:', { id: user.id, name: user.name, email: user.email });
     
     return { 
@@ -253,7 +253,7 @@ const mockAuthForDevelopment = {
     }
     
     // Create user
-    const userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const userId = 'user-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     
     mockAuthForDevelopment.registeredUsers.set(email.toLowerCase(), {

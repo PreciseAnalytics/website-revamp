@@ -352,7 +352,7 @@ export default function AnimatedHeader() {
               {isClient && (
                 <CertificationLogos>
                   <CertificationLink
-                    href="https://dsbs.sba.gov/search/dsp_profile.cfm?SAM_UEI=ZRCYVLWCXL57"
+                    href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="View SBA Certification"

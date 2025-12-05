@@ -32,6 +32,12 @@ const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
   border-bottom: ${(p) => (p.$isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none')};
 `;
 
+const HeaderContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+`;
+
 const HeaderInner = styled.div`
   display: flex;
   align-items: center;
@@ -44,6 +50,18 @@ const LeftSection = styled.div`
   align-items: center;
   gap: 3rem;
   flex: 1;
+`;
+
+const CenterSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem 0 0.5rem;
+
+  ${media.tablet(`
+    display: none;
+  `)}
 `;
 
 const RightSection = styled.div`
@@ -66,11 +84,11 @@ const LogoContainer = styled.div`
 
 const CompanyLogo = styled(motion.img)`
   height: auto;
-  width: 200px;
+  width: 320px;
   object-fit: contain;
 
   ${media.tablet(`
-    width: 160px;
+    width: 200px;
   `)}
 `;
 
@@ -102,6 +120,36 @@ const NavLinkText = styled.span<{ $active: boolean }>`
 
   &:hover {
     color: rgb(var(--accent));
+  }
+`;
+
+// NEW: Phone Number Link Styled Component
+const PhoneLink = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: rgb(255, 125, 0); /* Neon orange */
+  font-weight: 700;
+  font-size: 2rem;
+  text-decoration: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 0.8rem;
+  background: rgba(255, 125, 0, 0.1);
+  border: 2px solid rgba(255, 125, 0, 0.3);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 125, 0, 0.2);
+    border-color: rgb(255, 125, 0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.4);
+  }
+
+  svg {
+    width: 2.25rem;
+    height: 2.25rem;
+    fill: currentColor;
   }
 `;
 
@@ -232,6 +280,37 @@ const MobileNavLinkText = styled.span<{ $active: boolean }>`
   }
 `;
 
+// NEW: Mobile Phone Link Styled Component
+const MobilePhoneLink = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.5rem 2.4rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-radius: 0.8rem;
+  background: rgba(255, 125, 0, 0.15);
+  border: 2px solid rgba(255, 125, 0, 0.4);
+  color: rgb(255, 125, 0); /* Neon orange */
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+
+  &:hover {
+    background: rgba(255, 125, 0, 0.25);
+    border-color: rgb(255, 125, 0);
+    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
+  }
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+    fill: currentColor;
+  }
+`;
+
 const MobileScheduleButtonContainer = styled.div`
   display: inline-flex;
   align-items: center;
@@ -322,62 +401,74 @@ export default function AnimatedHeader() {
     <>
       <HeaderWrapper $isScrolled={isScrolled}>
         <Container>
-          <HeaderInner>
-            <LeftSection>
-              <LogoContainer onClick={handleLogoClick} aria-label="Precise Analytics Homepage">
-                <CompanyLogo src="/PA-logo.png" alt="Precise Analytics" />
-              </LogoContainer>
-              <Nav>
-                <NavList>
-                  {LINKS.map(link => (
-                    <NavItem key={link.href}>
-                      <NavLinkText 
-                        $active={router.pathname === link.href}
-                        onClick={() => handleNavClick(link.href)}
-                      >
-                        {link.label}
-                      </NavLinkText>
-                    </NavItem>
-                  ))}
-                </NavList>
-              </Nav>
-            </LeftSection>
-            <RightSection>
-              <ButtonContainer>
-                <ScheduleButtonContainer onClick={handleScheduleClick}>
-                  Schedule a Consultation
-                </ScheduleButtonContainer>
-              </ButtonContainer>
+          <HeaderContent>
+            <HeaderInner>
+              <LeftSection>
+                <LogoContainer onClick={handleLogoClick} aria-label="Precise Analytics Homepage">
+                  <CompanyLogo src="/PA-logo.png" alt="Precise Analytics" />
+                </LogoContainer>
+                <Nav>
+                  <NavList>
+                    {LINKS.map(link => (
+                      <NavItem key={link.href}>
+                        <NavLinkText 
+                          $active={router.pathname === link.href}
+                          onClick={() => handleNavClick(link.href)}
+                        >
+                          {link.label}
+                        </NavLinkText>
+                      </NavItem>
+                    ))}
+                  </NavList>
+                </Nav>
+              </LeftSection>
 
-              {isClient && (
-                <CertificationLogos>
-                  <CertificationLink
-                    href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="View SBA Certification"
-                  >
-                    <SBACertLogo src="/Veteran-Owned-Certified.png" alt="Veteran-Owned Certified" />
-                  </CertificationLink>
-                  <CertificationLink
-                    href="https://directory.sbsd.virginia.gov/#/directory"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="View SWaM Certification"
-                  >
-                    <SWAMCertLogo src="/SWAM_LOGO.jpg" alt="SWaM Certified" />
-                  </CertificationLink>
-                </CertificationLogos>
-              )}
+              <RightSection>
+                <ButtonContainer>
+                  <ScheduleButtonContainer onClick={handleScheduleClick}>
+                    Schedule a Consultation
+                  </ScheduleButtonContainer>
+                </ButtonContainer>
 
-              <MobileMenuButton onClick={toggleMobileMenu}>
-                <MenuIconWrapper>
-                  {isMenuOpen ? <CloseIcon /> : <HamburgerIcon />}
-                </MenuIconWrapper>
-              </MobileMenuButton>
-            </RightSection>
+                {isClient && (
+                  <CertificationLogos>
+                    <CertificationLink
+                      href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View SBA Certification"
+                    >
+                      <SBACertLogo src="/Veteran-Owned-Certified.png" alt="Veteran-Owned Certified" />
+                    </CertificationLink>
+                    <CertificationLink
+                      href="https://directory.sbsd.virginia.gov/#/directory"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View SWaM Certification"
+                    >
+                      <SWAMCertLogo src="/SWAM_LOGO.jpg" alt="SWaM Certified" />
+                    </CertificationLink>
+                  </CertificationLogos>
+                )}
 
-          </HeaderInner>
+                <MobileMenuButton onClick={toggleMobileMenu}>
+                  <MenuIconWrapper>
+                    {isMenuOpen ? <CloseIcon /> : <HamburgerIcon />}
+                  </MenuIconWrapper>
+                </MobileMenuButton>
+              </RightSection>
+            </HeaderInner>
+
+            <CenterSection>
+              {/* Phone Number Centered on Its Own Line */}
+              <PhoneLink href="tel:+18043964148" aria-label="Call Precise Analytics">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                </svg>
+                (804) 396-4148
+              </PhoneLink>
+            </CenterSection>
+          </HeaderContent>
         </Container>
         <AnimatePresence>
           {isMenuOpen && (
@@ -389,12 +480,26 @@ export default function AnimatedHeader() {
             >
               <Container>
                 <MobileNavList>
+                  {/* NEW: Phone Number at Top of Mobile Menu */}
+                  <MobileNavItem
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0 }}
+                  >
+                    <MobilePhoneLink href="tel:+18043964148" aria-label="Call Precise Analytics">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                      </svg>
+                      Call: (804) 396-4148
+                    </MobilePhoneLink>
+                  </MobileNavItem>
+
                   {LINKS.map((link, i) => (
                     <MobileNavItem
                       key={link.href}
                       initial={{ opacity: 0, x: -30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.1 }}
+                      transition={{ duration: 0.3, delay: (i + 1) * 0.1 }}
                     >
                       <MobileNavLinkText 
                         $active={router.pathname === link.href}
@@ -407,7 +512,7 @@ export default function AnimatedHeader() {
                   <MobileNavItem
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: LINKS.length * 0.1 }}
+                    transition={{ duration: 0.3, delay: (LINKS.length + 1) * 0.1 }}
                   >
                     <MobileScheduleButtonContainer onClick={handleScheduleClick}>
                       Schedule a Consultation

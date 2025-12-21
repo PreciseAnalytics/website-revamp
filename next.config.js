@@ -24,13 +24,17 @@ const nextConfig = {
     styledComponents: true,
   },
 
-  // ✅ SEO FIX: 301 redirect for legacy request-quote page
   async redirects() {
     return [
       {
         source: '/request-quote',
         destination: '/contact',
-        permanent: true, // 301
+        permanent: true,
+      },
+      {
+        source: '/contact-us',
+        destination: '/contact',
+        permanent: true,
       },
     ];
   },

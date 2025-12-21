@@ -6,6 +6,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+
   images: {
     remotePatterns: [
       {
@@ -16,17 +17,34 @@ const nextConfig = {
     deviceSizes: [320, 640, 1080, 1200],
     imageSizes: [64, 128],
   },
+
   swcMinify: true,
+
   compiler: {
     styledComponents: true,
   },
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+
+  // ✅ SEO FIX: 301 redirect for legacy request-quote page
+  async redirects() {
+    return [
+      {
+        source: '/request-quote',
+        destination: '/contact',
+        permanent: true, // 301
+      },
+    ];
+  },
+
+  webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.svg$/,
       issuer: {
         and: [/\.(js|ts)x?$/],
       },
-      use: [{ loader: '@svgr/webpack' }, { loader: 'url-loader' }],
+      use: [
+        { loader: '@svgr/webpack' },
+        { loader: 'url-loader' },
+      ],
     });
 
     return config;

@@ -11,7 +11,7 @@ import AnimatedLogo from 'components/AnimatedLogo';
 import { media } from 'utils/media';
 import { EnvVars } from 'env';
 import { usePrivacyPolicyContext } from 'contexts/privacy-policy.context';
-import PrivacyCookieBanner from 'components/PrivacyCookieBanner'; // adjust path if needed
+
 
 
 // Footer navigation structure with clickable category headers
@@ -318,7 +318,7 @@ export default function AnimatedFooter() {
           </Copyright>
         </BottomBar>
       </Container>
-      {isClient && <PrivacyCookieBanner />}
+
     
       {showBackToTop && (
         <BackToTopButton

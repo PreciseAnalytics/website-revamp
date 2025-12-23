@@ -2,10 +2,11 @@
 
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script'; // ✅ Add this
 import './globals.css';
 import PrivacyCookieBanner from '@/components/PrivacyCookieBanner';
-import { ThemeProvider } from '@/contexts/ThemeContext'; // ✅ Theme context
-import ThemeToggle from '@/components/ThemeToggle';       // ✅ Toggle button
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,16 +24,25 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
-          {/* Optional toggle button for dark/light mode */}
+          {/* Your existing layout content */}
           <ThemeToggle />
-
-          <div id="page-content" style={{ minHeight: '100vh', position: 'relative' }}>
-            {children}
-          </div>
-
-          {/* Cookie Banner - fixed and animated */}
           <PrivacyCookieBanner />
+          {children}
         </ThemeProvider>
+
+        {/* GA4 scripts */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-QBCDN5PJ94"
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-QBCDN5PJ94');
+          `}
+        </Script>
       </body>
     </html>
   );

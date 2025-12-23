@@ -1,233 +1,159 @@
-import React, { useState, useEffect } from 'react';
-import NextLink from 'next/link';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 
-interface PrivacyCookieBannerProps {
-  onAcceptAll?: () => void;
-  onRejectAll?: () => void;
-  onPreferenceCenter?: () => void;
+type Props = {
+  onAccept: () => void;
+  onManage: () => void;
+};
+
+const AUTO_DISMISS_MS = 8000;
+
+export default function CookieConsentBanner({ onAccept, onManage }: Props) {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setVisible(false);
+    }, AUTO_DISMISS_MS);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <Wrapper role="region" aria-label="Cookie consent">
+      <Content>
+        <Text>
+          <Title>Your Privacy</Title>
+          <Description>
+            We use cookies to support secure operation, analyze performance,
+            and improve your experience.
+          </Description>
+        </Text>
+
+        <Actions>
+          <ManageButton
+            onClick={() => {
+              onManage();
+              // ❗ DO NOT close banner here
+            }}
+          >
+            Manage Preferences
+          </ManageButton>
+
+          <AcceptButton
+            onClick={() => {
+              onAccept();
+              setVisible(false); // Accept should dismiss
+            }}
+          >
+            Accept
+          </AcceptButton>
+        </Actions>
+      </Content>
+    </Wrapper>
+  );
 }
 
-const BannerContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-  color: white;
-  padding: 1.5rem 2rem;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  border-bottom: 3px solid #3498db;
-  
-  @media (max-width: 768px) {
-    padding: 1rem;
+/* ================= ANIMATION ================= */
+
+const slideUp = keyframes`
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 `;
 
-const BannerContent = styled.div`
-  max-width: 1200px;
+/* ================= STYLES ================= */
+
+const Wrapper = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #0f1720;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 3000;
+  animation: ${slideUp} 0.45s ease-out forwards;
+`;
+
+const Content = styled.div`
+  max-width: 1280px;
   margin: 0 auto;
+  padding: 2.2rem 2.4rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
-  
-  @media (max-width: 968px) {
+  gap: 3rem;
+  font-family: 'Aptos', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  @media (max-width: 768px) {
     flex-direction: column;
-    gap: 1.5rem;
-    text-align: center;
+    align-items: flex-start;
+    gap: 1.6rem;
   }
 `;
 
-const ContentSection = styled.div`
-  flex: 1;
+const Text = styled.div`
+  max-width: 760px;
 `;
 
-const Title = styled.h2`
-  margin: 0 0 0.8rem 0;
+const Title = styled.div`
   font-size: 1.8rem;
   font-weight: 600;
   color: #ffffff;
-  
-  @media (max-width: 768px) {
-    font-size: 1.5rem;
-  }
+  margin-bottom: 0.6rem;
 `;
 
-const Message = styled.p`
+const Description = styled.p`
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #ecf0f1;
-  max-width: 700px;
-  
-  @media (max-width: 768px) {
-    font-size: 0.9rem;
-  }
 `;
 
-const Link = styled(NextLink)`
-  color: #3498db;
-  text-decoration: underline;
-  transition: color 0.2s ease;
-  
-  &:hover {
-    color: #2980b9;
-  }
-`;
-
-const ButtonContainer = styled.div`
+const Actions = styled.div`
   display: flex;
-  gap: 1rem;
-  align-items: center;
-  
+  gap: 1.4rem;
+  flex-shrink: 0;
+
   @media (max-width: 768px) {
-    flex-direction: column;
     width: 100%;
-    gap: 0.8rem;
-  }
-  
-  @media (max-width: 968px) and (min-width: 769px) {
-    justify-content: center;
-    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 `;
 
-const Button = styled.button<{ 
-  variant?: 'primary' | 'secondary' | 'outline' 
-}>`
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 6px;
+const ManageButton = styled.button`
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 1rem 2rem;
+  font-size: 1.4rem;
+  border-radius: 0.6rem;
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  min-width: 120px;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
+
+  &:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
   }
-  
-  ${props => {
-    switch (props.variant) {
-      case 'primary':
-        return `
-          background: #27ae60;
-          color: white;
-          box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
-          
-          &:hover {
-            background: #229954;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
-          }
-        `;
-      case 'secondary':
-        return `
-          background: #e74c3c;
-          color: white;
-          box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
-          
-          &:hover {
-            background: #c0392b;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
-          }
-        `;
-      case 'outline':
-      default:
-        return `
-          background: transparent;
-          color: #3498db;
-          border: 2px solid #3498db;
-          
-          &:hover {
-            background: #3498db;
-            color: white;
-            transform: translateY(-1px);
-          }
-        `;
-    }
-  }}
 `;
 
-const PrivacyCookieBanner: React.FC<PrivacyCookieBannerProps> = ({
-  onAcceptAll,
-  onRejectAll,
-  onPreferenceCenter
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+const AcceptButton = styled.button`
+  background: #ffffff;
+  color: #0f1720;
+  border: none;
+  padding: 1rem 2.2rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  cursor: pointer;
 
-  useEffect(() => {
-    setIsMounted(true);
-    
-    // Only check localStorage after component mounts on client
-    const consent = localStorage.getItem('cookieConsent');
-    if (!consent) {
-      setIsVisible(true);
-    }
-  }, []);
-
-  const handleAccept = () => {
-    localStorage.setItem('cookieConsent', 'accepted');
-    localStorage.setItem('cookieConsentTimestamp', new Date().toISOString());
-    setIsVisible(false);
-    onAcceptAll?.();
-  };
-
-  const handleReject = () => {
-    localStorage.setItem('cookieConsent', 'rejected');
-    localStorage.setItem('cookieConsentTimestamp', new Date().toISOString());
-    setIsVisible(false);
-    onRejectAll?.();
-  };
-
-  const handlePreferences = () => {
-    onPreferenceCenter?.();
-    // Note: Keep banner visible when opening preferences
-  };
-
-  // Don't render anything until mounted on client to prevent hydration mismatch
-  if (!isMounted || !isVisible) {
-    return null;
+  &:hover {
+    opacity: 0.9;
   }
-
-  return (
-    <BannerContainer>
-      <BannerContent>
-        <ContentSection>
-          <Title>Your Privacy</Title>
-          <Message>
-            We use cookies to personalize content and ads, provide social media features and analyse our traffic. 
-            We also share information about your use of our site with our social media, advertising and analytics partners. 
-            You can control your cookie preferences by clicking on the buttons on the right and place a do not sell or 
-            share my personal information request.{' '}
-            <Link href="/privacy-policy">
-              Data Protection Portal
-            </Link>
-          </Message>
-        </ContentSection>
-        
-        <ButtonContainer>
-          <Button variant="outline" onClick={handlePreferences}>
-            Preference Center
-          </Button>
-          <Button variant="secondary" onClick={handleReject}>
-            Reject All
-          </Button>
-          <Button variant="primary" onClick={handleAccept}>
-           I&apos;m OK with that
-          </Button>
-        </ButtonContainer>
-      </BannerContent>
-    </BannerContainer>
-  );
-};
-
-export default PrivacyCookieBanner;
+`;

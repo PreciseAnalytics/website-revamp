@@ -6,18 +6,47 @@ import '@fontsource/inter';
 
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
+import { useRouter } from 'next/router';
 
 import { GlobalStyle } from '@/components/GlobalStyles';
-import NewsletterModal from 'components/NewsletterModal';
 import AnimatedFooter from 'components/AnimatedFooter';
-import PrivacyPolicyModal from 'components/PrivacyPolicyModal';
 
-import { NewsletterModalContextProvider, useNewsletterModalContext } from 'contexts/newsletter-modal.context';
-import { PrivacyPolicyProvider, usePrivacyPolicyContext } from 'contexts/privacy-policy.context';
+import CookieConsentBar from '@/components/CookieConsentBar';
+import PrivacyPreferenceCenter from '@/components/PrivacyPreferenceCenter';
+
+import {
+  NewsletterModalContextProvider,
+} from 'contexts/newsletter-modal.context';
+import {
+  PrivacyPolicyProvider,
+} from 'contexts/privacy-policy.context';
+
+import { loadConsent, saveConsent } from '@/lib/cookieConsent';
+import { loadGA } from '@/lib/analytics';
+
+const GA_ID = 'G-QBCDN5PJ94';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+
+  // 📊 Track SPA page navigation
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (!(window as any).gtag) return;
+
+      (window as any).gtag('event', 'page_view', {
+        page_path: url,
+      });
+    };
+
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router.events]);
+
   return (
     <>
       <Head>
@@ -33,8 +62,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       <LazyMotion features={domAnimation}>
         <Providers>
           <Component {...pageProps} />
-          <AnimatedFooter /> {/* ✅ Global Footer w/ Back to Top */}
-          <Modals />          {/* ✅ Global Modals */}
+          <AnimatedFooter />
+          <Modals />
         </Providers>
       </LazyMotion>
     </>
@@ -52,14 +81,74 @@ function Providers<T>({ children }: PropsWithChildren<T>) {
 }
 
 function Modals() {
-  const { isModalOpened, setIsModalOpened } = useNewsletterModalContext();
-  const { isPrivacyPolicyOpen, closePrivacyPolicy } = usePrivacyPolicyContext();
+  const [showBar, setShowBar] = React.useState(false);
+  const [showPrefs, setShowPrefs] = React.useState(false);
+
+  // 🔒 Initial consent load
+  useEffect(() => {
+    const consent = loadConsent();
+
+    if (!consent) {
+      setShowBar(true);
+    }
+
+    if (consent?.performance) {
+      loadGA(GA_ID);
+    }
+  }, []);
+
+  // 🔁 React to preference updates
+  useEffect(() => {
+    const handler = () => {
+      const consent = loadConsent();
+      if (consent?.performance) {
+        loadGA(GA_ID);
+      }
+    };
+
+    window.addEventListener('cookie-consent-updated', handler);
+    return () => window.removeEventListener('cookie-consent-updated', handler);
+  }, []);
 
   return (
     <>
-      {isModalOpened && <NewsletterModal onClose={() => setIsModalOpened(false)} />}
-      <PrivacyPolicyModal isOpen={isPrivacyPolicyOpen} onClose={closePrivacyPolicy} />
-      {/* CookieConsentBanner removed to prevent duplicate rendering */}
+      {showBar && (
+        <CookieConsentBar
+          onCustomize={() => setShowPrefs(true)}
+          onEssentialOnly={() => {
+            saveConsent({
+              necessary: true,
+              performance: false,
+              functional: false,
+              targeting: false,
+              timestamp: Date.now(),
+            });
+            window.dispatchEvent(new Event('cookie-consent-updated'));
+            setShowBar(false);
+          }}
+          onAcceptAll={() => {
+            saveConsent({
+              necessary: true,
+              performance: true,
+              functional: true,
+              targeting: true,
+              timestamp: Date.now(),
+            });
+            window.dispatchEvent(new Event('cookie-consent-updated'));
+            setShowBar(false);
+            loadGA(GA_ID);
+          }}
+        />
+      )}
+
+      <PrivacyPreferenceCenter
+        isOpen={showPrefs}
+        onClose={() => {
+          window.dispatchEvent(new Event('cookie-consent-updated'));
+          setShowPrefs(false);
+          setShowBar(false);
+        }}
+      />
     </>
   );
 }

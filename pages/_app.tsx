@@ -9,7 +9,7 @@ import Head from 'next/head';
 import React, { PropsWithChildren } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 
-import { GlobalStyle } from 'components/GlobalStyles';
+import { GlobalStyle } from '@/components/GlobalStyles';
 import NewsletterModal from 'components/NewsletterModal';
 import AnimatedFooter from 'components/AnimatedFooter';
 import PrivacyPolicyModal from 'components/PrivacyPolicyModal';

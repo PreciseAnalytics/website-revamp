@@ -1,300 +1,307 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useCallback } from 'react';
 import Container from 'components/Container';
 import SectionTitle from 'components/SectionTitle';
 import AnimatedReveal from 'components/AnimatedReveal';
 import { media } from 'utils/media';
 
-const servicesData = [
+type ServiceCard = {
+  id: string;
+  title: string;
+  image: string; // photorealistic hero bg
+  description: string; // readable, sentence-style (no bullets)
+};
+
+const services: ServiceCard[] = [
   {
     id: 'data-strategy',
     title: 'Data Strategy and Consulting',
-    description: 'Our expert consultants work closely with your team to develop a robust data strategy aligned with your business objectives. From data collection and integration to governance and security, we guide you in making informed decisions that drive business success.',
-    icon: '📋',
-    color: '0, 120, 255',
-    services: [
-      'Data collection and integration strategy',
-      'Data governance framework development',
-      'Security and compliance planning',
-      'Business objective alignment',
-      'Strategic decision guidance',
-      'Data architecture design'
-    ]
+    image: '/images/services/data-strategy.jpg',
+    description:
+      'Define a clear enterprise data strategy that aligns governance, architecture, and execution so analytics delivers measurable outcomes.',
   },
   {
     id: 'business-intelligence',
-    title: 'Business Intelligence and Reporting',
-    description: 'Unlock the full potential of your data with our Business Intelligence (BI) and reporting solutions. We create intuitive dashboards and reports that provide real-time insights, enabling you to monitor key metrics, identify trends, and make data-driven decisions.',
-    icon: '📊',
-    color: '0, 200, 83',
-    services: [
-      'Real-time dashboard creation',
-      'Interactive reporting solutions',
-      'Key performance indicator (KPI) monitoring',
-      'Trend analysis and visualization',
-      'Executive summary reports',
-      'Automated reporting systems'
-    ]
+    title: 'Business Intelligence & Reporting',
+    image: '/images/services/business-intelligence.jpg',
+    description:
+      'Build trusted executive dashboards and a consistent KPI layer so leaders can make decisions from one version of the truth.',
   },
   {
     id: 'predictive-analytics',
     title: 'Predictive Analytics',
-    description: 'Stay ahead of the competition by leveraging the power of predictive analytics. Our advanced modeling techniques and machine learning algorithms help you forecast future trends, identify opportunities, and mitigate risks, giving you a strategic advantage in the market.',
-    icon: '🔮',
-    color: '147, 51, 234',
-    services: [
-      'Future trend forecasting',
-      'Machine learning model development',
-      'Risk assessment and mitigation',
-      'Opportunity identification',
-      'Advanced statistical modeling',
-      'Predictive model deployment'
-    ]
+    image: '/images/services/predictive-analytics.jpg',
+    description:
+      'Forecast demand, identify risk early, and deploy interpretable models that drive real operational decisions—not notebook demos.',
   },
   {
     id: 'data-visualization',
     title: 'Data Visualization',
-    description: 'Make complex data easily understandable with our data visualization services. We use cutting-edge tools to create visually compelling representations of your data, allowing stakeholders to grasp insights quickly and make decisions with confidence.',
-    icon: '📈',
-    color: '255, 125, 0',
-    services: [
-      'Interactive data visualizations',
-      'Custom chart and graph creation',
-      'Infographic design',
-      'Stakeholder presentation materials',
-      'Visual storytelling with data',
-      'Multi-platform visualization deployment'
-    ]
+    image: '/images/services/data-visualization.jpg',
+    description:
+      'Turn complex systems into intuitive, decision-centric dashboard experiences built for clarity, adoption, and action.',
   },
   {
     id: 'data-warehousing',
-    title: 'Data Warehousing and Integration',
-    description: 'Optimize your data infrastructure with our data warehousing and integration services. We design and implement scalable solutions that ensure seamless data flow across your organization, enhancing collaboration and efficiency.',
-    icon: '🗄️',
-    color: '34, 197, 94',
-    services: [
-      'Scalable data warehouse design',
-      'Cross-platform data integration',
-      'ETL process optimization',
-      'Data pipeline automation',
-      'Cloud migration strategies',
-      'Performance tuning and optimization'
-    ]
+    title: 'Data Warehousing & Integration',
+    image: '/images/services/data-warehousing.jpg',
+    description:
+      'Unify fragmented systems into a scalable analytics foundation with reliable pipelines, clean models, and cloud-ready architecture.',
   },
   {
     id: 'data-quality',
     title: 'Data Quality Management',
-    description: 'Maintain the integrity of your data with our data quality management services. We implement processes and tools to cleanse, validate, and standardize your data, ensuring accuracy and reliability for all your analytics endeavors.',
-    icon: '✅',
-    color: '16, 185, 129',
-    services: [
-      'Data cleansing and validation',
-      'Standardization processes',
-      'Quality metrics and monitoring',
-      'Data profiling and assessment',
-      'Anomaly detection systems',
-      'Continuous improvement processes'
-    ]
+    image: '/images/services/data-quality.jpg',
+    description:
+      'Improve trust in reporting through continuous validation, monitoring, and remediation workflows that prevent downstream surprises.',
   },
+
+  // These 4 were the ones that commonly get “left out” in shorter versions:
   {
     id: 'custom-solutions',
     title: 'Custom Analytics Solutions',
-    description: 'Every business is unique, and so are its data needs. Our team specializes in creating custom analytics solutions tailored to your specific requirements. Whether it\'s developing bespoke algorithms or building custom applications, we have the expertise to deliver solutions that align with your vision.',
-    icon: '⚙️',
-    color: '236, 72, 153',
-    services: [
-      'Bespoke algorithm development',
-      'Custom application building',
-      'Tailored analytics frameworks',
-      'Industry-specific solutions',
-      'API development and integration',
-      'Specialized tool development'
-    ]
+    image: '/images/services/custom-solutions.jpg',
+    description:
+      'When off-the-shelf tools don’t fit, we build secure, scalable analytics apps tailored to mission-critical workflows and users.',
   },
   {
     id: 'training-support',
-    title: 'Training and Support',
-    description: 'Empower your team with the knowledge and skills needed to harness the full potential of data analytics. We offer training programs and ongoing support to ensure your staff is proficient in using analytics tools and interpreting data effectively.',
-    icon: '🎓',
-    color: '99, 102, 241',
-    services: [
-      'Comprehensive training programs',
-      'Tool-specific skill development',
-      'Data interpretation workshops',
-      'Ongoing technical support',
-      'Best practices guidance',
-      'Knowledge transfer sessions'
-    ]
-  }
+    title: 'Training & Enablement',
+    image: '/images/services/training-support.jpg',
+    description:
+      'Upskill teams with role-based training and adoption playbooks so analytics is used consistently, correctly, and confidently.',
+  },
+  {
+    id: 'agentic-ai',
+    title: 'Advanced Analytics & Agentic AI',
+    image: '/images/services/agentic-ai.jpg',
+    description:
+      'Design governed agent-based AI systems that monitor signals, reason over context, and support actions with human oversight.',
+  },
+  {
+    id: 'decision-intelligence',
+    title: 'Decision Intelligence & Automation',
+    image: '/images/services/decision-intelligence.jpg',
+    description:
+      'Embed analytics into workflows using scenario modeling, recommendations, and controlled automation that stays auditable.',
+  },
+  {
+    id: 'real-time-analytics',
+    title: 'Real-Time & Streaming Analytics',
+    image: '/images/services/real-time-analytics.jpg',
+    description:
+      'Enable real-time awareness and response with event-driven pipelines, low-latency metrics, alerting, and operational dashboards.',
+  },
+  {
+    id: 'governance-risk',
+    title: 'Data Governance, Risk & Compliance',
+    image: '/images/services/governance-risk.jpg',
+    description:
+      'Make analytics and AI secure and compliant with governance frameworks, access controls, auditability, lineage, and policy controls.',
+  },
 ];
 
+const FALLBACK_BG = '/images/services/data-strategy.jpg';
+
 export default function ServicesContent() {
+  const openServiceDetail = useCallback((serviceId: string) => {
+    // Open detail pages in a NEW tab (user request)
+    if (typeof window !== 'undefined') {
+      window.open(`/services/${serviceId}`, '_blank', 'noopener,noreferrer');
+    }
+  }, []);
+
   return (
-    <ServicesWrapper>
+    <Wrapper>
       <Container>
         <AnimatedReveal>
-          <SectionTitle>Our Data Analytics Services</SectionTitle>
+          <SectionTitle>Comprehensive Data Analytics Services</SectionTitle>
         </AnimatedReveal>
-        
-        <AnimatedReveal direction="up" delay={0.2}>
-          <SectionDescription>
-            Welcome to Precise Analytics where we transform data into actionable insights, empowering your business to make informed decisions. 
-            Our Data Analytics Consultancy services are designed to meet the diverse needs of modern enterprises, helping you harness the power of data for strategic growth and operational excellence.
-          </SectionDescription>
+
+        <AnimatedReveal direction="up" delay={0.15}>
+          <Intro>
+            Precise Analytics delivers enterprise-grade analytics, decision intelligence, and AI systems designed for real
+            operations. Each service includes practical implementation detail and visuals to help you understand exactly
+            what you’re buying—and why it works.
+          </Intro>
         </AnimatedReveal>
-        
-        <ServicesGrid>
-          {servicesData.map((sector, index) => (
-            <ServiceCard
-              key={sector.id}
-              initial={{ opacity: 0, y: 30 }}
+
+        <Grid>
+          {services.map((service, index) => (
+            <Card
+              key={service.id}
+              role="link"
+              tabIndex={0}
+              aria-label={`Open ${service.title} details in a new tab`}
+              $bg={service.image || FALLBACK_BG}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ 
-                scale: 1.02,
-                boxShadow: `0 15px 30px rgba(${sector.color}, 0.2)`
+              transition={{ duration: 0.45, delay: index * 0.04 }}
+              whileHover={{ y: -6 }}
+              onClick={() => openServiceDetail(service.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openServiceDetail(service.id);
+                }
               }}
             >
-              <ServiceHeader>
-                <ServiceIcon>{sector.icon}</ServiceIcon>
-                <ServiceTitle>{sector.title}</ServiceTitle>
-              </ServiceHeader>
-              
-              <ServiceDescription>{sector.description}</ServiceDescription>
-              
-              <ServicesList>
-                {sector.services.map((service, serviceIndex) => (
-                  <ServiceItem
-                    key={serviceIndex}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: index * 0.1 + serviceIndex * 0.05 }}
-                  >
-                    <ServiceBullet style={{ color: `rgb(${sector.color})` }}>•</ServiceBullet>
-                    {service}
-                  </ServiceItem>
-                ))}
-              </ServicesList>
-            </ServiceCard>
+              <CardContent>
+                <CardTitle>{service.title}</CardTitle>
+                <CardText>{service.description}</CardText>
+              </CardContent>
+
+              <Actions>
+                {/* Leave Learn More styling as-is, but make it functional (opens detail page in new tab) */}
+                <LearnMore
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Learn more about ${service.title} (opens in a new tab)`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openServiceDetail(service.id);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openServiceDetail(service.id);
+                    }
+                  }}
+                >
+                  Learn More
+                </LearnMore>
+
+                {/* Schedule consult should be orange + open in new tab */}
+                <Schedule
+                  href={`/schedule-consult?service=${service.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Schedule a Consult
+                </Schedule>
+              </Actions>
+            </Card>
           ))}
-        </ServicesGrid>
+        </Grid>
       </Container>
-    </ServicesWrapper>
+    </Wrapper>
   );
 }
 
-const ServicesWrapper = styled.section`
+/* ================= STYLES ================= */
+
+const Wrapper = styled.section`
   padding: 10rem 0;
-  background: rgba(var(--background), 0.5);
-  
-  ${media.tablet(`
-    padding: 8rem 0;
-  `)}
 `;
 
-const SectionDescription = styled.p`
-  font-size: 2rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.8);
+const Intro = styled.p`
+  max-width: 92rem;
+  margin: 0 auto 5rem;
   text-align: center;
-  max-width: 80rem;
-  margin: 0 auto 6rem;
-  
-  ${media.tablet(`
-    font-size: 1.8rem;
-    margin-bottom: 4rem;
-  `)}
+  font-size: 1.85rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.82);
 `;
 
-const ServicesGrid = styled.div`
+const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr));
-  gap: 4rem;
-  max-width: 120rem;
-  margin: 0 auto;
-  
-  ${media.tablet(`
-    gap: 3rem;
-    grid-template-columns: 1fr;
-  `)}
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+
+  ${media.desktop(`grid-template-columns: repeat(3, 1fr);`)}
+  ${media.tablet(`grid-template-columns: repeat(2, 1fr);`)}
+  ${media.phone(`grid-template-columns: 1fr;`)}
+
 `;
 
-const ServiceCard = styled(motion.div)`
-  background: rgba(var(--cardBackground), 0.8);
-  backdrop-filter: blur(10px);
+const Card = styled(motion.div)<{ $bg: string }>`
+  min-height: 34rem;
   border-radius: 2rem;
-  padding: 4rem;
-  border: 1px solid rgba(var(--text), 0.1);
-  transition: all 0.3s ease;
-  
-  ${media.tablet(`
-    padding: 3rem;
-  `)}
-`;
-
-const ServiceHeader = styled.div`
+  overflow: hidden;
+  cursor: pointer;
   display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
-  gap: 2rem;
-`;
+  flex-direction: column;
+  justify-content: space-between;
 
-const ServiceIcon = styled.div`
-  font-size: 4rem;
-  
-  ${media.tablet(`
-    font-size: 3rem;
-  `)}
-`;
+  /* Photorealistic background image + readability gradient */
+  background-image:
+    linear-gradient(to bottom, rgba(11, 18, 32, 0.22), rgba(11, 18, 32, 0.92)),
+    url(${(p) => p.$bg});
+  background-size: cover;
+  background-position: center;
 
-const ServiceTitle = styled.h3`
-  font-size: 2.4rem;
-  font-weight: 700;
-  color: rgb(var(--text));
-  margin: 0;
-  
-  ${media.tablet(`
-    font-size: 2rem;
-  `)}
-`;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  outline: none;
 
-const ServiceDescription = styled.p`
-  font-size: 1.8rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.8);
-  margin-bottom: 3rem;
-  
-  ${media.tablet(`
-    font-size: 1.6rem;
-    margin-bottom: 2rem;
-  `)}
-`;
+  &:hover {
+    border-color: rgba(255, 140, 43, 0.65);
+  }
 
-const ServicesList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 0;
-`;
-
-const ServiceItem = styled(motion.li)`
-  display: flex;
-  align-items: flex-start;
-  font-size: 1.6rem;
-  line-height: 1.6;
-  color: rgb(var(--text));
-  margin-bottom: 1rem;
-  gap: 1rem;
-  
-  &:last-child {
-    margin-bottom: 0;
+  &:focus-visible {
+    box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.25);
   }
 `;
 
-const ServiceBullet = styled.span`
-  font-size: 1.8rem;
-  font-weight: bold;
-  flex-shrink: 0;
-  margin-top: 0.2rem;
+const CardContent = styled.div`
+  padding: 3rem;
+`;
+
+const CardTitle = styled.h3`
+  margin: 0 0 1.2rem;
+  font-size: 2.2rem;
+
+  /* Neon green title (user request) */
+  color: #39ff14;
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+`;
+
+const CardText = styled.p`
+  margin: 0;
+  font-size: 1.55rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+`;
+
+const Actions = styled.div`
+  padding: 2.4rem 3rem;
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+`;
+
+const LearnMore = styled.div`
+  background: #ffffff;
+  color: #ff8c2b;
+  padding: 1rem 1.4rem;
+  border-radius: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1.2rem;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.96;
+  }
+`;
+
+const Schedule = styled(Link)`
+  background: #ff8c2b; /* orange */
+  color: #ffffff;
+  padding: 1rem 1.4rem;
+  border-radius: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 1.2rem;
+  text-decoration: none;
+
+  &:hover {
+    opacity: 0.95;
+  }
 `;

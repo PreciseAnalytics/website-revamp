@@ -1,14 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
 
-// default breakpoints
-// {
-//   smallPhone: 320;
-//   phone: 375;
-//   tablet: 768;
-//   desktop: 1024;
-//   largeDesktop: 1440;
-// }
-
 export const GlobalStyle = createGlobalStyle`
 
 .next-light-theme {
@@ -17,9 +8,10 @@ export const GlobalStyle = createGlobalStyle`
   --text: 10,18,30;
   --textSecondary: 255,255,255;
   --primary: 57,255,20; /* Neon Green */
-  --secondary: 255,255,0; /* Bright Yellow */
+  --secondary: 15,23,42; /* Dark Blue - REMOVED YELLOW */
   --tertiary: 231,241,251;
   --accent: 57,255,20; /* Neon Green */
+  --accentOrange: 255,140,43; /* Orange accent */
   --cardBackground: 255,255,255;
   --inputBackground: 255,255,255;
   --navbarBackground: 255,255,255;
@@ -35,10 +27,11 @@ export const GlobalStyle = createGlobalStyle`
   --secondBackground: 30,41,59;
   --text: 237,237,238;
   --textSecondary: 255,255,255;
-  --primary: 57,255,20;
-  --secondary: 255,255,0;
+  --primary: 57,255,20; /* Neon Green */
+  --secondary: 255,140,43; /* Orange - REMOVED YELLOW */
   --tertiary: 15,23,42;
-  --accent: 57,255,20;
+  --accent: 57,255,20; /* Neon Green */
+  --accentOrange: 255,140,43; /* Orange accent */
   --cardBackground: 30,41,59;
   --inputBackground: 30,41,59;
   --navbarBackground: 15,23,42;
@@ -128,10 +121,10 @@ body {
   font-feature-settings: "kern";
   position: relative;
   overflow-x: hidden;
-  padding-bottom: 250px; /* 👈 ensures cookie banner is visible */
+  padding-bottom: 250px;
 }
 
-/* Dynamic animated background */
+/* Dynamic animated background - REMOVED YELLOW */
 body::before {
   content: '';
   position: fixed;
@@ -143,9 +136,9 @@ body::before {
   background: linear-gradient(
     45deg,
     rgba(57, 255, 20, 0.1) 0%,
-    rgba(255, 255, 0, 0.1) 25%,
+    rgba(255, 140, 43, 0.1) 25%,
     rgba(57, 255, 20, 0.05) 50%,
-    rgba(255, 255, 0, 0.05) 75%,
+    rgba(255, 140, 43, 0.05) 75%,
     rgba(57, 255, 20, 0.1) 100%
   );
   background-size: 400% 400%;
@@ -158,7 +151,7 @@ body::before {
   100% { background-position: 0% 50%; }
 }
 
-/* Particle animation overlay */
+/* Particle animation overlay - REMOVED YELLOW */
 body::after {
   content: '';
   position: fixed;
@@ -169,7 +162,7 @@ body::after {
   z-index: -1;
   background-image: 
     radial-gradient(circle at 20% 80%, rgba(57, 255, 20, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 0, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 140, 43, 0.3) 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, rgba(57, 255, 20, 0.2) 0%, transparent 50%);
   animation: particleFloat 20s ease-in-out infinite;
 }

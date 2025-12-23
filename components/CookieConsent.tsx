@@ -29,6 +29,7 @@ function CookieConsentSystem() {
 
 function CookieConsentContent() {
   const [showBanner, setShowBanner] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [showPreferenceCenter, setShowPreferenceCenter] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [preferences, setPreferences] = useState<CookiePreferences>({
@@ -102,7 +103,13 @@ function CookieConsentContent() {
       loadGA(GA_ID);
     }
     
-    setShowBanner(false);
+    // Trigger closing animation
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowBanner(false);
+      setIsClosing(false);
+    }, 400); // Match animation duration
+    
     setShowPreferenceCenter(false);
   }, []);
 
@@ -169,7 +176,7 @@ function CookieConsentContent() {
     <>
       {/* Bottom Banner */}
       {showBanner && (
-        <Banner>
+        <Banner $isClosing={isClosing}>
           <BannerContent>
             <BannerText>
               <BannerTitle>We value your privacy</BannerTitle>
@@ -307,6 +314,17 @@ const slideUp = keyframes`
   }
 `;
 
+const slideDown = keyframes`
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+`;
+
 const slideIn = keyframes`
   from {
     transform: translateX(-100%);
@@ -327,7 +345,7 @@ const fadeIn = keyframes`
 
 /* ================= BANNER STYLES ================= */
 
-const Banner = styled.div`
+const Banner = styled.div<{ $isClosing: boolean }>`
   position: fixed;
   bottom: 0;
   left: 0;
@@ -335,7 +353,7 @@ const Banner = styled.div`
   background: #1a1a2e;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 99999;
-  animation: ${slideUp} 0.4s ease-out;
+  animation: ${props => props.$isClosing ? slideDown : slideUp} 0.4s ease-out forwards;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
 `;
 

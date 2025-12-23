@@ -41,7 +41,7 @@ export default function Footer() {
             </ContactInfo>
           </FooterSection>
 
-          {/* Services - FIXED LINKS */}
+          {/* Services */}
           <FooterSection>
             <SectionTitle>Services</SectionTitle>
             <FooterLinks>
@@ -52,7 +52,7 @@ export default function Footer() {
             </FooterLinks>
           </FooterSection>
 
-          {/* Industries - FIXED LINKS */}
+          {/* Industries */}
           <FooterSection>
             <SectionTitle>Industries</SectionTitle>
             <FooterLinks>
@@ -82,6 +82,16 @@ export default function Footer() {
               <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
               <FooterLink href="/terms-of-service">Terms of Service</FooterLink>
               <FooterLink href="/cookies-policy">Cookies Policy</FooterLink>
+
+              {/* ✅ Cookie Preferences */}
+              <CookiePreferencesButton
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new Event('open-cookie-preferences'));
+                }}
+              >
+                Cookie Preferences
+              </CookiePreferencesButton>
             </FooterLinks>
           </FooterSection>
         </FooterContent>
@@ -89,19 +99,18 @@ export default function Footer() {
         {/* Social Links */}
         <SocialSection>
           <SocialLinks>
-            <SocialLink href="https://twitter.com/preciseanalytics" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+            <SocialLink href="https://twitter.com/preciseanalytics" target="_blank" rel="noopener noreferrer">
               <SocialIcon>𝕏</SocialIcon>
             </SocialLink>
-            <SocialLink href="https://facebook.com/preciseanalytics" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <SocialLink href="https://facebook.com/preciseanalytics" target="_blank" rel="noopener noreferrer">
               <SocialIcon>f</SocialIcon>
             </SocialLink>
-            <SocialLink href="https://linkedin.com/company/preciseanalytics" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <SocialLink href="https://linkedin.com/company/preciseanalytics" target="_blank" rel="noopener noreferrer">
               <SocialIcon>in</SocialIcon>
             </SocialLink>
           </SocialLinks>
         </SocialSection>
 
-        {/* Bottom Bar */}
         <BottomBar>
           <Copyright>
             © {new Date().getFullYear()} Precise Analytics LLC. All rights reserved.
@@ -123,21 +132,6 @@ const FooterWrapper = styled.footer`
   padding: 8rem 0 3rem;
   border-top: 1px solid rgba(57, 255, 20, 0.15);
   position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(57, 255, 20, 0.5),
-      transparent
-    );
-  }
 `;
 
 const FooterContent = styled.div`
@@ -146,23 +140,15 @@ const FooterContent = styled.div`
   gap: 4rem;
   margin-bottom: 6rem;
 
-  ${media?.desktop?.(
-    `grid-template-columns: 2fr 1fr 1fr;`
-  ) || ''}
-
-  ${media?.tablet?.(
-    `
+  ${media.desktop(`grid-template-columns: 2fr 1fr 1fr;`)}
+  ${media.tablet(`
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    `
-  ) || ''}
-
-  ${media.phone(
-  `
-  grid-template-columns: 1fr;
-  gap: 3rem;
-`
-)}
+  `)}
+  ${media.phone(`
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  `)}
 `;
 
 const FooterSection = styled.div`
@@ -178,18 +164,9 @@ const LogoArea = styled.div`
 const Logo = styled(Link)`
   display: inline-block;
   margin-bottom: 2rem;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 0.8;
-  }
 `;
 
-const LogoImage = styled.div`
-  position: relative;
-  width: auto;
-  height: auto;
-`;
+const LogoImage = styled.div``;
 
 const Tagline = styled.p`
   font-size: 1.45rem;
@@ -213,11 +190,6 @@ const ContactItem = styled.div`
   a {
     color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
-    transition: color 0.2s;
-
-    &:hover {
-      color: #39ff14;
-    }
   }
 `;
 
@@ -230,9 +202,7 @@ const SectionTitle = styled.h3`
   font-size: 1.8rem;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 `;
 
 const FooterLinks = styled.div`
@@ -245,8 +215,21 @@ const FooterLink = styled(Link)`
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
-  transition: all 0.2s;
-  display: inline-block;
+
+  &:hover {
+    color: #39ff14;
+    transform: translateX(4px);
+  }
+`;
+
+const CookiePreferencesButton = styled.button`
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.75);
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
 
   &:hover {
     color: #39ff14;
@@ -277,25 +260,9 @@ const SocialLink = styled.a`
   align-items: center;
   justify-content: center;
   color: #39ff14;
-  font-size: 2rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: all 0.3s;
-
-  &:hover {
-    background: #39ff14;
-    color: #0b1220;
-    border-color: #39ff14;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(57, 255, 20, 0.4);
-  }
 `;
 
-const SocialIcon = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+const SocialIcon = styled.span``;
 
 const BottomBar = styled.div`
   text-align: center;

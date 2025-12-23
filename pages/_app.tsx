@@ -13,20 +13,18 @@ import { useRouter } from 'next/router';
 import { GlobalStyle } from '@/components/GlobalStyles';
 import AnimatedFooter from 'components/AnimatedFooter';
 
-// ✅ Professional OneTrust-style cookie consent
+// Cookie consent
 import CookieConsent from '@/components/CookieConsent';
 
-import {
-  NewsletterModalContextProvider,
-} from 'contexts/newsletter-modal.context';
-import {
-  PrivacyPolicyProvider,
-} from 'contexts/privacy-policy.context';
+import { NewsletterModalContextProvider } from 'contexts/newsletter-modal.context';
+import { PrivacyPolicyProvider } from 'contexts/privacy-policy.context';
+
+const GA_ID = 'G-QBCDN5PJ94';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
-  // 📊 Track SPA page navigation
+  // SPA route tracking
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (!(window as any).gtag) return;
@@ -45,6 +43,21 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
+        {/* GA4 */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="icon" type="image/png" href="/favicon.png" />
@@ -58,7 +71,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         <Providers>
           <Component {...pageProps} />
           <AnimatedFooter />
-          {/* ✅ Professional OneTrust-style cookie consent */}
           <CookieConsent />
         </Providers>
       </LazyMotion>

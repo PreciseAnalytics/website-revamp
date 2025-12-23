@@ -5,6 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import { media, mq } from 'utils/media';
 
+// ✅ Import the GA loader
+import { loadGA } from '@/lib/analytics';
+
+// ✅ Your GA4 Measurement ID
+const GA_ID = 'G-QBCDN5PJ94';
+
 interface CookiePreferences {
   necessary: boolean;
   analytics: boolean;
@@ -126,13 +132,30 @@ function CookiePreferencesContent() {
           const parsedPreferences = JSON.parse(savedPreferences);
           setPreferences(parsedPreferences);
           // Ensure banner stays hidden if preferences already exist
-          setShowBanner(false); 
+          setShowBanner(false);
+          
+          // ✅ NEW: Load GA if user previously accepted analytics
+          if (parsedPreferences.analytics) {
+            loadGA(GA_ID);
+          }
         } catch (e) {
           console.error("Error parsing saved cookie preferences:", e);
           setShowBanner(true);
         }
       }
     }, 1000);
+  }, []);
+
+  // ✅ NEW: Listen for footer "Cookie Preferences" button
+  useEffect(() => {
+    const openPrefsHandler = () => {
+      setShowPreferences(true);
+    };
+
+    window.addEventListener('open-cookie-preferences', openPrefsHandler);
+    return () => {
+      window.removeEventListener('open-cookie-preferences', openPrefsHandler);
+    };
   }, []);
 
   const handleAcceptAll = useCallback(() => {
@@ -151,6 +174,9 @@ function CookiePreferencesContent() {
       setShowBanner(false);
       setShowPreferences(false);
       
+      // ✅ NEW: Load Google Analytics
+      loadGA(GA_ID);
+      
       console.log('Cookie preferences saved:', allAccepted); // Debug log
     } catch (error) {
       console.error('Error saving cookie preferences:', error);
@@ -166,6 +192,11 @@ function CookiePreferencesContent() {
       // Close both banner and preferences modal
       setShowBanner(false);
       setShowPreferences(false);
+      
+      // ✅ NEW: Load GA only if analytics is enabled
+      if (preferences.analytics) {
+        loadGA(GA_ID);
+      }
       
       console.log('Custom preferences saved:', preferences); // Debug log
     } catch (error) {
@@ -188,6 +219,8 @@ function CookiePreferencesContent() {
       // Close both banner and preferences modal
       setShowBanner(false);
       setShowPreferences(false);
+      
+      // ✅ NOTE: GA is NOT loaded when rejected
       
       console.log('Cookies rejected:', rejected); // Debug log
     } catch (error) {

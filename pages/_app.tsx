@@ -13,8 +13,8 @@ import { useRouter } from 'next/router';
 import { GlobalStyle } from '@/components/GlobalStyles';
 import AnimatedFooter from 'components/AnimatedFooter';
 
-import CookieConsentBar from '@/components/CookieConsentBar';
-import PrivacyPreferenceCenter from '@/components/PrivacyPreferenceCenter';
+// ✅ Professional OneTrust-style cookie consent
+import CookieConsent from '@/components/CookieConsent';
 
 import {
   NewsletterModalContextProvider,
@@ -22,11 +22,6 @@ import {
 import {
   PrivacyPolicyProvider,
 } from 'contexts/privacy-policy.context';
-
-import { loadConsent, saveConsent } from '@/lib/cookieConsent';
-import { loadGA } from '@/lib/analytics';
-
-const GA_ID = 'G-QBCDN5PJ94';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -63,7 +58,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         <Providers>
           <Component {...pageProps} />
           <AnimatedFooter />
-          <Modals />
+          {/* ✅ Professional OneTrust-style cookie consent */}
+          <CookieConsent />
         </Providers>
       </LazyMotion>
     </>
@@ -77,79 +73,6 @@ function Providers<T>({ children }: PropsWithChildren<T>) {
         {children}
       </PrivacyPolicyProvider>
     </NewsletterModalContextProvider>
-  );
-}
-
-function Modals() {
-  const [showBar, setShowBar] = React.useState(false);
-  const [showPrefs, setShowPrefs] = React.useState(false);
-
-  // 🔒 Initial consent load
-  useEffect(() => {
-    const consent = loadConsent();
-
-    if (!consent) {
-      setShowBar(true);
-    }
-
-    if (consent?.performance) {
-      loadGA(GA_ID);
-    }
-  }, []);
-
-  // 🔁 React to preference updates
-  useEffect(() => {
-    const handler = () => {
-      const consent = loadConsent();
-      if (consent?.performance) {
-        loadGA(GA_ID);
-      }
-    };
-
-    window.addEventListener('cookie-consent-updated', handler);
-    return () => window.removeEventListener('cookie-consent-updated', handler);
-  }, []);
-
-  return (
-    <>
-      {showBar && (
-        <CookieConsentBar
-          onCustomize={() => setShowPrefs(true)}
-          onEssentialOnly={() => {
-            saveConsent({
-              necessary: true,
-              performance: false,
-              functional: false,
-              targeting: false,
-              timestamp: Date.now(),
-            });
-            window.dispatchEvent(new Event('cookie-consent-updated'));
-            setShowBar(false);
-          }}
-          onAcceptAll={() => {
-            saveConsent({
-              necessary: true,
-              performance: true,
-              functional: true,
-              targeting: true,
-              timestamp: Date.now(),
-            });
-            window.dispatchEvent(new Event('cookie-consent-updated'));
-            setShowBar(false);
-            loadGA(GA_ID);
-          }}
-        />
-      )}
-
-      <PrivacyPreferenceCenter
-        isOpen={showPrefs}
-        onClose={() => {
-          window.dispatchEvent(new Event('cookie-consent-updated'));
-          setShowPrefs(false);
-          setShowBar(false);
-        }}
-      />
-    </>
   );
 }
 

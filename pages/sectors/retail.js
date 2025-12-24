@@ -7,7 +7,6 @@ import AnimatedHeader from '../../components/AnimatedHeader';
 import AnimatedFooter from '../../components/AnimatedFooter';
 import Container from '../../components/Container';
 import { EnvVars } from '../../env';
-import { media } from '../../utils/media';
 
 const RetailPage = () => {
   const handleConsultationClick = () => {
@@ -22,11 +21,17 @@ const RetailPage = () => {
   return (
     <>
       <Head>
-        <title>Retail Analytics Solutions | {EnvVars.SITE_NAME}</title>
+        <title>
+          Retail Analytics Solutions for Federal & Government Operations | {EnvVars.SITE_NAME}
+        </title>
+
         <meta
           name="description"
-          content="Advanced retail analytics for federal commissaries, exchanges, and government retail operations. Customer analytics, inventory optimization, and performance insights."
+          content="Federal retail analytics solutions for military exchanges, commissaries, and government retail operations. Customer analytics, inventory optimization, POS insights, and performance intelligence."
         />
+
+        <link rel="canonical" href="https://preciseanalytics.io/sectors/retail" />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <AnimatedHeader />
@@ -66,8 +71,44 @@ const RetailPage = () => {
             </motion.div>
           </HeroSection>
 
-          {/* Content Section */}
+          <IntroLinks>
+            Explore how our retail analytics capabilities connect with other regulated sectors,
+            including{' '}
+            <NextLink href="/sectors/healthcare">healthcare analytics</NextLink>,{' '}
+            <NextLink href="/sectors/manufacturing">manufacturing analytics</NextLink>, and{' '}
+            <NextLink href="/sectors/finance">financial analytics</NextLink>.
+          </IntroLinks>
+          {/* SEO AUTHORITY INTRO */}
+          <SectionIntro>
+            <strong>Precise Analytics</strong> delivers specialized retail analytics solutions for
+            <strong> federal commissaries, military exchanges, and government-operated retail environments</strong>.
+            Our retail analytics capabilities support data-driven decision-making across customer behavior analysis,
+            inventory optimization, pricing strategy, and operational performance measurement.
+
+            <br /><br />
+
+            We work with highly regulated retail organizations that operate at national scale, including
+            military exchange systems, commissary agencies, and federal facilities. Our analytics solutions
+            transform point-of-sale (POS), supply chain, merchandising, and customer engagement data into
+            actionable intelligence that improves efficiency, reduces waste, and enhances the customer experience.
+
+            <br /><br />
+
+            From demand forecasting and inventory planning to customer segmentation and revenue performance
+            dashboards, Precise Analytics helps government retail organizations modernize their data
+            infrastructure and unlock measurable operational value.
+          </SectionIntro>
+
+          
+
+          {/* Content Section */} 
           <ContentSection>
+
+          
+          <h2 style={{ display: 'none' }}>
+            Federal Retail Analytics Solutions for Military Exchanges and Commissaries
+          </h2>
+
             <SectionTitle>Retail Analytics & Intelligence</SectionTitle>
             
             {/* Services Grid */}
@@ -476,6 +517,34 @@ const SectionTitle = styled.h2`
     height: 4px;
     background: linear-gradient(90deg, rgb(147, 51, 234), rgb(219, 39, 119));
     border-radius: 2px;
+  }
+`;
+
+const SectionIntro = styled.p`
+  max-width: 90rem;
+  margin: 0 auto 6rem;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  text-align: center;
+`;
+
+const IntroLinks = styled.p`
+  max-width: 90rem;
+  margin: 2rem auto 4rem;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  text-align: center;
+  color: rgba(var(--text), 0.8);
+
+  a {
+    color: rgb(147, 51, 234);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 

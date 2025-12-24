@@ -5,47 +5,52 @@ import AnimatedHeader from 'components/AnimatedHeader';
 
 import Container from 'components/Container';
 import { EnvVars } from 'env';
-import { media, mq } from 'utils/media';
+import { mq } from 'utils/media';
 import Link from 'next/link';
-
 
 const coreCompetencies = [
   {
     id: 1,
     title: 'Data Engineering and Analytics',
-    description: 'Designing end-to-end data infrastructure, optimizing ETL processes, and enhancing data architecture for secure management. Skilled in advanced analytics, predictive modeling, and data processing.',
-    icon: '📊'
+    description:
+      'Designing end-to-end data infrastructure, optimizing ETL processes, and enhancing data architecture for secure management. Skilled in advanced analytics, predictive modeling, and data processing.',
+    icon: '📊',
   },
   {
     id: 2,
     title: 'Business Intelligence (BI)',
-    description: 'Develop and deploy BI dashboards and reports to convert raw data into actionable insights, integrating platforms like Google Ads and CRMs for real-time campaign performance and client retention analysis.',
-    icon: '📈'
+    description:
+      'Develop and deploy BI dashboards and reports to convert raw data into actionable insights, integrating platforms like Google Ads and CRMs for real-time campaign performance and client retention analysis.',
+    icon: '📈',
   },
   {
     id: 3,
     title: 'Software Development',
-    description: 'Deliver full-stack development using modern frameworks, cloud-native solutions with AWS, Azure, and GCP, and seamless enterprise integration with platforms like Salesforce, EHRs, and Medicaid systems.',
-    icon: '💻'
+    description:
+      'Deliver full-stack development using modern frameworks, cloud-native solutions with AWS, Azure, and GCP, and seamless enterprise integration with platforms like Salesforce, EHRs, and Medicaid systems.',
+    icon: '💻',
   },
   {
     id: 4,
     title: 'Machine Learning and AI',
-    description: 'Develop custom AI/ML models for predictive analytics, NLP, and computer vision to enable lead scoring, patient outcome predictions, and image-based diagnostics.',
-    icon: '🤖'
+    description:
+      'Develop custom AI/ML models for predictive analytics, NLP, and computer vision to enable lead scoring, patient outcome predictions, and image-based diagnostics.',
+    icon: '🤖',
   },
   {
     id: 5,
     title: 'Healthcare Compliance and Security',
-    description: 'Ensure compliance with HIPAA, DEA, and state-specific regulations through automated reporting, secure systems, and advanced security measures like encryption and role-based access controls (RBAC).',
-    icon: '🔐'
+    description:
+      'Ensure compliance with HIPAA, DEA, and state-specific regulations through automated reporting, secure systems, and advanced security measures like encryption and role-based access controls (RBAC).',
+    icon: '🔐',
   },
   {
     id: 6,
     title: 'Inventory and Resource Management',
-    description: 'Optimize inventory and resource management with real-time tracking, automated planning, and forecasting to ensure operational efficiency and minimize disruptions.',
-    icon: '📦'
-  }
+    description:
+      'Optimize inventory and resource management with real-time tracking, automated planning, and forecasting to ensure operational efficiency and minimize disruptions.',
+    icon: '📦',
+  },
 ];
 
 const differentiators = [
@@ -53,7 +58,7 @@ const differentiators = [
   'Secure Data Solutions: Compliance with FISMA, HIPAA, and NIST regulations, ensuring robust cybersecurity.',
   'Customizable Services: Flexible solutions designed to meet the unique requirements of diverse agencies.',
   'Proven Track Record: Demonstrated success in improving decision-making, operational efficiency, and resource allocation.',
-  'Innovation in Healthcare: Advanced platforms showcasing our ability to blend technology and healthcare expertise.'
+  'Innovation in Healthcare: Advanced platforms showcasing our ability to blend technology and healthcare expertise.',
 ];
 
 const pastProjects = [
@@ -61,32 +66,37 @@ const pastProjects = [
     id: 1,
     title: 'Imani Mental Health Services',
     location: 'Queen Creek, AZ',
-    scope: 'Enhanced data infrastructure, improved reporting capabilities, and leveraged data insights to optimize operational efficiencies and patient outcomes.'
+    scope:
+      'Enhanced data infrastructure, improved reporting capabilities, and leveraged data insights to optimize operational efficiencies and patient outcomes.',
   },
   {
     id: 2,
     title: 'QC Medchain (SBIR)',
     location: 'Minneapolis, MN',
-    scope: 'Designed data solutions to improve supply chain management, reduce counterfeit drugs, enhance traceability, and boost efficiency.'
+    scope:
+      'Designed data solutions to improve supply chain management, reduce counterfeit drugs, enhance traceability, and boost efficiency.',
   },
   {
     id: 3,
     title: 'Agencies on Aging',
     location: 'NorthEastern States',
-    scope: 'Delivered a scalable, cloud-based healthcare platform on Microsoft Azure for seamless service management, billing, and compliance. Reduced administrative costs by 30%, achieved a 95% success rate in first-pass claims processing, and improved care delivery.'
+    scope:
+      'Delivered a scalable, cloud-based healthcare platform on Microsoft Azure for seamless service management, billing, and compliance. Reduced administrative costs by 30%, achieved a 95% success rate in first-pass claims processing, and improved care delivery.',
   },
   {
     id: 4,
     title: 'Hercules Touch Anesthesia',
     location: 'Nationwide',
-    scope: 'Deployed in 65+ clinics across 7 states, this system integrates appointment scheduling, procedure recording, history management, vitals monitoring, compliance reporting, and inventory tracking. This reduced compliance costs, increased operational efficiency, and enhanced patient safety.'
+    scope:
+      'Deployed in 65+ clinics across 7 states, this system integrates appointment scheduling, procedure recording, history management, vitals monitoring, compliance reporting, and inventory tracking. This reduced compliance costs, increased operational efficiency, and enhanced patient safety.',
   },
   {
     id: 5,
     title: 'Lose the Back Pain',
     location: 'Multi-State',
-    scope: 'Built a BI platform to centralize marketing data, optimize campaigns, and increase client retention. Boosted campaign ROI by 15%, increased sales productivity by 25%, and reduced customer acquisition costs by 20%.'
-  }
+    scope:
+      'Built a BI platform to centralize marketing data, optimize campaigns, and increase client retention. Boosted campaign ROI by 15%, increased sales productivity by 25%, and reduced customer acquisition costs by 20%.',
+  },
 ];
 
 const naicsCodes = [
@@ -95,13 +105,15 @@ const naicsCodes = [
   { code: '541512', description: 'Computer Systems Design Services' },
   { code: '541519', description: 'Other Computer Related Services' },
   { code: '541611', description: 'Administrative Management and General Management Consulting' },
-  { code: '541690', description: 'Other Scientific and Technical Consulting Services' }
+  { code: '541690', description: 'Other Scientific and Technical Consulting Services' },
 ];
 
 export default function CapabilitiesStatementPage() {
   return (
     <>
       <Head>
+        <link rel="canonical" href="https://preciseanalytics.io/capabilities-statement" />
+        <meta name="robots" content="index, follow" />
         <title>Capabilities Statement - {EnvVars.SITE_NAME}</title>
         <meta
           name="description"
@@ -112,24 +124,20 @@ export default function CapabilitiesStatementPage() {
           content="capabilities statement, data engineering, business intelligence, software development, machine learning, AI, healthcare compliance, VOSB, SWaM"
         />
       </Head>
-      
+
       <AnimatedHeader />
-      
+
       <PageWrapper>
         <Container>
-                <CenteredWrapper>
-                  <DownloadCTA href="/capabilities-statement.pdf" download>
-                    📄 Download Full Capabilities Statement (PDF)
-                  </DownloadCTA>
-                  <ViewCTA
-                    href="/capabilities-statement.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    👁️ View Full Capabilities Statement (PDF)
-                  </ViewCTA>
-                </CenteredWrapper>
-   
+          <CenteredWrapper>
+            <DownloadCTA href="/capabilities-statement.pdf" download>
+              📄 Download Full Capabilities Statement (PDF)
+            </DownloadCTA>
+            <ViewCTA href="/capabilities-statement.pdf" target="_blank" rel="noopener noreferrer">
+              👁️ View Full Capabilities Statement (PDF)
+            </ViewCTA>
+          </CenteredWrapper>
+
           {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -138,32 +146,30 @@ export default function CapabilitiesStatementPage() {
           >
             <HeroSection>
               <HeroTitle>Capabilities Statement</HeroTitle>
-              <HeroSubtitle>
-                Precision-Driven Insights for Mission Success
-              </HeroSubtitle>
+              <HeroSubtitle>Precision-Driven Insights for Mission Success</HeroSubtitle>
               <CertificationSection>
                 <CertificationLogos>
                   <LogoContainer>
-                    <CertificationLogoLink 
+                    <CertificationLogoLink
                       href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <CertificationLogo 
-                        src="/sba-logo.png" 
+                      <CertificationLogo
+                        src="/sba-logo.png"
                         alt="SBA Veteran-Owned Small Business Certified"
                       />
                     </CertificationLogoLink>
                     <LogoLabel>VETERAN-OWNED CERTIFIED</LogoLabel>
                   </LogoContainer>
                   <LogoContainer>
-                    <CertificationLogoLink 
+                    <CertificationLogoLink
                       href="https://directory.sbsd.virginia.gov/#/executiveExport"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <EnlargedSwamLogo 
-                        src="/SWAM_LOGO.jpg" 
+                      <EnlargedSwamLogo
+                        src="/SWAM_LOGO.jpg"
                         alt="SWaM Certified - Small, Women-owned, and Minority-owned Business"
                       />
                     </CertificationLogoLink>
@@ -188,10 +194,11 @@ export default function CapabilitiesStatementPage() {
             <Section>
               <SectionTitle>Company Overview</SectionTitle>
               <OverviewText>
-                Precise Analytics is a leading data engineering, analytics, and consulting firm. We are committed to delivering 
-                precision-driven insights and cutting-edge solutions to federal, state, and local agencies. By combining expertise 
-                in data analytics, software development, and AI/ML integration, we empower organizations with actionable intelligence 
-                to enhance decision-making, operational efficiency, and mission success.
+                Precise Analytics is a leading data engineering, analytics, and consulting firm. We are
+                committed to delivering precision-driven insights and cutting-edge solutions to federal,
+                state, and local agencies. By combining expertise in data analytics, software development,
+                and AI/ML integration, we empower organizations with actionable intelligence to enhance
+                decision-making, operational efficiency, and mission success.
               </OverviewText>
             </Section>
           </motion.div>
@@ -297,15 +304,15 @@ export default function CapabilitiesStatementPage() {
                   <ProductIcon>📊</ProductIcon>
                   <ProductTitle>Healthcare Analytics Dashboard</ProductTitle>
                   <ProductDescription>
-                    Comprehensive BI platform for healthcare providers with real-time analytics, 
-                    patient outcome tracking, and compliance reporting.
+                    Comprehensive BI platform for healthcare providers with real-time analytics, patient
+                    outcome tracking, and compliance reporting.
                   </ProductDescription>
                 </ProductItem>
                 <ProductItem>
                   <ProductIcon>🏥</ProductIcon>
                   <ProductTitle>Anesthesia Management System</ProductTitle>
                   <ProductDescription>
-                    Integrated clinic management solution deployed across 65+ clinics, featuring 
+                    Integrated clinic management solution deployed across 65+ clinics, featuring
                     scheduling, procedure tracking, and inventory management.
                   </ProductDescription>
                 </ProductItem>
@@ -313,8 +320,8 @@ export default function CapabilitiesStatementPage() {
                   <ProductIcon>📈</ProductIcon>
                   <ProductTitle>Marketing Intelligence Platform</ProductTitle>
                   <ProductDescription>
-                    Advanced BI solution that centralized marketing data, optimized campaigns, 
-                    and increased ROI by 15% for healthcare clients.
+                    Advanced BI solution that centralized marketing data, optimized campaigns, and increased
+                    ROI by 15% for healthcare clients.
                   </ProductDescription>
                 </ProductItem>
               </ProductsShowcase>
@@ -397,7 +404,8 @@ export default function CapabilitiesStatementPage() {
             <CTASection>
               <CTATitle>Ready to Partner with Us?</CTATitle>
               <CTADescription>
-                Contact Precise Analytics today to discuss how our proven capabilities can support your mission.
+                Contact Precise Analytics today to discuss how our proven capabilities can support your
+                mission.
               </CTADescription>
               <Link href="/contact" passHref legacyBehavior>
                 <a>
@@ -405,24 +413,18 @@ export default function CapabilitiesStatementPage() {
                 </a>
               </Link>
             </CTASection>
-                <CenteredWrapper>
-                  <DownloadCTA href="/capabilities-statement.pdf" download>
-                    📄 Download Full Capabilities Statement (PDF)
-                  </DownloadCTA>
-                  <ViewCTA
-                    href="/capabilities-statement.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    👁️ View Full Capabilities Statement (PDF)
-                  </ViewCTA>
-                </CenteredWrapper>
 
+            <CenteredWrapper>
+              <DownloadCTA href="/capabilities-statement.pdf" download>
+                📄 Download Full Capabilities Statement (PDF)
+              </DownloadCTA>
+              <ViewCTA href="/capabilities-statement.pdf" target="_blank" rel="noopener noreferrer">
+                👁️ View Full Capabilities Statement (PDF)
+              </ViewCTA>
+            </CenteredWrapper>
           </motion.div>
         </Container>
       </PageWrapper>
-      
-      
     </>
   );
 }
@@ -435,7 +437,11 @@ const PageWrapper = styled.div`
 const HeroSection = styled.section`
   text-align: center;
   padding: 6rem 0 8rem;
-  background: linear-gradient(135deg, rgba(255, 125, 0, 0.05) 0%, rgba(255, 165, 0, 0.02) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 125, 0, 0.05) 0%,
+    rgba(255, 165, 0, 0.02) 100%
+  );
   border-radius: 2rem;
   margin-bottom: 6rem;
 `;
@@ -488,7 +494,7 @@ const LogoContainer = styled.div`
 const CertificationLogoLink = styled.a`
   display: block;
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: scale(1.05);
   }
@@ -506,20 +512,26 @@ const CertificationLogo = styled.img`
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
   }
 
-  ${mq('<=tablet', `
+  ${mq(
+    '<=tablet',
+    `
     height: 6rem;
     max-width: 10rem;
-  `)}
+  `
+  )}
 `;
 
 const EnlargedSwamLogo = styled(CertificationLogo)`
   height: 16rem;
   max-width: 20rem;
-  
-  ${mq('<=tablet', `
+
+  ${mq(
+    '<=tablet',
+    `
     height: 12rem;
     max-width: 16rem;
-  `)}
+  `
+  )}
 `;
 
 const LogoLabel = styled.div`
@@ -548,10 +560,13 @@ const ComplianceBadge = styled.div`
   border: 2px solid rgba(255, 125, 0, 0.3);
   box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
 
-  ${mq('<=tablet', `
+  ${mq(
+    '<=tablet',
+    `
     padding: 1.2rem 2.5rem;
     font-size: 1.2rem;
-  `)}
+  `
+  )}
 `;
 
 const ComplianceIcon = styled.div`
@@ -748,7 +763,6 @@ const CompanyDataGrid = styled.div`
   gap: 2rem;
 
   ${mq('<=tablet', 'grid-template-columns: repeat(2, 1fr);')}
-
   ${mq('<=phone', 'grid-template-columns: 1fr;')}
 `;
 
@@ -790,11 +804,14 @@ const NAICSItem = styled.div`
   margin-bottom: 1.5rem;
   border: 1px solid rgba(255, 125, 0, 0.1);
 
-  ${mq('<=phone', `
+  ${mq(
+    '<=phone',
+    `
     flex-direction: column;
     text-align: center;
     gap: 1rem;
-  `)}
+  `
+  )}
 `;
 
 const NAICSCode = styled.div`
@@ -838,7 +855,6 @@ const CTADescription = styled.p`
 
   ${mq('<=tablet', 'font-size: 1.6rem;')}
 `;
-
 
 // Styled wrappers & buttons
 const CenteredWrapper = styled.div`
@@ -904,7 +920,6 @@ const ViewCTA = styled.a`
   }
 `;
 
-
 const CTAButton = styled.div`
   display: inline-block;
   cursor: pointer;
@@ -925,8 +940,11 @@ const CTAButton = styled.div`
     box-shadow: 0 12px 25px rgba(255, 125, 0, 0.4);
   }
 
-  ${mq('<=tablet', `
+  ${mq(
+    '<=tablet',
+    `
     padding: 1.4rem 2.8rem;
     font-size: 1.6rem;
-  `)}
+  `
+  )}
 `;

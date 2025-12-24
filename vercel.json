@@ -1,7 +1,5 @@
 {
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
 
   "headers": [
     {
@@ -12,40 +10,19 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
-    },
-    {
-      "source": "/(.*)\\.(ico|jpg|jpeg|png|gif|svg|webp|woff|woff2|ttf|eot)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
-    },
-    {
-      "source": "/(.*)\\.(css|js)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
-      ]
     }
   ],
 
-  "redirects": [
-    { "source": "/home", "destination": "/", "permanent": true },
+  "routes": [
+    { "src": "^/home/?$", "status": 308, "headers": { "Location": "/" } },
 
-    { "source": "/contact-us", "destination": "/contact", "permanent": true },
-    { "source": "/contact-us/", "destination": "/contact", "permanent": true },
+    { "src": "^/contact-us/?$", "status": 308, "headers": { "Location": "/contact" } },
+    { "src": "^/request-quote/?$", "status": 308, "headers": { "Location": "/contact" } },
 
-    { "source": "/request-quote", "destination": "/contact", "permanent": true },
-    { "source": "/request-quote/", "destination": "/contact", "permanent": true },
+    { "src": "^/data-visualization/?$", "status": 308, "headers": { "Location": "/services" } },
+    { "src": "^/predictive-analysis/?$", "status": 308, "headers": { "Location": "/services" } },
+    { "src": "^/technology/?$", "status": 308, "headers": { "Location": "/services" } },
 
-    { "source": "/data-visualization", "destination": "/services", "permanent": true },
-    { "source": "/data-visualization/", "destination": "/services", "permanent": true },
-
-    { "source": "/predictive-analysis", "destination": "/services", "permanent": true },
-    { "source": "/predictive-analysis/", "destination": "/services", "permanent": true },
-
-    { "source": "/technology", "destination": "/services", "permanent": true },
-    { "source": "/technology/", "destination": "/services", "permanent": true },
-
-    { "source": "/manufacturing", "destination": "/sectors/manufacturing", "permanent": true },
-    { "source": "/manufacturing/", "destination": "/sectors/manufacturing", "permanent": true }
+    { "src": "^/manufacturing/?$", "status": 308, "headers": { "Location": "/sectors/manufacturing" } }
   ]
 }

@@ -79,7 +79,10 @@ const RetailPage = () => {
             <NextLink href="/sectors/finance">financial analytics</NextLink>.
           </IntroLinks>
           {/* SEO AUTHORITY INTRO */}
-          <SectionIntro>
+          <SectionIntro>  
+            <h2>
+              Federal Retail Analytics Solutions for Military Exchanges and Commissaries
+            </h2>
             <strong>Precise Analytics</strong> delivers specialized retail analytics solutions for
             <strong> federal commissaries, military exchanges, and government-operated retail environments</strong>.
             Our retail analytics capabilities support data-driven decision-making across customer behavior analysis,
@@ -103,11 +106,6 @@ const RetailPage = () => {
 
           {/* Content Section */} 
           <ContentSection>
-
-          
-          <h2 style={{ display: 'none' }}>
-            Federal Retail Analytics Solutions for Military Exchanges and Commissaries
-          </h2>
 
             <SectionTitle>Retail Analytics & Intelligence</SectionTitle>
             

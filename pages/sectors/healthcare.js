@@ -13,11 +13,20 @@ export default function HealthcarePage() {
   return (
     <>
       <Head>
-        <title>Healthcare Analytics Solutions | {EnvVars.SITE_NAME}</title>
+        <title>
+          Healthcare Analytics Solutions for Federal Agencies | {EnvVars.SITE_NAME}
+        </title>
+
         <meta
           name="description"
-          content="HIPAA-compliant healthcare analytics for federal agencies including VA, CDC, NIH, and FDA. Transforming healthcare data into actionable insights."
+          content="Federal healthcare analytics solutions for VA, CDC, NIH, FDA, and public health agencies. HIPAA-compliant clinical analytics, population health insights, and regulatory reporting."
         />
+
+        <link
+          rel="canonical"
+          href="https://preciseanalytics.io/sectors/healthcare"
+        />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <AnimatedHeader />
@@ -43,7 +52,14 @@ export default function HealthcarePage() {
             </BackText>
           </BackNavigation>
 
-          <HeroSection>
+          <HeroSection> 
+            <IntroLinks>
+              Our healthcare analytics capabilities integrate with other regulated sectors,
+              including{' '}
+              <NextLink href="/sectors/retail">federal retail analytics</NextLink>,{' '}
+              <NextLink href="/sectors/manufacturing">manufacturing analytics</NextLink>, and{' '}
+              <NextLink href="/sectors/finance">financial analytics</NextLink>.
+            </IntroLinks>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -454,6 +470,26 @@ const SectionIntro = styled.p`
   color: rgba(var(--text), 0.85);
   text-align: center;
 `;
+
+const IntroLinks = styled.p`
+  max-width: 90rem;
+  margin: 0 auto 4rem;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  text-align: center;
+  color: rgba(var(--text), 0.8);
+
+  a {
+    color: rgb(34, 197, 94);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 
 const CTAButton = styled(motion(NextLink))`
   display: inline-block;

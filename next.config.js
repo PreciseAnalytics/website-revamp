@@ -58,12 +58,12 @@ const nextConfig = {
       },
       {
         source: '/data-visualization',
-        destination: '/services/data-visualization',
+        destination: '/services',
         permanent: true,
       },
       {
         source: '/predictive-analysis',
-        destination: '/services/predictive-analytics',
+        destination: '/services',
         permanent: true,
       },
       {
@@ -71,6 +71,7 @@ const nextConfig = {
         destination: '/services',
         permanent: true,
       },
+
       {
         source: '/manufacturing',
         destination: '/sectors/manufacturing',

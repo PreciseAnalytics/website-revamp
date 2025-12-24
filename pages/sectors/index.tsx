@@ -7,31 +7,34 @@ import NextLink from 'next/link';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
 
-
 const sectors = [
   {
     id: 'healthcare',
     name: 'Healthcare',
     title: 'Healthcare Analytics Solutions',
-    description: 'Transform patient care with data-driven insights, compliance reporting, and operational efficiency solutions.',
+    description:
+      'Transform patient care with data-driven insights, compliance reporting, and operational efficiency solutions.',
   },
   {
     id: 'manufacturing',
     name: 'Manufacturing',
     title: 'Manufacturing Analytics',
-    description: 'Optimize production, reduce costs, and improve quality with advanced manufacturing analytics and IoT integration.',
+    description:
+      'Optimize production, reduce costs, and improve quality with advanced manufacturing analytics and IoT integration.',
   },
   {
     id: 'finance',
     name: 'Finance',
     title: 'Financial Technology Solutions',
-    description: 'Risk management, fraud detection, regulatory compliance, and customer insights for financial institutions.',
+    description:
+      'Risk management, fraud detection, regulatory compliance, and customer insights for financial institutions.',
   },
   {
     id: 'retail',
     name: 'Retail',
     title: 'Retail Analytics Solutions',
-    description: 'Customer behavior analysis, inventory optimization, and sales forecasting for retail excellence.',
+    description:
+      'Customer behavior analysis, inventory optimization, and sales forecasting for retail excellence.',
   },
 ];
 
@@ -42,9 +45,12 @@ export default function SectorsPage() {
         <title>Sectors We Serve | Precise Analytics</title>
         <meta
           name="description"
-          content="Discover how Precise Analytics delivers specialized data solutions across healthcare, manufacturing, finance, and retail sectors."
+          content="Discover how Precise Analytics delivers specialized data analytics and decision intelligence solutions across healthcare, manufacturing, finance, and retail sectors."
         />
-        <meta name="keywords" content="data analytics, healthcare, manufacturing, finance, retail, sectors" />
+        <meta
+          name="keywords"
+          content="sector analytics, healthcare analytics, retail analytics, manufacturing analytics, financial data solutions"
+        />
       </Head>
 
       <AnimatedHeader />
@@ -65,6 +71,31 @@ export default function SectorsPage() {
             </motion.div>
           </Container>
         </HeroSection>
+
+        {/* ✅ NEW: Sector Overview Content (Indexing Signal Boost) */}
+        <IntroSection>
+          <Container>
+            <IntroText>
+              Precise Analytics partners with organizations operating in highly regulated, data-intensive environments
+              where accuracy, compliance, and actionable insight are critical to success. Each sector we serve presents
+              unique operational challenges, regulatory requirements, and decision-making pressures. Our approach
+              combines advanced analytics, domain expertise, and scalable data platforms to deliver solutions that are
+              purpose-built for each industry.
+              <br />
+              <br />
+              In healthcare, we support payers, providers, and public agencies with analytics that improve outcomes,
+              enhance compliance, and optimize resource utilization. Manufacturing clients leverage our solutions to
+              gain visibility into production performance, supply chains, and quality metrics. Financial institutions
+              rely on our analytics to strengthen risk management, regulatory reporting, and customer intelligence,
+              while retail organizations use our data-driven insights to forecast demand, optimize inventory, and better
+              understand consumer behavior.
+              <br />
+              <br />
+              By aligning analytics strategy with industry-specific needs, Precise Analytics enables organizations to
+              make confident, data-informed decisions that drive measurable results.
+            </IntroText>
+          </Container>
+        </IntroSection>
 
         <IndustriesSection>
           <Container>
@@ -115,13 +146,14 @@ export default function SectorsPage() {
           </Container>
         </CTASection>
       </PageWrapper>
-
-      
     </>
   );
 }
 
-// Styled Components
+/* =======================
+   Styled Components
+======================= */
+
 const PageWrapper = styled.div`
   min-height: 100vh;
 `;
@@ -161,6 +193,19 @@ const HeroDescription = styled.p`
   ${media.tablet(`
     font-size: 1.8rem;
   `)}
+`;
+
+/* NEW */
+const IntroSection = styled.section`
+  padding: 6rem 0;
+`;
+
+const IntroText = styled.p`
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  max-width: 90rem;
+  margin: 0 auto;
 `;
 
 const IndustriesSection = styled.section`

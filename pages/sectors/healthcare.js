@@ -56,6 +56,19 @@ export default function HealthcarePage() {
             </motion.div>
           </HeroSection>
 
+          <SectionIntro>
+            Precise Analytics delivers healthcare analytics solutions designed for highly regulated, data-intensive
+            environments where accuracy, compliance, and security are critical. We support federal agencies, public
+            health organizations, and healthcare institutions in transforming complex clinical, claims, and population
+            health data into actionable insights.
+            <br /><br />
+            Our healthcare expertise spans HIPAA-compliant analytics, public health reporting, clinical research
+            analytics, and regulatory data support for agencies such as the VA, CDC, NIH, and FDA. By combining deep
+            domain knowledge with advanced analytics and modern data platforms, we enable healthcare organizations to
+            improve outcomes, meet compliance requirements, and drive measurable impact.
+          </SectionIntro>
+
+
           <SectionTitle>Our Healthcare Expertise</SectionTitle>
 
           <ServicesGrid>
@@ -431,6 +444,15 @@ const CTADescription = styled.p`
   margin-left: auto;
   margin-right: auto;
   line-height: 1.6;
+`;
+
+const SectionIntro = styled.p`
+  max-width: 90rem;
+  margin: 0 auto 6rem;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  text-align: center;
 `;
 
 const CTAButton = styled(motion(NextLink))`

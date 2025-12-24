@@ -52,6 +52,11 @@ const nextConfig = {
       { source: '/manufacturing', destination: '/sectors/manufacturing', permanent: true },
       { source: '/manufacturing/', destination: '/sectors/manufacturing', permanent: true },
 
+      { source: '/retail', destination: '/sectors/retail', permanent: true },
+      { source: '/retail/', destination: '/sectors/retail', permanent: true },
+
+
+
       /**
        * ---------------------------------------
        * TRAILING SLASH NORMALIZATION

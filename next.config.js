@@ -31,148 +31,48 @@ const nextConfig = {
     return [
       /**
        * ---------------------------------------
-       * CANONICAL HOST (www → non-www)
+       * LEGACY URL FIXES (PATH ONLY)
        * ---------------------------------------
        */
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.preciseanalytics.io' }],
-        destination: 'https://preciseanalytics.io/:path*',
-        permanent: true,
-      },
+      { source: '/contact-us', destination: '/contact', permanent: true },
+      { source: '/contact-us/', destination: '/contact', permanent: true },
+
+      { source: '/request-quote', destination: '/contact', permanent: true },
+      { source: '/request-quote/', destination: '/contact', permanent: true },
+
+      { source: '/data-visualization', destination: '/services', permanent: true },
+      { source: '/data-visualization/', destination: '/services', permanent: true },
+
+      { source: '/predictive-analysis', destination: '/services', permanent: true },
+      { source: '/predictive-analysis/', destination: '/services', permanent: true },
+
+      { source: '/technology', destination: '/services', permanent: true },
+      { source: '/technology/', destination: '/services', permanent: true },
+
+      { source: '/manufacturing', destination: '/sectors/manufacturing', permanent: true },
+      { source: '/manufacturing/', destination: '/sectors/manufacturing', permanent: true },
 
       /**
        * ---------------------------------------
-       * PRIMARY LEGACY URL FIXES (EXPLICIT)
+       * TRAILING SLASH NORMALIZATION
        * ---------------------------------------
        */
-      {
-        source: '/contact-us',
-        destination: '/contact',
-        permanent: true,
-      },
-      {
-        source: '/contact-us/',
-        destination: '/contact',
-        permanent: true,
-      },
-
-      {
-        source: '/request-quote',
-        destination: '/contact',
-        permanent: true,
-      },
-      {
-        source: '/request-quote/',
-        destination: '/contact',
-        permanent: true,
-      },
-
-      {
-        source: '/data-visualization',
-        destination: '/services',
-        permanent: true,
-      },
-      {
-        source: '/data-visualization/',
-        destination: '/services',
-        permanent: true,
-      },
-
-      {
-        source: '/predictive-analysis',
-        destination: '/services',
-        permanent: true,
-      },
-      {
-        source: '/predictive-analysis/',
-        destination: '/services',
-        permanent: true,
-      },
-
-      {
-        source: '/technology',
-        destination: '/services',
-        permanent: true,
-      },
-      {
-        source: '/technology/',
-        destination: '/services',
-        permanent: true,
-      },
-
-      {
-        source: '/manufacturing',
-        destination: '/sectors/manufacturing',
-        permanent: true,
-      },
-      {
-        source: '/manufacturing/',
-        destination: '/sectors/manufacturing',
-        permanent: true,
-      },
-
-      /**
-       * ---------------------------------------
-       * TRAILING SLASH NORMALIZATION (CORE PAGES)
-       * ---------------------------------------
-       */
-      {
-        source: '/about-us/',
-        destination: '/about-us',
-        permanent: true,
-      },
-      {
-        source: '/careers/',
-        destination: '/careers',
-        permanent: true,
-      },
-      {
-        source: '/capabilities-statement/',
-        destination: '/capabilities-statement',
-        permanent: true,
-      },
-      {
-        source: '/services/',
-        destination: '/services',
-        permanent: true,
-      },
-      {
-        source: '/sectors/',
-        destination: '/sectors',
-        permanent: true,
-      },
-      {
-        source: '/contact/',
-        destination: '/contact',
-        permanent: true,
-      },
-      {
-        source: '/privacy-policy/',
-        destination: '/privacy-policy',
-        permanent: true,
-      },
+      { source: '/about-us/', destination: '/about-us', permanent: true },
+      { source: '/careers/', destination: '/careers', permanent: true },
+      { source: '/capabilities-statement/', destination: '/capabilities-statement', permanent: true },
+      { source: '/services/', destination: '/services', permanent: true },
+      { source: '/sectors/', destination: '/sectors', permanent: true },
+      { source: '/contact/', destination: '/contact', permanent: true },
+      { source: '/privacy-policy/', destination: '/privacy-policy', permanent: true },
 
       /**
        * ---------------------------------------
        * WORDPRESS GHOST URL ELIMINATION
        * ---------------------------------------
        */
-      {
-        source: '/wp-admin/:path*',
-        destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/wp-content/:path*',
-        destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/wp-includes/:path*',
-        destination: '/',
-        permanent: true,
-      },
+      { source: '/wp-admin/:path*', destination: '/', permanent: true },
+      { source: '/wp-content/:path*', destination: '/', permanent: true },
+      { source: '/wp-includes/:path*', destination: '/', permanent: true },
 
       /**
        * ---------------------------------------
@@ -197,13 +97,8 @@ const nextConfig = {
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
-      issuer: {
-        and: [/\.(js|ts)x?$/],
-      },
-      use: [
-        { loader: '@svgr/webpack' },
-        { loader: 'url-loader' },
-      ],
+      issuer: { and: [/\.(js|ts)x?$/] },
+      use: [{ loader: '@svgr/webpack' }, { loader: 'url-loader' }],
     });
 
     return config;

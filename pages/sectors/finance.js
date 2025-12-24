@@ -13,11 +13,20 @@ export default function FinancePage() {
   return (
     <>
       <Head>
-        <title>Finance Analytics Solutions | {EnvVars.SITE_NAME}</title>
+        <title>
+          Financial Analytics Solutions for Federal & Public Sector | {EnvVars.SITE_NAME}
+        </title>
+
         <meta
           name="description"
-          content="Compliant and intelligent analytics for federal financial agencies, banks, and insurers. Empowering fraud detection, risk modeling, and regulatory reporting."
+          content="Federal financial analytics solutions for Treasury, FDIC, SEC, IRS, and public finance agencies. Fraud detection, risk modeling, audit analytics, and regulatory compliance."
         />
+
+        <link
+          rel="canonical"
+          href="https://preciseanalytics.io/sectors/finance"
+        />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <AnimatedHeader />
@@ -28,7 +37,14 @@ export default function FinancePage() {
             <Arrow>⬅</Arrow> Back to All Sectors
           </BackLink>
 
-          <HeroSection>
+          <HeroSection> 
+            <IntroLinks>
+              Our financial analytics capabilities integrate with other regulated sectors,
+              including{' '}
+              <NextLink href="/sectors/healthcare">healthcare analytics</NextLink>,{' '}
+              <NextLink href="/sectors/retail">federal retail analytics</NextLink>, and{' '}
+              <NextLink href="/sectors/manufacturing">manufacturing analytics</NextLink>.
+            </IntroLinks>
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -41,7 +57,28 @@ export default function FinancePage() {
             </motion.div>
           </HeroSection>
 
-          <SectionTitle>Analytics for Financial Integrity</SectionTitle>
+          <SectionTitle>Analytics for Financial Integrity</SectionTitle> 
+
+          <SectionIntro>
+              <strong>Precise Analytics</strong> delivers advanced financial analytics solutions
+              for <strong>federal financial agencies, public finance organizations, and regulated
+              financial institutions</strong>. Our finance analytics capabilities support fraud
+              detection, audit automation, regulatory reporting, and risk management across
+              large-scale government and commercial environments.
+
+              <br /><br />
+
+              We support organizations responsible for financial oversight, revenue collection,
+              public spending transparency, and market regulation. Our solutions transform
+              transactional, treasury, audit, and compliance data into actionable intelligence
+              that strengthens financial integrity and operational accountability.
+
+              <br /><br />
+
+              From fraud analytics and anomaly detection to forecasting, compliance automation,
+              and financial performance dashboards, Precise Analytics helps finance organizations
+              modernize data infrastructure and meet evolving regulatory demands.
+            </SectionIntro>
 
           <ServicesGrid>
             <ServiceCard as={motion.div} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -177,6 +214,26 @@ const Arrow = styled.span`
   transform: translateY(-1px);
 `;
 
+const IntroLinks = styled.p`
+  max-width: 90rem;
+  margin: 0 auto 4rem;
+  font-size: 1.6rem;
+  line-height: 1.6;
+  text-align: center;
+  color: rgba(var(--text), 0.8);
+
+  a {
+    color: rgb(56, 189, 248);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
+
 const HeroSection = styled.section`
   text-align: center;
   padding: 6rem 0 8rem;
@@ -254,6 +311,16 @@ const ServiceDescription = styled.p`
   font-size: 1.6rem;
   opacity: 0.85;
 `;
+
+const SectionIntro = styled.p`
+  max-width: 90rem;
+  margin: 0 auto 6rem;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  text-align: center;
+`;
+
 
 const ClientsGrid = styled.div`
   display: grid;

@@ -43,7 +43,7 @@ const nextConfig = {
 
       /**
        * ---------------------------------------
-       * PRIMARY LEGACY URL FIXES (GSC 404s)
+       * PRIMARY LEGACY URL FIXES (EXPLICIT)
        * ---------------------------------------
        */
       {
@@ -52,22 +52,51 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/request-quote',
-        destination: '/schedule-consult',
+        source: '/contact-us/',
+        destination: '/contact',
         permanent: true,
       },
+
+      {
+        source: '/request-quote',
+        destination: '/contact',
+        permanent: true,
+      },
+      {
+        source: '/request-quote/',
+        destination: '/contact',
+        permanent: true,
+      },
+
       {
         source: '/data-visualization',
         destination: '/services',
         permanent: true,
       },
       {
+        source: '/data-visualization/',
+        destination: '/services',
+        permanent: true,
+      },
+
+      {
         source: '/predictive-analysis',
         destination: '/services',
         permanent: true,
       },
       {
+        source: '/predictive-analysis/',
+        destination: '/services',
+        permanent: true,
+      },
+
+      {
         source: '/technology',
+        destination: '/services',
+        permanent: true,
+      },
+      {
+        source: '/technology/',
         destination: '/services',
         permanent: true,
       },
@@ -77,10 +106,15 @@ const nextConfig = {
         destination: '/sectors/manufacturing',
         permanent: true,
       },
+      {
+        source: '/manufacturing/',
+        destination: '/sectors/manufacturing',
+        permanent: true,
+      },
 
       /**
        * ---------------------------------------
-       * TRAILING SLASH NORMALIZATION
+       * TRAILING SLASH NORMALIZATION (CORE PAGES)
        * ---------------------------------------
        */
       {
@@ -142,7 +176,7 @@ const nextConfig = {
 
       /**
        * ---------------------------------------
-       * QUERY STRING CANONICALIZATION (WP JOBS)
+       * QUERY STRING CANONICALIZATION
        * ---------------------------------------
        */
       {

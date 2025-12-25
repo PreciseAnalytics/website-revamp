@@ -693,7 +693,20 @@ export default function ServiceDetailPage() {
   const { slug } = router.query;
 
   if (!slug || typeof slug !== 'string' || !SERVICES[slug]) {
-    return null;
+    return (
+      <>
+        <Head>
+          <title>Service Not Found | {EnvVars.SITE_NAME}</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
+        <AnimatedHeader />
+        <Container style={{ padding: '10rem 0', textAlign: 'center' }}>
+          <h1>Service Not Found</h1>
+          <p>The service you are looking for does not exist.</p>
+          <Link href="/services">Back to Services</Link>
+        </Container>
+      </>
+    );
   }
 
   const service = SERVICES[slug];
@@ -703,6 +716,11 @@ export default function ServiceDetailPage() {
       <Head>
         <title>{`${service.title} | ${EnvVars.SITE_NAME}`}</title>
         <meta name="description" content={service.description} />
+        <link
+          rel="canonical"
+          href={`https://preciseanalytics.io/services/${slug}`}
+        />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <AnimatedHeader />

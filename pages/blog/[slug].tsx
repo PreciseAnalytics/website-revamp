@@ -92,15 +92,27 @@ export default function SingleArticlePage(props: SingleArticlePageProps) {
     date: date, 
     tags: Array.isArray(tags) ? tags.join(', ') : '', 
     imageUrl, 
-    author: '' 
+    author: 'Precise Analytics', 
   };
   const formattedDate = formatDate(new Date(date));
-  const absoluteImageUrl = imageUrl.replace(/\/+/, '/');
+  const absoluteImageUrl = imageUrl.startsWith('http')
+    ? imageUrl
+    : `https://preciseanalytics.io${imageUrl}`;
   return (
     <>
+      <Head>
+        <title>{title} | {process.env.NEXT_PUBLIC_SITE_NAME || 'Precise Analytics'}</title>
+        <meta name="description" content={description} />
+        <link
+          rel="canonical"
+          href={`https://preciseanalytics.io/blog/${slug}`}
+        />
+        <meta name="robots" content="index, follow" />
+      </Head>
+
       <OpenGraphHead slug={slug} {...meta} />
       <StructuredDataHead slug={slug} {...meta} />
-      <MetadataHead {...meta} />
+  <MetadataHead {...meta} />
       <CustomContainer id="content" ref={contentRef}>
         <ShareWidget title={title} slug={slug} />
         <Header title={title} formattedDate={formattedDate} imageUrl={absoluteImageUrl} readTime={readTime} />

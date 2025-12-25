@@ -13,11 +13,20 @@ export default function ManufacturingPage() {
   return (
     <>
       <Head>
-        <title>Manufacturing Analytics Solutions | {EnvVars.SITE_NAME}</title>
+        <title>
+          Manufacturing Analytics Solutions for Defense & Federal Agencies | {EnvVars.SITE_NAME}
+        </title>
+
         <meta
           name="description"
-          content="ITAR/EAR compliant manufacturing analytics for defense contractors and federal agencies. Advanced IoT, supply chain, and quality analytics."
+          content="ITAR and EAR compliant manufacturing analytics for defense contractors and federal agencies. Industrial IoT analytics, supply chain intelligence, quality management, and compliance reporting."
         />
+
+        <link
+          rel="canonical"
+          href="https://preciseanalytics.io/sectors/manufacturing"
+        />
+        <meta name="robots" content="index, follow" />
       </Head>
 
       <AnimatedHeader />
@@ -42,6 +51,20 @@ export default function ManufacturingPage() {
           </HeroSection>
 
           <SectionTitle>Manufacturing Excellence Through Data</SectionTitle>
+
+          <SectionIntro>
+            <strong>Precise Analytics</strong> provides advanced manufacturing analytics solutions
+            for <strong>defense manufacturers, federal production facilities, and regulated
+            industrial organizations</strong>. We help manufacturing leaders transform operational,
+            supply chain, quality, and compliance data into actionable intelligence that improves
+            efficiency, resilience, and mission readiness.
+            <br /><br />
+            Our manufacturing analytics capabilities support highly regulated environments where
+            security, traceability, and compliance are non-negotiable. From ITAR/EAR-controlled
+            production data to industrial IoT telemetry and supplier risk analytics, we enable
+            organizations to modernize manufacturing operations while meeting strict federal and
+            defense requirements.
+          </SectionIntro>
 
           <ServicesGrid>
             <ServiceCard as={motion.div} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
@@ -455,4 +478,14 @@ const RelatedCard = styled(NextLink)`
     border-color: rgba(var(--accent), 0.3);
     transform: translateY(-4px);
   }
+`;
+
+
+const SectionIntro = styled.p`
+  max-width: 90rem;
+  margin: 0 auto 6rem;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  text-align: center;
 `;

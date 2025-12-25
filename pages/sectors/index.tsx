@@ -42,6 +42,11 @@ export default function SectorsPage() {
   return (
     <>
       <Head>
+        <link
+        rel="canonical"
+        href="https://preciseanalytics.io/sectors"
+      />
+      <meta name="robots" content="index, follow" />
         <title>Sectors We Serve | Precise Analytics</title>
         <meta
           name="description"

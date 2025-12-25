@@ -1,16 +1,3 @@
 {
-  "framework": "nextjs",
-
-  "routes": [
-    { "src": "^/home/?$", "status": 308, "headers": { "Location": "/" } },
-
-    { "src": "^/contact-us/?$", "status": 308, "headers": { "Location": "/contact" } },
-    { "src": "^/request-quote/?$", "status": 308, "headers": { "Location": "/contact" } },
-
-    { "src": "^/data-visualization/?$", "status": 308, "headers": { "Location": "/services" } },
-    { "src": "^/predictive-analysis/?$", "status": 308, "headers": { "Location": "/services" } },
-    { "src": "^/technology/?$", "status": 308, "headers": { "Location": "/services" } },
-
-    { "src": "^/manufacturing/?$", "status": 308, "headers": { "Location": "/sectors/manufacturing" } }
-  ]
+  "framework": "nextjs"
 }

@@ -1,7 +1,9 @@
 User-agent: *
-Disallow: /wp-admin/
-Disallow: /wp-admin/admin-ajax.php
-
 Allow: /
+
+# Block admin and unnecessary paths
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
 
 Sitemap: https://preciseanalytics.io/sitemap.xml

@@ -14,21 +14,21 @@ export default function FinancePage() {
     <>
       <Head>
         <title>
-          Financial Analytics Solutions for Federal & Public Sector | {EnvVars.SITE_NAME}
+          Financial Analytics Solutions for Federal Agencies | {EnvVars.SITE_NAME}
         </title>
 
         <meta
           name="description"
-          content="Federal financial analytics solutions for Treasury, FDIC, SEC, IRS, and public finance agencies. Fraud detection, risk modeling, audit analytics, and regulatory compliance."
+          content="Financial analytics solutions for federal agencies and regulated institutions. Fraud detection, risk modeling, public finance analytics, and regulatory compliance reporting."
         />
 
         <link
           rel="canonical"
           href="https://preciseanalytics.io/sectors/finance"
         />
+
         <meta name="robots" content="index, follow" />
       </Head>
-
       <AnimatedHeader />
 
       <PageWrapper>
@@ -465,3 +465,4 @@ const RelatedCard = styled(NextLink)`
     transform: translateY(-4px);
   }
 `;
+

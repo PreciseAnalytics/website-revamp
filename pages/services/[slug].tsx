@@ -725,6 +725,26 @@ export default function ServiceDetailPage() {
 
       <AnimatedHeader />
 
+      {/* Back Navigation */}
+      <TopNav>
+        <Container>
+          <BackNavigation
+            href="/services"
+          >
+            <BackIcon>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="m12 19-7-7 7-7"/>
+                <path d="M19 12H5"/>
+              </svg>
+            </BackIcon>
+            <BackText>
+              <BackLabel>Back to</BackLabel>
+              <BackDestination>All Services</BackDestination>
+            </BackText>
+          </BackNavigation>
+        </Container>
+      </TopNav>
+
       {/* Hero Section */}
       <Hero style={{ backgroundImage: `url(${service.image})` }}>
         <Overlay />
@@ -869,6 +889,89 @@ export default function ServiceDetailPage() {
 }
 
 /* ================= STYLES ================= */
+
+const TopNav = styled.div`
+  background: rgb(var(--background));
+  padding: 2rem 0 1rem;
+  border-bottom: 1px solid rgba(var(--text), 0.1);
+`;
+
+const BackNavigation = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 1.8rem 3rem;
+  background: rgba(255, 165, 0, 0.1);
+  border: 2px solid rgba(255, 165, 0, 0.3);
+  border-radius: 1.6rem;
+  color: rgb(255, 140, 0);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  font-size: 1.1rem;
+  box-shadow: 0 4px 15px rgba(255, 165, 0, 0.2);
+
+  &:hover {
+    background: rgba(255, 165, 0, 0.15);
+    border-color: rgba(255, 165, 0, 0.5);
+    box-shadow: 0 8px 25px rgba(255, 165, 0, 0.3);
+    transform: translateX(-8px) translateY(-2px);
+  }
+
+  ${media.phone(`
+    padding: 1.4rem 2rem;
+    font-size: 1rem;
+  `)}
+`;
+
+const BackIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 1rem;
+  background: rgba(255, 165, 0, 0.2);
+  transition: all 0.3s ease;
+  
+  svg {
+    width: 2.2rem;
+    height: 2.2rem;
+    transition: transform 0.3s ease;
+  }
+
+  ${BackNavigation}:hover & {
+    background: rgba(255, 165, 0, 0.3);
+    
+    svg {
+      transform: translateX(-3px);
+    }
+  }
+`;
+
+const BackText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+`;
+
+const BackLabel = styled.span`
+  font-size: 1.4rem;
+  opacity: 0.8;
+  line-height: 1;
+  font-weight: 500;
+`;
+
+const BackDestination = styled.span`
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+
+  ${media.phone(`
+    font-size: 1.6rem;
+  `)}
+`;
 
 const Hero = styled.section`
   position: relative;

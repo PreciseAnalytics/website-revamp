@@ -118,7 +118,8 @@ export default function SolutionsPage() {
     timeline: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [isError, setIsError] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => setIsClient(true), []);
 
@@ -127,32 +128,70 @@ export default function SolutionsPage() {
     setContactData({ ...contactData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitSuccess(null);
+    
+    // Quick client-side validation
+    if (!contactData.firstName || !contactData.lastName || !contactData.email || !contactData.solution) {
+      alert('Please fill in all required fields');
+      return;
+    }
 
-    setTimeout(() => {
-      console.log('Submitted:', contactData);
-      setIsSubmitting(false);
-      setSubmitSuccess("Thank you! We'll be in touch within 24 hours to discuss your project.");
-      setContactData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        company: '',
-        solution: '',
-        message: '',
-        timeline: '',
+    setIsSubmitting(true);
+    setIsError(false);
+
+    try {
+      const response = await fetch('/api/solutions-contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: contactData.firstName,
+          lastName: contactData.lastName,
+          email: contactData.email,
+          company: contactData.company,
+          solution: contactData.solution,
+          timeline: contactData.timeline,
+          message: contactData.message
+        }),
       });
-    }, 2000);
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Success - show modal and clear form
+        setShowSuccessModal(true);
+        setContactData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          company: '',
+          solution: '',
+          message: '',
+          timeline: '',
+        });
+      } else {
+        // Error - show alert with option to email directly
+        alert(data.message || 'There was an error submitting your request. Please try again or email us at contact@preciseanalytics.io');
+        setIsError(true);
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('There was an error submitting your request. Please email us directly at contact@preciseanalytics.io');
+      setIsError(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleGetStartedClick = (solutionTitle: string) => {
     setContactData({ ...contactData, solution: solutionTitle });
     const formElement = document.getElementById('contact-form');
     if (formElement) {
-      formElement.scrollIntoView({ behavior: 'smooth' });
+      const yOffset = -100; // Offset for header
+      const y = formElement.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
@@ -234,10 +273,6 @@ export default function SolutionsPage() {
             <FormWrapper>
               <FormTitle>Start Your Project</FormTitle>
               <FormSubtitle>Ready to transform your data? Let&apos;s discuss your specific needs and goals.</FormSubtitle>
-              
-              {submitSuccess && (
-                <StatusMessage>{submitSuccess}</StatusMessage>
-              )}
               
               <Form onSubmit={handleSubmit}>
                 <FormGrid>
@@ -352,6 +387,43 @@ export default function SolutionsPage() {
         </Container>
       </PageWrapper>
 
+      {/* Success Modal Popup */}
+      {showSuccessModal && (
+        <ModalOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setShowSuccessModal(false)}
+        >
+          <ModalContent
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: 'spring', duration: 0.5 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ModalHeader>
+              <SuccessIcon>✓</SuccessIcon>
+              <ModalTitle>Message Sent Successfully!</ModalTitle>
+            </ModalHeader>
+            
+            <ModalBody>
+              <ModalText>
+                Your message has been successfully submitted. Thank you for trusting Precise Analytics with your analytics and data needs. One of our specialists will review your request and contact you soon to discuss how we can support your objectives with tailored, data-driven solutions.
+              </ModalText>
+              <ModalText>
+                We appreciate the opportunity to work with you!
+              </ModalText>
+            </ModalBody>
+            
+            <ModalFooter>
+              <CloseButton onClick={() => setShowSuccessModal(false)}>
+                Close
+              </CloseButton>
+            </ModalFooter>
+          </ModalContent>
+        </ModalOverlay>
+      )}
       
     </>
   );
@@ -359,7 +431,8 @@ export default function SolutionsPage() {
 
 // Styled Components with fixed media queries
 const PageWrapper = styled.div`
-  padding: 4rem 0;
+  padding: 4rem 0 6rem;
+  min-height: 100vh;
 `;
 
 const PageTitle = styled.h1`
@@ -592,7 +665,9 @@ const ExpertiseItem = styled.li`
 
 const ContactSection = styled.section`
   margin-top: 8rem;
-  margin-bottom: 8rem;
+  margin-bottom: 10rem;
+  padding: 0 0 6rem;
+  min-height: 80vh;
 `;
 
 const FormWrapper = styled.div`
@@ -605,6 +680,12 @@ const FormWrapper = styled.div`
 
   ${media.tablet(`
     padding: 3rem 2rem;
+    margin: 0 2rem;
+  `)}
+  
+  ${media.phone(`
+    padding: 2rem 1.5rem;
+    margin: 0 1rem;
   `)}
 `;
 
@@ -689,13 +770,133 @@ const SubmitBtn = styled.button`
   }
 `;
 
-const StatusMessage = styled.p`
-  font-size: 1.6rem;
+// Modal Styled Components
+const ModalOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+`;
+
+const ModalContent = styled(motion.div)`
+  background: rgb(var(--cardBackground));
+  border-radius: 2rem;
+  max-width: 60rem;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 125, 0, 0.3);
+  overflow: hidden;
+
+  ${media.tablet(`
+    max-width: 50rem;
+  `)}
+
+  ${media.phone(`
+    max-width: 95%;
+    margin: 0 1rem;
+  `)}
+`;
+
+const ModalHeader = styled.div`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  padding: 3rem;
   text-align: center;
-  padding: 1rem;
-  background: rgba(0, 255, 0, 0.1);
-  border: 1px solid rgba(0, 255, 0, 0.3);
-  border-radius: 0.8rem;
-  color: green;
-  margin-bottom: 2rem;
+  position: relative;
+`;
+
+const SuccessIcon = styled.div`
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  background: white;
+  color: rgb(255, 125, 0);
+  font-size: 5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+`;
+
+const ModalTitle = styled.h2`
+  color: white;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin: 0;
+
+  ${media.tablet(`
+    font-size: 2.4rem;
+  `)}
+`;
+
+const ModalBody = styled.div`
+  padding: 3rem;
+  text-align: center;
+
+  ${media.phone(`
+    padding: 2rem 1.5rem;
+  `)}
+`;
+
+const ModalText = styled.p`
+  font-size: 1.7rem;
+  line-height: 1.8;
+  color: rgb(var(--text));
+  margin: 0 0 2rem 0;
+
+  &:last-child {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: rgb(255, 125, 0);
+  }
+
+  ${media.tablet(`
+    font-size: 1.6rem;
+  `)}
+`;
+
+const ModalFooter = styled.div`
+  padding: 2rem 3rem 3rem;
+  display: flex;
+  justify-content: center;
+
+  ${media.phone(`
+    padding: 1.5rem 1.5rem 2rem;
+  `)}
+`;
+
+const CloseButton = styled.button`
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  border: none;
+  padding: 1.5rem 4rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 125, 0, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(255, 125, 0, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  ${media.phone(`
+    padding: 1.2rem 3rem;
+    font-size: 1.6rem;
+  `)}
 `;

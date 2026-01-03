@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
 import AnimatedHeader from '../../components/AnimatedHeader';
-import AnimatedFooter from '../../components/AnimatedFooter';
 import Container from '../../components/Container';
 import { EnvVars } from '../../env';
 import { media } from '../../utils/media';
@@ -180,7 +179,6 @@ export default function FinancePage() {
         </Container>
       </PageWrapper>
 
-      <AnimatedFooter />
     </>
   );
 }
@@ -465,4 +463,3 @@ const RelatedCard = styled(NextLink)`
     transform: translateY(-4px);
   }
 `;
-

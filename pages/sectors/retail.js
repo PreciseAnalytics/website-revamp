@@ -4,20 +4,10 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import NextLink from 'next/link';
 import AnimatedHeader from '../../components/AnimatedHeader';
-import AnimatedFooter from '../../components/AnimatedFooter';
 import Container from '../../components/Container';
 import { EnvVars } from '../../env';
 
 const RetailPage = () => {
-  const handleConsultationClick = () => {
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-      contactForm.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.location.href = '/#contact-form';
-    }
-  };
-
   return (
     <>
       <Head>
@@ -315,14 +305,15 @@ const RetailPage = () => {
                 Partner with Precise Analytics for data-driven retail solutions that improve customer experience 
                 and operational efficiency in federal retail environments.
               </CTADescription>
-              <CTAButton
-                as={motion.button}
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleConsultationClick}
-              >
-                Schedule a Consultation
-              </CTAButton>
+              <NextLink href="/schedule-consult" passHref>
+                <CTAButton
+                  as={motion.a}
+                  whileHover={{ scale: 1.05, y: -3 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Schedule a Consultation
+                </CTAButton>
+              </NextLink>
             </CTASection>
 
             {/* Related Sectors Section */}
@@ -367,8 +358,6 @@ const RetailPage = () => {
           </ContentSection>
         </Container>
       </PageWrapper>
-
-      <AnimatedFooter />
     </>
   );
 };
@@ -850,6 +839,8 @@ const CTAButton = styled.button`
   box-shadow: 0 8px 24px rgba(147, 51, 234, 0.25);
   position: relative;
   overflow: hidden;
+  display: inline-block;
+  text-decoration: none;
 
   &::before {
     content: '';

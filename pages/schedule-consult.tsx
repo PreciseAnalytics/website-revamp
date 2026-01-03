@@ -203,6 +203,10 @@ export default function ScheduleConsult() {
     router.push('/services');
   };
 
+  const goBackToSectors = () => {
+    router.push('/sectors');
+  };
+
   return (
     <>
       <Head>
@@ -218,18 +222,24 @@ export default function ScheduleConsult() {
       </Head>
       <AnimatedHeader />
 
-      {/* BACK TO SERVICES BUTTON */}
+      {/* BACK NAVIGATION BUTTONS */}
       <BackButtonWrapper
         as={motion.div}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
         <Container>
-          <BackButton onClick={goBackToServices}>
-            <BackIcon>←</BackIcon>
-            <BackText>Back to Services</BackText>
-          </BackButton>
+          <BackButtonContainer>
+            <BackButton onClick={goBackToServices}>
+              <BackIcon>←</BackIcon>
+              <BackText>Back to Services</BackText>
+            </BackButton>
+            <BackButton onClick={goBackToSectors}>
+              <BackText>Back to All Sectors</BackText>
+              <BackIcon>→</BackIcon>
+            </BackButton>
+          </BackButtonContainer>
         </Container>
       </BackButtonWrapper>
 
@@ -793,6 +803,18 @@ const BackButtonWrapper = styled.div`
   `)}
 `;
 
+const BackButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  
+  ${media.tablet(`
+    flex-direction: column;
+    gap: 1rem;
+  `)}
+`;
+
 const BackButton = styled.button`
   display: inline-flex;
   align-items: center;
@@ -810,12 +832,21 @@ const BackButton = styled.button`
   &:hover {
     background: linear-gradient(135deg, rgba(255, 125, 0, 0.2), rgba(255, 165, 0, 0.1));
     border-color: rgb(255, 125, 0);
+  }
+  
+  &:first-child:hover {
     transform: translateX(-5px);
+  }
+  
+  &:last-child:hover {
+    transform: translateX(5px);
   }
 
   ${media.tablet(`
     padding: 1rem 2rem;
     font-size: 1.4rem;
+    width: 100%;
+    justify-content: center;
   `)}
 `;
 
@@ -823,8 +854,12 @@ const BackIcon = styled.span`
   font-size: 2rem;
   transition: transform 0.3s ease;
 
-  ${BackButton}:hover & {
+  ${BackButton}:first-child:hover &:first-child {
     transform: translateX(-3px);
+  }
+  
+  ${BackButton}:last-child:hover &:last-child {
+    transform: translateX(3px);
   }
 `;
 

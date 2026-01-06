@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   
@@ -49,15 +49,28 @@ const nextConfig = {
         destination: '/sectors',
         permanent: true,
       },
-      
-      // Ensure consistent trailing slash handling (optional - choose one approach)
-      // Uncomment if you want to enforce no trailing slashes:
-      // {
-      //   source: '/:path*/',
-      //   destination: '/:path*',
-      //   permanent: true,
-      // },
     ];
+  },
+  
+  // Return 410 Gone for old WordPress URLs
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Block WordPress admin paths with 410 Gone
+        {
+          source: '/wp-admin/:path*',
+          destination: '/api/410',
+        },
+        {
+          source: '/wp-includes/:path*',
+          destination: '/api/410',
+        },
+        {
+          source: '/wp-content/:path*',
+          destination: '/api/410',
+        },
+      ],
+    };
   },
   
   // Add headers for better SEO
@@ -88,4 +101,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

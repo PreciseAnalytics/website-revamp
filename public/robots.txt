@@ -1,9 +1,31 @@
+# robots.txt for Precise Analytics LLC
+# https://preciseanalytics.io
+
+# Allow all crawlers to access the site
 User-agent: *
 Allow: /
 
-# Block admin and unnecessary paths
+# Block admin and system directories (if any)
 Disallow: /api/
 Disallow: /_next/
 Disallow: /admin/
+Disallow: /*.json$
 
+# Block duplicate or deprecated URLs (these now redirect)
+Disallow: /about-us/team
+Disallow: /our-team
+Disallow: /blog
+Disallow: /features
+Disallow: /pricing
+Disallow: /certifications
+Disallow: /Industries
+
+# Allow specific important resources
+Allow: /sitemap.xml
+Allow: /robots.txt
+
+# Sitemap location
 Sitemap: https://preciseanalytics.io/sitemap.xml
+
+# Crawl-delay (optional - remove if causing issues)
+# Crawl-delay: 1

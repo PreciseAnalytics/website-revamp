@@ -1,113 +1,91 @@
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
-  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
-
-  trailingSlash: false,
-
-  swcMinify: true,
-
-  compiler: {
-    styledComponents: true,
-  },
-
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'github.blog',
-      },
-    ],
-    deviceSizes: [320, 640, 1080, 1200],
-    imageSizes: [64, 128],
-  },
-
+  
   async redirects() {
     return [
-      /**
-       * ---------------------------------------
-       * LEGACY URL FIXES (PATH ONLY)
-       * ---------------------------------------
-       */
-      { source: '/contact-us', destination: '/contact', permanent: true },
-      { source: '/contact-us/', destination: '/contact', permanent: true },
-
-      { source: '/request-quote', destination: '/contact', permanent: true },
-      { source: '/request-quote/', destination: '/contact', permanent: true },
-
-      { source: '/data-visualization', destination: '/services', permanent: true },
-      { source: '/data-visualization/', destination: '/services', permanent: true },
-
-      { source: '/predictive-analysis', destination: '/services', permanent: true },
-      { source: '/predictive-analysis/', destination: '/services', permanent: true },
-
-      { source: '/technology', destination: '/services', permanent: true },
-      { source: '/technology/', destination: '/services', permanent: true },
-
-      { source: '/manufacturing', destination: '/sectors/manufacturing', permanent: true },
-      { source: '/manufacturing/', destination: '/sectors/manufacturing', permanent: true },
-
-      { source: '/retail', destination: '/sectors/retail', permanent: true },
-      { source: '/retail/', destination: '/sectors/retail', permanent: true },
-
-
-
-      /**
-       * ---------------------------------------
-       * TRAILING SLASH NORMALIZATION
-       * ---------------------------------------
-       */
-      { source: '/about-us/', destination: '/about-us', permanent: true },
-      { source: '/careers/', destination: '/careers', permanent: true },
-      { source: '/capabilities-statement/', destination: '/capabilities-statement', permanent: true },
-      { source: '/services/', destination: '/services', permanent: true },
-      { source: '/sectors/', destination: '/sectors', permanent: true },
-      { source: '/contact/', destination: '/contact', permanent: true },
-      { source: '/privacy-policy/', destination: '/privacy-policy', permanent: true },
-
-      /**
-       * ---------------------------------------
-       * WORDPRESS GHOST URL ELIMINATION
-       * ---------------------------------------
-       */
-      { source: '/wp-admin/:path*', destination: '/', permanent: true },
-      { source: '/wp-content/:path*', destination: '/', permanent: true },
-      { source: '/wp-includes/:path*', destination: '/', permanent: true },
-
-      /**
-       * ---------------------------------------
-       * QUERY STRING CANONICALIZATION
-       * ---------------------------------------
-       */
+      // Consolidate duplicate team pages to single canonical URL
       {
-        source: '/',
-        has: [{ type: 'query', key: 'post_type' }],
-        destination: '/careers',
+        source: '/about-us/team',
+        destination: '/team',
+        permanent: true, // 301 redirect
+      },
+      {
+        source: '/our-team',
+        destination: '/team',
+        permanent: true,
+      },
+      
+      // Remove deprecated/non-existent pages
+      {
+        source: '/blog',
+        destination: '/',
         permanent: true,
       },
       {
-        source: '/',
-        has: [{ type: 'query', key: 'p' }],
-        destination: '/careers',
+        source: '/features',
+        destination: '/services',
         permanent: true,
+      },
+      {
+        source: '/pricing',
+        destination: '/schedule-consult',
+        permanent: true,
+      },
+      {
+        source: '/certifications',
+        destination: '/capabilities-statement',
+        permanent: true,
+      },
+      
+      // Fix case sensitivity issue
+      {
+        source: '/Industries',
+        destination: '/sectors',
+        permanent: true,
+      },
+      {
+        source: '/industries',
+        destination: '/sectors',
+        permanent: true,
+      },
+      
+      // Ensure consistent trailing slash handling (optional - choose one approach)
+      // Uncomment if you want to enforce no trailing slashes:
+      // {
+      //   source: '/:path*/',
+      //   destination: '/:path*',
+      //   permanent: true,
+      // },
+    ];
+  },
+  
+  // Add headers for better SEO
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          },
+        ],
       },
     ];
   },
-
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.svg$/,
-      issuer: { and: [/\.(js|ts)x?$/] },
-      use: [{ loader: '@svgr/webpack' }, { loader: 'url-loader' }],
-    });
-
-    return config;
-  },
 };
 
-module.exports = withBundleAnalyzer(nextConfig);
+module.exports = nextConfig;

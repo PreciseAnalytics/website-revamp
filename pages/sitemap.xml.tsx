@@ -2,59 +2,53 @@ import { GetServerSideProps } from 'next';
 
 const SITE_URL = 'https://preciseanalytics.io';
 
-const STATIC_PAGES = [
-  // Main pages
-  '/',
-  '/about-us',
-  '/services',
-  '/solutions',
-  '/contact',
-  '/careers',
-  '/certifications',
+// Define page priorities and change frequencies
+interface PageConfig {
+  path: string;
+  priority: string;
+  changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+}
+
+const STATIC_PAGES: PageConfig[] = [
+  // Main pages - High priority
+  { path: '/', priority: '1.0', changefreq: 'daily' },
+  { path: '/services', priority: '0.9', changefreq: 'monthly' },
+  { path: '/solutions', priority: '0.9', changefreq: 'monthly' },
+  { path: '/capabilities-statement', priority: '0.9', changefreq: 'monthly' },
   
-  // About section
-  '/about-us/team',
-  '/our-team',
-  '/team',
+  // About & Team - Medium-high priority
+  { path: '/about-us', priority: '0.8', changefreq: 'monthly' },
+  { path: '/team', priority: '0.7', changefreq: 'monthly' },
   
-  // Capabilities
-  '/capabilities-statement',
+  // Sectors - Medium-high priority
+  { path: '/sectors', priority: '0.8', changefreq: 'monthly' },
+  { path: '/sectors/healthcare', priority: '0.7', changefreq: 'monthly' },
+  { path: '/sectors/finance', priority: '0.7', changefreq: 'monthly' },
+  { path: '/sectors/manufacturing', priority: '0.7', changefreq: 'monthly' },
+  { path: '/sectors/retail', priority: '0.7', changefreq: 'monthly' },
   
-  // Sectors - main index
-  '/sectors',
-  '/sectors/finance',
-  '/sectors/healthcare',
-  '/sectors/manufacturing',
-  '/sectors/retail',
+  // Conversion pages
+  { path: '/schedule-consult', priority: '0.8', changefreq: 'monthly' },
+  { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+  { path: '/careers', priority: '0.6', changefreq: 'monthly' },
   
-  // Industries (if different from sectors)
-  '/Industries',
-  
-  // Features & Solutions
-  '/features',
-  '/pricing',
-  '/schedule-consult',
-  
-  // Blog
-  '/blog',
-  
-  // Legal pages
-  '/privacy-policy',
-  '/terms-of-service',
-  '/cookies-policy',
+  // Legal pages - Low priority
+  { path: '/privacy-policy', priority: '0.3', changefreq: 'yearly' },
+  { path: '/terms-of-service', priority: '0.3', changefreq: 'yearly' },
+  { path: '/cookies-policy', priority: '0.3', changefreq: 'yearly' },
 ];
 
 function generateSitemapXml() {
-  const lastmod = new Date().toISOString().split('T')[0]; // Dynamic current date
+  const lastmod = new Date().toISOString().split('T')[0];
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${STATIC_PAGES.map(
-  (path) => `  <url>
-    <loc>${SITE_URL}${path}</loc>
+  (page) => `  <url>
+    <loc>${SITE_URL}${page.path}</loc>
     <lastmod>${lastmod}</lastmod>
-    <changefreq>${path === '/' ? 'daily' : 'weekly'}</changefreq>
-    <priority>${path === '/' ? '1.0' : '0.8'}</priority>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
   </url>`
 ).join('\n')}
 </urlset>`;

@@ -99,6 +99,9 @@ const nextConfig = {
       },
     ];
   },
+  
+  // Handle trailing slashes
+  trailingSlash: false,
 };
 
 export default nextConfig;

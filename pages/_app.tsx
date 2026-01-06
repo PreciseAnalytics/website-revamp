@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 
 import { GlobalStyle } from '@/components/GlobalStyles';
 import AnimatedFooter from 'components/AnimatedFooter';
+import CanonicalTag from '@/components/CanonicalTag';
 
 // Cookie consent
 import CookieConsent from '@/components/CookieConsent';
@@ -65,6 +66,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="theme-color" content="#0F172A" />
       </Head>
 
+      <CanonicalTag />
       <GlobalStyle />
 
       <LazyMotion features={domAnimation}>

@@ -356,7 +356,6 @@ export default function CareersPage() {
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
-  const [pendingApplyPosition, setPendingApplyPosition] = useState<Position | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -683,18 +682,10 @@ export default function CareersPage() {
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     console.log('🔄 Filter changed:', key, '=', value);
     setFilters((prev) => ({ ...prev, [key]: value }));
-    
-    if (key === 'department' && value !== 'All') {
-      const normalizedValue = value.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+    if (positionsSectionRef.current) {
       setTimeout(() => {
-        const element = document.getElementById(`category-${normalizedValue}`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          element.style.animation = 'highlight 1.5s ease';
-          setTimeout(() => {
-            element.style.animation = '';
-          }, 1500);
-        }
+        positionsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
   };
@@ -709,23 +700,7 @@ export default function CareersPage() {
     }, 100);
   };
 
-  const handleBackToAllJobs = () => {
-    console.log('🔙 Back to all jobs clicked');
-    setFilters((prev) => ({ ...prev, department: 'All' }));
-    if (positionsSectionRef.current) {
-      positionsSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
 
-  // Group positions by department
-  const groupedPositions = filteredPositions.reduce((acc, pos) => {
-    const dept = pos.department || 'general';
-    if (!acc[dept]) {
-      acc[dept] = [];
-    }
-    acc[dept].push(pos);
-    return acc;
-  }, {} as Record<string, Position[]>);
 
   // Enhanced login with proper validation
   const handleLogin = async () => {
@@ -772,12 +747,6 @@ export default function CareersPage() {
         setShowLoginModal(false);
         setLoginData({ email: '', password: '' });
         console.log('✅ API Login successful:', data.user);
-
-        if (pendingApplyPosition) {
-          const positionToApply = pendingApplyPosition;
-          setPendingApplyPosition(null);
-          openApplicationForPosition(positionToApply, data.user, data.token);
-        }
         
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'login', { method: 'email' });
@@ -802,12 +771,6 @@ export default function CareersPage() {
         setShowLoginModal(false);
         setLoginData({ email: '', password: '' });
         console.log('✅ Mock login successful:', mockResult.user);
-
-        if (pendingApplyPosition) {
-          const positionToApply = pendingApplyPosition;
-          setPendingApplyPosition(null);
-          openApplicationForPosition(positionToApply, mockResult.user, mockResult.token);
-        }
         
         alert('✅ Local fallback login used. No verification email is sent in this mode.');
       }
@@ -1010,7 +973,6 @@ export default function CareersPage() {
     localStorage.removeItem('user');
     setIsLoggedIn(false);
     setUser(null);
-    setPendingApplyPosition(null);
     console.log('✅ User logged out');
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'logout', { method: 'email' });
@@ -1063,22 +1025,6 @@ export default function CareersPage() {
   const handleApplyClick = (position: Position) => {
     console.log('🚀 Apply clicked for:', position.title, 'User logged in:', isLoggedIn);
     openApplicationForPosition(position);
-  };
-
-  const handleRegisterToApplyClick = (position: Position) => {
-    setAuthError(null);
-    setPendingApplyPosition(position);
-    setShowJobModal(false);
-    setShowLoginModal(false);
-    setShowRegisterModal(true);
-  };
-
-  const handleLoginToApplyClick = (position: Position) => {
-    setAuthError(null);
-    setPendingApplyPosition(position);
-    setShowJobModal(false);
-    setShowRegisterModal(false);
-    setShowLoginModal(true);
   };
 
   // Manual refresh function for debugging
@@ -1135,10 +1081,10 @@ export default function CareersPage() {
                   </AuthContainer>
                 ) : (
                   <AuthContainer>
-                    <LoginButton onClick={() => { setAuthError(null); setPendingApplyPosition(null); setShowRegisterModal(false); setShowResetModal(false); setShowLoginModal(true); }}>
+                    <LoginButton onClick={() => { setAuthError(null); setShowRegisterModal(false); setShowResetModal(false); setShowLoginModal(true); }}>
                       Login
                     </LoginButton>
-                    <RegisterToApplyButton onClick={() => { setAuthError(null); setPendingApplyPosition(null); setShowLoginModal(false); setShowResetModal(false); setShowRegisterModal(true); }}>
+                    <RegisterToApplyButton onClick={() => { setAuthError(null); setShowLoginModal(false); setShowResetModal(false); setShowRegisterModal(true); }}>
                       Register to Apply
                     </RegisterToApplyButton>
                   </AuthContainer>
@@ -1317,18 +1263,18 @@ export default function CareersPage() {
               <NoPositionsMessage>
                 <NoPositionsIcon><AlertCircle size={40} /></NoPositionsIcon>
                 <NoPositionsTitle>Unable to Load Jobs</NoPositionsTitle>
-                <NoPositionsText>
-                  {error}
-                </NoPositionsText>
-                <RetryButton onClick={handleManualRefresh}>
-                  🔄 Try Again
-                </RetryButton>
-                <NoPositionsText>
-                  For immediate assistance, contact{' '}
-                  <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a>
-                </NoPositionsText>
-              </NoPositionsMessage>
-            ) : Object.keys(groupedPositions).length === 0 ? (
+              <NoPositionsText>
+                {error}
+              </NoPositionsText>
+              <RetryButton onClick={handleManualRefresh}>
+                🔄 Try Again
+              </RetryButton>
+              <NoPositionsText>
+                For immediate assistance, contact{' '}
+                <a href="mailto:careers@preciseanalytics.io">careers@preciseanalytics.io</a>
+              </NoPositionsText>
+            </NoPositionsMessage>
+            ) : filteredPositions.length === 0 ? (
               <NoPositionsMessage>
                 <NoPositionsIcon>📋</NoPositionsIcon>
                 <NoPositionsTitle>No Open Positions</NoPositionsTitle>
@@ -1338,62 +1284,42 @@ export default function CareersPage() {
                 </NoPositionsText>
               </NoPositionsMessage>
             ) : (
-              Object.entries(groupedPositions)
-                .sort(([deptA], [deptB]) => (deptA === 'general' ? 1 : deptA.localeCompare(deptB)))
-                .map(([department, deptPositions]) => (
-                  <JobCategory key={department} id={`category-${department.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
-                    <CategoryHeader>
-                      <CategoryTitle>{department.charAt(0).toUpperCase() + department.slice(1)}</CategoryTitle>
-                      {filters.department !== 'All' && (
-                        <BackToAllJobsButton onClick={handleBackToAllJobs}>
-                          Back to All Jobs
-                        </BackToAllJobsButton>
-                      )}
-                    </CategoryHeader>
-                    <JobListContainer>
-                      <JobListHeader>
-                        <HeaderCell className="title">Position</HeaderCell>
-                        <HeaderCell className="department">Department</HeaderCell>
-                        <HeaderCell className="location">Location</HeaderCell>
-                        <HeaderCell className="type">Type</HeaderCell>
-                        <HeaderCell className="salary">Salary</HeaderCell>
-                        <HeaderCell className="action">Apply</HeaderCell>
-                      </JobListHeader>
-                      {deptPositions.map((position) => (
-                        <JobListRow key={position.id}>
-                          <JobCell className="title">
-                            <JobTitle onClick={() => handleLearnMore(position)}>{position.title}</JobTitle>
-                            <JobPreview>{position.description.substring(0, 120)}...</JobPreview>
-                          </JobCell>
-                          <JobCell className="department">
-                            <DepartmentTag>{position.department}</DepartmentTag>
-                          </JobCell>
-                          <JobCell className="location">
-                            <LocationText>{position.location}</LocationText>
-                          </JobCell>
-                          <JobCell className="type">
-                            <TypeBadge>{position.employment_type.replace('_', ' ').toUpperCase()}</TypeBadge>
-                          </JobCell>
-                          <JobCell className="salary">
-                            <SalaryText>{position.salary_range}</SalaryText>
-                          </JobCell>
-                          <JobCell className="action">
-                            <JobActions>
-                              <LearnMoreButton onClick={() => handleLearnMore(position)}>Learn More</LearnMoreButton>
-                              {isLoggedIn ? (
-                                <CompactApplyButton onClick={() => handleApplyClick(position)}>Apply Now</CompactApplyButton>
-                              ) : (
-                                <CompactApplyButton onClick={() => handleRegisterToApplyClick(position)}>
-                                  Register to Apply
-                                </CompactApplyButton>
-                              )}
-                            </JobActions>
-                          </JobCell>
-                        </JobListRow>
-                      ))}
-                    </JobListContainer>
-                  </JobCategory>
-                ))
+              <JobListContainer>
+                <JobListHeader>
+                  <HeaderCell className="title">Position</HeaderCell>
+                  <HeaderCell className="department">Department</HeaderCell>
+                  <HeaderCell className="location">Location</HeaderCell>
+                  <HeaderCell className="type">Type</HeaderCell>
+                  <HeaderCell className="salary">Salary</HeaderCell>
+                  <HeaderCell className="action">Actions</HeaderCell>
+                </JobListHeader>
+                {filteredPositions.map((position) => (
+                  <JobListRow key={position.id}>
+                    <JobCell className="title">
+                      <JobTitle onClick={() => handleLearnMore(position)}>{position.title}</JobTitle>
+                      <JobPreview>{position.description.substring(0, 120)}...</JobPreview>
+                    </JobCell>
+                    <JobCell className="department">
+                      <DepartmentTag>{position.department}</DepartmentTag>
+                    </JobCell>
+                    <JobCell className="location">
+                      <LocationText>{position.location}</LocationText>
+                    </JobCell>
+                    <JobCell className="type">
+                      <TypeBadge>{position.employment_type.replace('_', ' ').toUpperCase()}</TypeBadge>
+                    </JobCell>
+                    <JobCell className="salary">
+                      <SalaryText>{position.salary_range}</SalaryText>
+                    </JobCell>
+                    <JobCell className="action">
+                      <JobActions>
+                        <LearnMoreButton onClick={() => handleLearnMore(position)}>Learn More</LearnMoreButton>
+                        <CompactApplyButton onClick={() => handleApplyClick(position)}>Apply Now</CompactApplyButton>
+                      </JobActions>
+                    </JobCell>
+                  </JobListRow>
+                ))}
+              </JobListContainer>
             )}
           </PositionsSection>
         </Container>
@@ -1451,21 +1377,39 @@ export default function CareersPage() {
                 )}
                 <JobModalActions>
                   <SecondaryButton onClick={() => setShowJobModal(false)}>Keep Browsing</SecondaryButton>
-                  {isLoggedIn ? (
-                    <PrimaryButton onClick={() => handleApplyClick(selectedPosition)}>
-                      Apply for This Position
-                    </PrimaryButton>
-                  ) : (
-                    <>
-                      <SecondaryButton onClick={() => handleLoginToApplyClick(selectedPosition)}>
-                        Login to Apply
-                      </SecondaryButton>
-                      <PrimaryButton onClick={() => handleRegisterToApplyClick(selectedPosition)}>
-                        Register to Apply
-                      </PrimaryButton>
-                    </>
-                  )}
+                  <PrimaryButton onClick={() => handleApplyClick(selectedPosition)}>
+                    Apply for This Position
+                  </PrimaryButton>
                 </JobModalActions>
+                {!isLoggedIn && (
+                  <JobModalHint>
+                    Want to track your application status?{' '}
+                    <JobModalHintLink
+                      onClick={() => {
+                        setAuthError(null);
+                        setShowJobModal(false);
+                        setShowRegisterModal(false);
+                        setShowResetModal(false);
+                        setShowLoginModal(true);
+                      }}
+                    >
+                      Login
+                    </JobModalHintLink>{' '}
+                    or{' '}
+                    <JobModalHintLink
+                      onClick={() => {
+                        setAuthError(null);
+                        setShowJobModal(false);
+                        setShowLoginModal(false);
+                        setShowResetModal(false);
+                        setShowRegisterModal(true);
+                      }}
+                    >
+                      create an account
+                    </JobModalHintLink>
+                    .
+                  </JobModalHint>
+                )}
               </JobModalBody>
             </JobModalContent>
           </ModalOverlay>
@@ -2287,47 +2231,6 @@ const FilterSelect = styled.select`
   }
 `;
 
-const JobCategory = styled.div`
-  margin-bottom: 4rem;
-  scroll-margin-top: 100px;
-  @keyframes highlight {
-    0% { border: 3px solid rgba(255, 125, 0, 0); }
-    50% { border: 3px solid rgba(255, 125, 0, 0.8); }
-    100% { border: 3px solid rgba(255, 125, 0, 0); }
-  }
-`;
-
-const CategoryHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  ${mq('<=tablet', 'flex-direction: column; align-items: flex-start; gap: 1rem;')}
-`;
-
-const CategoryTitle = styled.h3`
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: rgb(255, 125, 0);
-`;
-
-const BackToAllJobsButton = styled.button`
-  padding: 0.8rem 1.6rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  background: transparent;
-  color: rgb(255, 125, 0);
-  border: 2px solid rgb(255, 125, 0);
-  border-radius: 0.8rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  &:hover {
-    background: rgba(255, 125, 0, 0.1);
-    transform: translateY(-2px);
-  }
-  ${mq('<=tablet', 'width: 100%; text-align: center;')}
-`;
-
 const JobListContainer = styled.div`
   background: rgba(var(--cardBackground), 0.9);
   border-radius: 1.6rem;
@@ -2600,7 +2503,7 @@ const ModalOverlay = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 12000;
+  z-index: 20000;
   padding: 2rem;
 `;
 
@@ -2736,6 +2639,28 @@ const JobModalActions = styled.div`
   ${mq('<=tablet', 'flex-direction: column;')}
 `;
 
+const JobModalHint = styled.p`
+  margin: 1.5rem 0 0 0;
+  font-size: 1.4rem;
+  color: rgb(var(--text), 0.7);
+  line-height: 1.5;
+`;
+
+const JobModalHintLink = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: rgb(255, 125, 0);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: rgb(230, 100, 0);
+  }
+`;
+
 const PrimaryButton = styled.button`
   padding: 1.2rem 2.4rem;
   font-size: 1.6rem;
@@ -2800,7 +2725,7 @@ const AuthModalContent = styled(motion.div)`
   background: rgba(255, 255, 255, 0.98);
   border-radius: 2rem;
   padding: 3.5rem 4rem;
-  max-width: 70rem;
+  max-width: 86rem;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;

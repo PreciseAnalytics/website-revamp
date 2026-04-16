@@ -306,19 +306,6 @@ export default function ScheduleConsult() {
                     </ContactDetails>
                   </ContactItem>
                   <ContactItem>
-                    <ContactIcon>📧</ContactIcon>
-                    <ContactDetails>
-                      <ContactLabel>Alternate Email</ContactLabel>
-                      <ContactValue>
-                        <span 
-                          onClick={() => window.location.href = 'mailto:preciseanalyticsllc@gmail.com'}
-                        >
-                          preciseanalyticsllc@gmail.com
-                        </span>
-                      </ContactValue>
-                    </ContactDetails>
-                  </ContactItem>
-                  <ContactItem>
                     <ContactIcon>📞</ContactIcon>
                     <ContactDetails>
                       <ContactLabel>Phone</ContactLabel>

@@ -10,6 +10,8 @@ import Container from 'components/Container';
 import AnimatedLogo from 'components/AnimatedLogo';
 import { HamburgerIcon } from './HamburgerIcon';
 import CloseIcon from 'components/CloseIcon';
+import AuthModal from 'components/AuthModals';
+import { useAuth } from 'contexts/auth.context';
 
 const LINKS = [
   { label: 'Services', href: '/services' },
@@ -358,6 +360,127 @@ const MobilePhoneLink = styled.a`
   }
 `;
 
+const AuthBtns = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+`;
+
+const LoginBtn = styled.button`
+  padding: 0.7rem 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: transparent;
+  color: rgb(var(--text));
+  border: 1.5px solid rgba(var(--text), 0.25);
+  border-radius: 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s, color 0.2s;
+  &:hover { border-color: rgba(var(--text), 0.6); }
+`;
+
+const RegisterBtn = styled.button`
+  padding: 0.7rem 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: rgb(255, 125, 0);
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  &:hover { background: rgb(230, 100, 0); }
+`;
+
+const UserMenuWrapper = styled.div`
+  position: relative;
+`;
+
+const UserMenuBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: rgba(var(--text), 0.06);
+  border: 1.5px solid rgba(var(--text), 0.15);
+  border-radius: 2rem;
+  padding: 0.5rem 1.2rem 0.5rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover { background: rgba(var(--text), 0.1); }
+`;
+
+const UserAvatar = styled.span`
+  width: 3rem; height: 3rem;
+  border-radius: 50%;
+  background: rgb(255, 125, 0);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  text-transform: uppercase;
+  flex-shrink: 0;
+`;
+
+const UserName = styled.span`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+`;
+
+const UserChevron = styled.span`
+  font-size: 1rem;
+  color: rgba(var(--text), 0.5);
+`;
+
+const UserDropdown = styled(motion.div)`
+  position: absolute;
+  top: calc(100% + 0.8rem);
+  right: 0;
+  background: rgb(var(--cardBackground));
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  min-width: 20rem;
+  overflow: hidden;
+  z-index: 9999;
+`;
+
+const UserDropdownName = styled.p`
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  padding: 1.4rem 1.6rem 0.2rem;
+`;
+
+const UserDropdownEmail = styled.p`
+  font-size: 1.2rem;
+  color: rgba(var(--text), 0.5);
+  padding: 0 1.6rem 1.2rem;
+`;
+
+const UserDropdownDivider = styled.div`
+  height: 1px;
+  background: rgba(var(--text), 0.08);
+  margin: 0;
+`;
+
+const UserDropdownItem = styled.button`
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 1.1rem 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: rgb(var(--text));
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: rgba(var(--text), 0.06); }
+`;
+
 const MobileScheduleButtonContainer = styled.div`
   display: inline-flex;
   align-items: center;
@@ -422,6 +545,7 @@ function useScrollTrigger(threshold = 20) {
 export default function AnimatedHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
   const { isScrolled } = useScrollTrigger(20);
 
   useEffect(() => {
@@ -446,6 +570,16 @@ export default function AnimatedHeader() {
 
   return (
     <>
+      <AnimatePresence>
+        {authModal && (
+          <AuthModal
+            mode={authModal}
+            onClose={() => setAuthModal(null)}
+            onSwitch={(m) => setAuthModal(m)}
+          />
+        )}
+      </AnimatePresence>
+
       <HeaderWrapper $isScrolled={isScrolled}>
         <HeaderPane>
           <HeaderContent>

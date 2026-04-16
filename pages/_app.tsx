@@ -19,6 +19,7 @@ import CookieConsent from '@/components/CookieConsent';
 
 import { NewsletterModalContextProvider } from 'contexts/newsletter-modal.context';
 import { PrivacyPolicyProvider } from 'contexts/privacy-policy.context';
+import { AuthProvider } from 'contexts/auth.context';
 
 const GA_ID = 'G-QBCDN5PJ94';
 
@@ -82,11 +83,13 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 function Providers<T>({ children }: PropsWithChildren<T>) {
   return (
-    <NewsletterModalContextProvider>
-      <PrivacyPolicyProvider>
-        {children}
-      </PrivacyPolicyProvider>
-    </NewsletterModalContextProvider>
+    <AuthProvider>
+      <NewsletterModalContextProvider>
+        <PrivacyPolicyProvider>
+          {children}
+        </PrivacyPolicyProvider>
+      </NewsletterModalContextProvider>
+    </AuthProvider>
   );
 }
 

@@ -8,46 +8,30 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { media } from 'utils/media';
 import { JOBS, getJobById, Job } from 'lib/jobsData';
-
-interface StoredUser {
-  name: string;
-  email: string;
-}
+import { useAuth } from 'contexts/auth.context';
+import AuthModal from 'components/AuthModals';
 
 interface Props {
   job: Job;
 }
 
 export default function JobDetailPage({ job }: Props) {
-  const [user, setUser] = useState<StoredUser | null>(null);
-  const [modal, setModal] = useState<'login' | 'register' | 'apply' | null>(null);
+  const { user, logout } = useAuth();
+  const [modal, setModal] = useState<'apply' | null>(null);
+  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
 
-  // login form
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-
-  // register form
-  const [regName, setRegName] = useState('');
-  const [regEmail, setRegEmail] = useState('');
-  const [regPassword, setRegPassword] = useState('');
-  const [regConfirm, setRegConfirm] = useState('');
-
-  // apply form
+  // apply form — pre-fill phone from profile
   const [applyMessage, setApplyMessage] = useState('');
-  const [applyResumeUrl, setApplyResumeUrl] = useState('');
+  const [applyPhone, setApplyPhone] = useState(user?.phone || '');
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [coverLetterFile, setCoverLetterFile] = useState<File | null>(null);
+  const [certsFile, setCertsFile] = useState<File | null>(null);
   const [applySubmitted, setApplySubmitted] = useState(false);
 
   const [authError, setAuthError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('pa_user');
-      if (stored) setUser(JSON.parse(stored));
-    } catch {}
-  }, []);
-
-  function openModal(m: 'login' | 'register' | 'apply') {
+  function openModal(m: 'apply') {
     setAuthError('');
     setModal(m);
   }
@@ -57,88 +41,52 @@ export default function JobDetailPage({ job }: Props) {
     setAuthError('');
   }
 
-  function handleLogout() {
-    localStorage.removeItem('pa_user');
-    localStorage.removeItem('pa_token');
-    setUser(null);
-  }
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setAuthError('');
-    setLoading(true);
-    try {
-      if (!loginEmail.trim() || !loginPassword.trim()) throw new Error('All fields are required.');
-      const stored = localStorage.getItem(`pa_account_${loginEmail.toLowerCase()}`);
-      if (!stored) throw new Error('No account found with that email.');
-      const account = JSON.parse(stored);
-      if (account.password !== loginPassword) throw new Error('Incorrect password.');
-      const u: StoredUser = { name: account.name, email: account.email };
-      localStorage.setItem('pa_user', JSON.stringify(u));
-      localStorage.setItem('pa_token', 'tok_' + Date.now());
-      setUser(u);
-      setLoginEmail('');
-      setLoginPassword('');
-      closeModal();
-    } catch (err: any) {
-      setAuthError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault();
-    setAuthError('');
-    setLoading(true);
-    try {
-      if (!regName.trim() || !regEmail.trim() || !regPassword.trim())
-        throw new Error('All fields are required.');
-      if (regPassword !== regConfirm) throw new Error('Passwords do not match.');
-      if (regPassword.length < 8) throw new Error('Password must be at least 8 characters.');
-      const key = `pa_account_${regEmail.toLowerCase()}`;
-      if (localStorage.getItem(key)) throw new Error('An account with this email already exists.');
-      localStorage.setItem(key, JSON.stringify({ name: regName.trim(), email: regEmail.toLowerCase(), password: regPassword }));
-      const u: StoredUser = { name: regName.trim(), email: regEmail.toLowerCase() };
-      localStorage.setItem('pa_user', JSON.stringify(u));
-      localStorage.setItem('pa_token', 'tok_' + Date.now());
-      setUser(u);
-      setRegName(''); setRegEmail(''); setRegPassword(''); setRegConfirm('');
-      closeModal();
-    } catch (err: any) {
-      setAuthError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function handleApply(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: user?.name,
-          email: user?.email,
-          subject: `Job Application: ${job.title} (${job.jobNumber})`,
-          message: [
-            `Applicant: ${user?.name} <${user?.email}>`,
-            `Position: ${job.title} — ${job.jobNumber}`,
-            applyResumeUrl ? `Resume / LinkedIn: ${applyResumeUrl}` : '',
-            applyMessage ? `\nCover note:\n${applyMessage}` : '',
-          ]
-            .filter(Boolean)
-            .join('\n'),
-        }),
-      });
-    } catch {}
-    setApplySubmitted(true);
-    setLoading(false);
+      const fd = new FormData();
+      fd.append('name', user ? `${user.firstName} ${user.lastName}` : '');
+      fd.append('email', user?.email || '');
+      fd.append('phone', applyPhone);
+      fd.append('jobTitle', job.title);
+      fd.append('jobNumber', job.jobNumber);
+      fd.append('coverNote', applyMessage);
+      if (resumeFile) fd.append('resume', resumeFile);
+      if (coverLetterFile) fd.append('coverLetter', coverLetterFile);
+      if (certsFile) fd.append('certifications', certsFile);
+
+      const res = await fetch('/api/submit-application', { method: 'POST', body: fd });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Submission failed');
+      }
+
+      // Save record to localStorage as applicants log
+      const record = {
+        name: user ? `${user.firstName} ${user.lastName}` : '',
+        email: user?.email,
+        phone: applyPhone,
+        jobTitle: job.title,
+        jobNumber: job.jobNumber,
+        submittedAt: new Date().toISOString(),
+        hasResume: Boolean(resumeFile),
+        hasCoverLetter: Boolean(coverLetterFile),
+        hasCerts: Boolean(certsFile),
+      };
+      const existing = JSON.parse(localStorage.getItem('pa_applications') || '[]');
+      existing.push(record);
+      localStorage.setItem('pa_applications', JSON.stringify(existing));
+
+      setApplySubmitted(true);
+    } catch (err: any) {
+      setAuthError(err.message || 'Submission failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const isLoggedIn = Boolean(user);
 
   return (
     <>
@@ -182,6 +130,12 @@ export default function JobDetailPage({ job }: Props) {
         />
       </Head>
 
+      <AnimatePresence>
+        {authModal && (
+          <AuthModal mode={authModal} onClose={() => setAuthModal(null)} onSwitch={setAuthModal} />
+        )}
+      </AnimatePresence>
+
       <AnimatedHeader />
 
       <PageWrapper>
@@ -207,18 +161,18 @@ export default function JobDetailPage({ job }: Props) {
               </DetailCard>
 
               <ApplyBox>
-                {isLoggedIn ? (
+                {user ? (
                   <>
-                    <WelcomeText>Signed in as <strong>{user!.name}</strong></WelcomeText>
+                    <WelcomeText>Signed in as <strong>{user.firstName} {user.lastName}</strong></WelcomeText>
                     <ApplyButton onClick={() => openModal('apply')}>Apply for This Role</ApplyButton>
-                    <LogoutLink onClick={handleLogout}>Sign out</LogoutLink>
+                    <LogoutLink onClick={logout}>Sign out</LogoutLink>
                   </>
                 ) : (
                   <>
                     <ApplyBoxTitle>Ready to apply?</ApplyBoxTitle>
                     <ApplyBoxSubtitle>Create a free account or sign in to submit your application.</ApplyBoxSubtitle>
-                    <ApplyButton onClick={() => openModal('register')}>Create Account &amp; Apply</ApplyButton>
-                    <LoginLink onClick={() => openModal('login')}>Already have an account? Sign in</LoginLink>
+                    <ApplyButton onClick={() => setAuthModal('register')}>Create Account &amp; Apply</ApplyButton>
+                    <LoginLink onClick={() => setAuthModal('login')}>Already have an account? Sign in</LoginLink>
                   </>
                 )}
               </ApplyBox>
@@ -293,12 +247,12 @@ export default function JobDetailPage({ job }: Props) {
 
               {/* Mobile apply CTA */}
               <MobileApplyBox>
-                {isLoggedIn ? (
+                {user ? (
                   <ApplyButton onClick={() => openModal('apply')}>Apply for This Role</ApplyButton>
                 ) : (
                   <>
-                    <ApplyButton onClick={() => openModal('register')}>Create Account &amp; Apply</ApplyButton>
-                    <MobileLoginLink onClick={() => openModal('login')}>Already have an account? Sign in</MobileLoginLink>
+                    <ApplyButton onClick={() => setAuthModal('register')}>Create Account &amp; Apply</ApplyButton>
+                    <MobileLoginNote onClick={() => setAuthModal('login')}>Already have an account? Sign in</MobileLoginNote>
                   </>
                 )}
               </MobileApplyBox>
@@ -309,75 +263,6 @@ export default function JobDetailPage({ job }: Props) {
 
       {/* ── Modals ── */}
       <AnimatePresence>
-        {modal === 'login' && (
-          <Overlay onClick={closeModal}>
-            <ModalBox onClick={(e) => e.stopPropagation()}>
-              <ModalHeader>
-                <ModalTitle>Sign In</ModalTitle>
-                <ModalClose onClick={closeModal}>&times;</ModalClose>
-              </ModalHeader>
-              <form onSubmit={handleLogin}>
-                {authError && <ErrorMsg>{authError}</ErrorMsg>}
-                <Field>
-                  <FieldLabel>Email Address</FieldLabel>
-                  <FieldInput type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="you@example.com" required />
-                </Field>
-                <Field>
-                  <FieldLabel>Password</FieldLabel>
-                  <FieldInput type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="Your password" required />
-                </Field>
-                <ModalActions>
-                  <SubmitBtn type="submit" disabled={loading}>{loading ? 'Signing in…' : 'Sign In'}</SubmitBtn>
-                </ModalActions>
-                <ModalFooterLink onClick={() => openModal('register')}>
-                  No account yet? Create one here
-                </ModalFooterLink>
-              </form>
-            </ModalBox>
-          </Overlay>
-        )}
-
-        {modal === 'register' && (
-          <Overlay onClick={closeModal}>
-            <ModalBox onClick={(e) => e.stopPropagation()}>
-              <ModalHeader>
-                <ModalTitle>Create Your Account</ModalTitle>
-                <ModalClose onClick={closeModal}>&times;</ModalClose>
-              </ModalHeader>
-              <ModalSubtitle>
-                Create a free account to apply to any open position at Precise Analytics.
-              </ModalSubtitle>
-              <form onSubmit={handleRegister}>
-                {authError && <ErrorMsg>{authError}</ErrorMsg>}
-                <Field>
-                  <FieldLabel>Full Name</FieldLabel>
-                  <FieldInput type="text" value={regName} onChange={e => setRegName(e.target.value)} placeholder="Jane Smith" required />
-                </Field>
-                <Field>
-                  <FieldLabel>Email Address</FieldLabel>
-                  <FieldInput type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="you@example.com" required />
-                </Field>
-                <FieldRow>
-                  <Field>
-                    <FieldLabel>Password</FieldLabel>
-                    <FieldInput type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} placeholder="Min. 8 characters" required />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Confirm Password</FieldLabel>
-                    <FieldInput type="password" value={regConfirm} onChange={e => setRegConfirm(e.target.value)} placeholder="Repeat password" required />
-                  </Field>
-                </FieldRow>
-                <ModalActions>
-                  <SubmitBtn type="submit" disabled={loading}>{loading ? 'Creating account…' : 'Create Account'}</SubmitBtn>
-                </ModalActions>
-                <ModalFooterLink onClick={() => openModal('login')}>
-                  Already have an account? Sign in
-                </ModalFooterLink>
-              </form>
-            </ModalBox>
-          </Overlay>
-        )}
-
         {modal === 'apply' && (
           <Overlay onClick={closeModal}>
             <ModalBox onClick={(e) => e.stopPropagation()}>
@@ -390,7 +275,7 @@ export default function JobDetailPage({ job }: Props) {
                   <SuccessIcon>&#10003;</SuccessIcon>
                   <SuccessTitle>Application Submitted!</SuccessTitle>
                   <SuccessText>
-                    Thank you, <strong>{user?.name}</strong>. Our recruiting team will review your
+                    Thank you, <strong>{user?.firstName}</strong>. Our recruiting team will review your
                     application for <strong>{job.title}</strong> ({job.jobNumber}) and be in touch
                     at <strong>{user?.email}</strong>.
                   </SuccessText>
@@ -398,27 +283,62 @@ export default function JobDetailPage({ job }: Props) {
                 </SuccessBox>
               ) : (
                 <form onSubmit={handleApply}>
+                  {authError && <ErrorMsg>{authError}</ErrorMsg>}
                   <ApplyMeta>
-                    Applying as <strong>{user?.name}</strong> ({user?.email}) &nbsp;&middot;&nbsp; Job {job.jobNumber}
+                    Applying as <strong>{user?.firstName} {user?.lastName}</strong> ({user?.email}) &nbsp;&middot;&nbsp; Job {job.jobNumber}
                   </ApplyMeta>
+
                   <Field>
-                    <FieldLabel>Resume URL or LinkedIn Profile (optional)</FieldLabel>
+                    <FieldLabel>Phone Number (optional)</FieldLabel>
                     <FieldInput
-                      type="url"
-                      value={applyResumeUrl}
-                      onChange={e => setApplyResumeUrl(e.target.value)}
-                      placeholder="https://linkedin.com/in/yourprofile"
+                      type="tel"
+                      value={applyPhone}
+                      onChange={e => setApplyPhone(e.target.value)}
+                      placeholder="(804) 555-0100"
                     />
                   </Field>
+
+                  <Field>
+                    <FieldLabel>Resume / CV <RequiredStar>*</RequiredStar></FieldLabel>
+                    <FileHint>PDF, DOC, or DOCX — max 5 MB</FileHint>
+                    <FieldFileInput
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      required
+                      onChange={e => setResumeFile(e.target.files?.[0] || null)}
+                    />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Cover Letter (optional)</FieldLabel>
+                    <FileHint>PDF, DOC, or DOCX — max 5 MB</FileHint>
+                    <FieldFileInput
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={e => setCoverLetterFile(e.target.files?.[0] || null)}
+                    />
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>Certifications / Additional Documents (optional)</FieldLabel>
+                    <FileHint>PDF — max 5 MB</FileHint>
+                    <FieldFileInput
+                      type="file"
+                      accept=".pdf"
+                      onChange={e => setCertsFile(e.target.files?.[0] || null)}
+                    />
+                  </Field>
+
                   <Field>
                     <FieldLabel>Cover Note (optional)</FieldLabel>
                     <FieldTextarea
-                      rows={5}
+                      rows={4}
                       value={applyMessage}
                       onChange={e => setApplyMessage(e.target.value)}
                       placeholder="Tell us why you are interested in this role and any relevant experience…"
                     />
                   </Field>
+
                   <ModalActions>
                     <SecondaryBtn type="button" onClick={closeModal}>Cancel</SecondaryBtn>
                     <SubmitBtn type="submit" disabled={loading}>{loading ? 'Submitting…' : 'Submit Application'}</SubmitBtn>
@@ -530,8 +450,6 @@ const ApplyButton = styled.button`
   text-align: center;
   &:hover { background: rgb(230,100,0); }
 `;
-const LoginLink = styled.button`font-size: 1.3rem; color: rgb(255,125,0); background: none; border: none; cursor: pointer; text-align: center; &:hover{text-decoration:underline;}`;
-const LogoutLink = styled.button`font-size: 1.3rem; color: rgba(var(--text),0.5); background: none; border: none; cursor: pointer; &:hover{color:rgb(var(--text));}`;
 const BackLink = styled(Link)`font-size: 1.4rem; color: rgba(var(--text),0.5); text-decoration: none; &:hover{color:rgb(255,125,0);}`;
 
 const MainContent = styled.article`flex: 1; min-width: 0;`;
@@ -584,7 +502,9 @@ const MobileApplyBox = styled.div`
   gap: 1rem;
   ${media.tablet(`display: flex;`)}
 `;
-const MobileLoginLink = styled.button`font-size: 1.4rem; color: rgb(255,125,0); background: none; border: none; cursor: pointer; text-align: center; &:hover{text-decoration:underline;}`;
+const LoginLink = styled.button`font-size: 1.3rem; color: rgb(255,125,0); background: none; border: none; cursor: pointer; text-align: center; &:hover{text-decoration:underline;}`;
+const LogoutLink = styled.button`font-size: 1.3rem; color: rgba(var(--text),0.5); background: none; border: none; cursor: pointer; &:hover{color:rgb(var(--text));}`;
+const MobileLoginNote = styled.button`font-size: 1.4rem; color: rgb(255,125,0); background: none; border: none; cursor: pointer; text-align: center; &:hover{text-decoration:underline;}`;
 
 // ── Modal styles ──────────────────────────────────────────────────────────────
 const Overlay = styled(motion.div).attrs(() => ({
@@ -619,7 +539,6 @@ const ModalBox = styled(motion.div).attrs(() => ({
 const ModalHeader = styled.div`display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;`;
 const ModalTitle = styled.h2`font-size: 2.2rem; font-weight: 700; color: #111;`;
 const ModalClose = styled.button`background: none; border: none; font-size: 2.8rem; cursor: pointer; color: #888; line-height: 1; &:hover{color:#111;}`;
-const ModalSubtitle = styled.p`font-size: 1.5rem; color: #555; margin-bottom: 2rem; line-height: 1.6;`;
 const ApplyMeta = styled.p`font-size: 1.4rem; color: #555; margin-bottom: 2rem; padding: 1rem 1.4rem; background: #f8f8f8; border-radius: 0.6rem;`;
 
 const Field = styled.div`display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.8rem;`;
@@ -663,6 +582,33 @@ const ModalFooterLink = styled.button`
 const ErrorMsg = styled.div`
   background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c;
   padding: 1rem 1.4rem; border-radius: 0.7rem; font-size: 1.4rem; margin-bottom: 1.5rem;
+`;
+
+const RequiredStar = styled.span`color: #e53e3e;`;
+
+const FileHint = styled.p`
+  font-size: 1.2rem;
+  color: #888;
+  margin: -0.2rem 0 0.5rem;
+`;
+
+const FieldFileInput = styled.input`
+  font-size: 1.4rem;
+  color: #333;
+  padding: 0.8rem 0;
+  cursor: pointer;
+  &::file-selector-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    background: #f0f0f0;
+    border: 1.5px solid #ccc;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: background 0.2s;
+    &:hover { background: #e0e0e0; }
+  }
 `;
 
 const SuccessBox = styled.div`

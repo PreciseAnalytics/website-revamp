@@ -1,12 +1,18 @@
+import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { AnimatePresence } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { media } from 'utils/media';
 import { JOBS } from 'lib/jobsData';
+import AuthModal from 'components/AuthModals';
+import { useAuth } from 'contexts/auth.context';
 
 export default function CareersPage() {
+  const { user, logout } = useAuth();
+  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
   const openJobs = JOBS.filter((j) => j.status === 'open');
 
   return (
@@ -19,27 +25,62 @@ export default function CareersPage() {
         />
       </Head>
 
+      <AnimatePresence>
+        {authModal && (
+          <AuthModal mode={authModal} onClose={() => setAuthModal(null)} onSwitch={setAuthModal} />
+        )}
+      </AnimatePresence>
+
       <AnimatedHeader />
 
       <PageWrapper>
         <Container>
           <PageHeader>
-            <PageTitle>Careers at Precise Analytics</PageTitle>
-            <PageSubtitle>
-              We are a veteran-owned data analytics and AI workforce company based in Richmond, VA.
-              We hire talented people across data science, AI training, engineering, and consulting.
-              Browse our open positions below and create a free account to apply.
-            </PageSubtitle>
+            <PageHeaderLeft>
+              <PageTitle>Work at Precise Analytics</PageTitle>
+              <PageSubtitle>
+                Richmond, VA &mdash; Remote &amp; Hybrid Roles Available
+              </PageSubtitle>
+            </PageHeaderLeft>
+            <PageHeaderPillars>
+              <Pillar>
+                <PillarLabel>What We Do</PillarLabel>
+                <PillarText>End-to-end data engineering, analytics, and AI solutions for government and commercial clients.</PillarText>
+              </Pillar>
+              <Pillar>
+                <PillarLabel>Who We Hire</PillarLabel>
+                <PillarText>Data scientists, engineers, AI specialists, and analysts who want their work to matter.</PillarText>
+              </Pillar>
+              <Pillar>
+                <PillarLabel>How to Apply</PillarLabel>
+                <PillarText>Browse open positions, create a free account, and submit your application directly below.</PillarText>
+              </Pillar>
+            </PageHeaderPillars>
           </PageHeader>
+
+          <AuthBar>
+            {user ? (
+              <>
+                <AuthBarText>Signed in as <strong>{user.firstName} {user.lastName}</strong> ({user.email})</AuthBarText>
+                <AuthBarLink onClick={logout}>Sign out</AuthBarLink>
+              </>
+            ) : (
+              <>
+                <AuthBarText>Have an account? Sign in to apply to any open position.</AuthBarText>
+                <AuthBarBtn onClick={() => setAuthModal('login')}>Sign In</AuthBarBtn>
+                <AuthBarBtnPrimary onClick={() => setAuthModal('register')}>Create Account</AuthBarBtnPrimary>
+              </>
+            )}
+          </AuthBar>
 
           <ContentLayout>
             <Sidebar>
               <SidebarCard>
-                <SidebarTitle>Our Mission</SidebarTitle>
+                <SidebarTitle>Our Work</SidebarTitle>
                 <SidebarText>
-                  We transform complex data into actionable insights for government and commercial
-                  clients — and we train the AI models that power the next generation of intelligent
-                  systems.
+                  We build data pipelines, analytics platforms, and AI systems for demanding clients
+                  — and operate a specialized division supplying skilled AI training talent to leading
+                  AI platforms.
                 </SidebarText>
               </SidebarCard>
               <SidebarCard>
@@ -119,24 +160,114 @@ const PageWrapper = styled.div`
 `;
 
 const PageHeader = styled.header`
-  padding-bottom: 3rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 5rem;
+  padding-bottom: 3.5rem;
   border-bottom: 1px solid rgba(var(--text), 0.1);
   margin-bottom: 3rem;
+  ${media.tablet(`flex-direction: column; gap: 2.5rem;`)}
+`;
+
+const PageHeaderLeft = styled.div`
+  flex: 0 0 26rem;
+  ${media.tablet(`flex: unset;`)}
 `;
 
 const PageTitle = styled.h1`
-  font-size: 3.6rem;
+  font-size: 3.2rem;
   font-weight: 700;
   color: rgb(var(--text));
-  margin-bottom: 1.2rem;
-  ${media.tablet(`font-size: 2.8rem;`)}
+  margin-bottom: 0.8rem;
+  ${media.tablet(`font-size: 2.6rem;`)}
 `;
 
 const PageSubtitle = styled.p`
-  font-size: 1.7rem;
-  line-height: 1.7;
+  font-size: 1.5rem;
+  color: rgba(var(--text), 0.5);
+`;
+
+const PageHeaderPillars = styled.div`
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.5rem;
+  ${media.tablet(`grid-template-columns: 1fr;`)}
+`;
+
+const Pillar = styled.div`
+  border-left: 2px solid rgb(255, 125, 0);
+  padding-left: 1.4rem;
+`;
+
+const PillarLabel = styled.p`
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgb(255, 125, 0);
+  margin-bottom: 0.6rem;
+`;
+
+const PillarText = styled.p`
+  font-size: 1.45rem;
+  line-height: 1.65;
+  color: rgba(var(--text), 0.8);
+`;
+
+const AuthBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 1.2rem 1.8rem;
+  background: rgba(255, 125, 0, 0.05);
+  border: 1px solid rgba(255, 125, 0, 0.15);
+  border-radius: 0.8rem;
+  margin-bottom: 3rem;
+`;
+
+const AuthBarText = styled.p`
+  font-size: 1.4rem;
   color: rgba(var(--text), 0.75);
-  max-width: 80rem;
+  flex: 1;
+`;
+
+const AuthBarBtn = styled.button`
+  padding: 0.6rem 1.4rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: transparent;
+  color: rgb(var(--text));
+  border: 1.5px solid rgba(var(--text), 0.25);
+  border-radius: 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s;
+  &:hover { border-color: rgba(var(--text), 0.6); }
+`;
+
+const AuthBarBtnPrimary = styled.button`
+  padding: 0.6rem 1.4rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: rgb(255, 125, 0);
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+  &:hover { background: rgb(230, 100, 0); }
+`;
+
+const AuthBarLink = styled.button`
+  font-size: 1.3rem;
+  color: rgba(var(--text), 0.5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover { color: rgb(var(--text)); text-decoration: underline; }
 `;
 
 const ContentLayout = styled.div`

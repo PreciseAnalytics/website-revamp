@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
+import Link from 'next/link';
 import { EnvVars } from 'env';
 import { media } from 'utils/media';
 import Button from 'components/Button';
@@ -10,11 +11,11 @@ import { HamburgerIcon } from './HamburgerIcon';
 import CloseIcon from 'components/CloseIcon';
 
 const LINKS = [
-  { label: 'About', href: '/about-us' },
   { label: 'Services', href: '/services' },
   { label: 'Solutions', href: '/solutions' },
   { label: 'Capabilities Statement', href: '/capabilities-statement' },
   { label: 'Sectors', href: '/sectors' },
+  { label: 'AI Workforce Solutions', href: '/ai-training', badge: 'NEW' },
   { label: 'Contact', href: '/contact' },
   { label: 'Careers', href: '/careers' },
 ];
@@ -82,13 +83,14 @@ const LogoContainer = styled.div`
   }
 `;
 
-const CompanyLogo = styled(motion.img)`
+const CompanyLogo = styled.img`
   height: auto;
-  width: 320px;
+  width: 220px;
   object-fit: contain;
+  display: block;
 
   ${media.tablet(`
-    width: 200px;
+    width: 160px;
   `)}
 `;
 
@@ -120,6 +122,59 @@ const NavLinkText = styled.span<{ $active: boolean }>`
 
   &:hover {
     color: rgb(var(--accent));
+  }
+`;
+
+const NavLinkHighlight = styled.span<{ $active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111;
+  font-weight: 800;
+  font-size: 1.6rem;
+  padding: 0.4rem 1rem;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+
+  &:hover {
+    background: #f5f5f5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+`;
+
+const NavBadge = styled.span`
+  background: #ff8c2b;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.4rem;
+  text-transform: uppercase;
+  line-height: 1.4;
+`;
+
+const MobileNavLinkHighlight = styled.span<{ $active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #111;
+  font-weight: 800;
+  font-size: 1.8rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f5f5f5;
   }
 `;
 
@@ -411,12 +466,22 @@ export default function AnimatedHeader() {
                   <NavList>
                     {LINKS.map(link => (
                       <NavItem key={link.href}>
-                        <NavLinkText 
-                          $active={router.pathname === link.href}
-                          onClick={() => handleNavClick(link.href)}
-                        >
-                          {link.label}
-                        </NavLinkText>
+                        {link.badge ? (
+                          <NavLinkHighlight
+                            $active={router.pathname === link.href}
+                            onClick={() => handleNavClick(link.href)}
+                          >
+                            {link.label}
+                            <NavBadge>{link.badge}</NavBadge>
+                          </NavLinkHighlight>
+                        ) : (
+                          <NavLinkText
+                            $active={router.pathname === link.href}
+                            onClick={() => handleNavClick(link.href)}
+                          >
+                            {link.label}
+                          </NavLinkText>
+                        )}
                       </NavItem>
                     ))}
                   </NavList>
@@ -459,15 +524,6 @@ export default function AnimatedHeader() {
               </RightSection>
             </HeaderInner>
 
-            <CenterSection>
-              {/* Phone Number Centered on Its Own Line */}
-              <PhoneLink href="tel:+18043964148" aria-label="Call Precise Analytics">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
-                </svg>
-                (804) 396-4148
-              </PhoneLink>
-            </CenterSection>
           </HeaderContent>
         </Container>
         <AnimatePresence>
@@ -480,20 +536,6 @@ export default function AnimatedHeader() {
             >
               <Container>
                 <MobileNavList>
-                  {/* NEW: Phone Number at Top of Mobile Menu */}
-                  <MobileNavItem
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: 0 }}
-                  >
-                    <MobilePhoneLink href="tel:+18043964148" aria-label="Call Precise Analytics">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
-                      </svg>
-                      Call: (804) 396-4148
-                    </MobilePhoneLink>
-                  </MobileNavItem>
-
                   {LINKS.map((link, i) => (
                     <MobileNavItem
                       key={link.href}
@@ -501,12 +543,22 @@ export default function AnimatedHeader() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.3, delay: (i + 1) * 0.1 }}
                     >
-                      <MobileNavLinkText 
-                        $active={router.pathname === link.href}
-                        onClick={() => handleNavClick(link.href)}
-                      >
-                        {link.label}
-                      </MobileNavLinkText>
+                      {link.badge ? (
+                        <MobileNavLinkHighlight
+                          $active={router.pathname === link.href}
+                          onClick={() => handleNavClick(link.href)}
+                        >
+                          {link.label}
+                          <NavBadge>{link.badge}</NavBadge>
+                        </MobileNavLinkHighlight>
+                      ) : (
+                        <MobileNavLinkText
+                          $active={router.pathname === link.href}
+                          onClick={() => handleNavClick(link.href)}
+                        >
+                          {link.label}
+                        </MobileNavLinkText>
+                      )}
                     </MobileNavItem>
                   ))}
                   <MobileNavItem

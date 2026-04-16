@@ -27,6 +27,9 @@ const STATIC_PAGES: PageConfig[] = [
   { path: '/sectors/manufacturing', priority: '0.7', changefreq: 'monthly' },
   { path: '/sectors/retail', priority: '0.7', changefreq: 'monthly' },
   
+  // AI Training - separate offering
+  { path: '/ai-training', priority: '0.85', changefreq: 'monthly' },
+
   // Conversion pages
   { path: '/schedule-consult', priority: '0.8', changefreq: 'monthly' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },

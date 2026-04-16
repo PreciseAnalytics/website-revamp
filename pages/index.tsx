@@ -397,155 +397,15 @@ export default function HomePage() {
             </IndustriesGrid>
           </IndustriesSection>
 
-          {/* Contact Form Section */}
-          <ContactSection id="contact-form" ref={contactFormRef}>
+          {/* CTA Section */}
+          <ContactSection id="contact-form">
             <FormWrapper>
-              <FormTitle>Start Your Project</FormTitle>
-              <FormSubtitle>Ready to transform your data? Let&apos;s discuss your specific needs and goals.</FormSubtitle>
-              
-              {submitSuccess && (
-                <StatusMessage 
-                  success={submitSuccess.includes('Fantastic')}
-                  initial={{ opacity: 0, scale: 0.8, y: -20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.5, type: "spring", bounce: 0.4 }}
-                >
-                  {submitSuccess}
-                </StatusMessage>
-              )}
-              
-              <Form onSubmit={handleSubmit} noValidate>
-                <FormGrid>
-                  <FormField>
-                    <label htmlFor="firstName">First Name *</label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      value={contactData.firstName}
-                      onChange={handleChange}
-                      required
-                      aria-invalid={!!formErrors.firstName}
-                      aria-describedby={formErrors.firstName ? "firstName-error" : undefined}
-                    />
-                    {formErrors.firstName && (
-                      <ErrorMessage id="firstName-error">{formErrors.firstName}</ErrorMessage>
-                    )}
-                  </FormField>
-                  
-                  <FormField>
-                    <label htmlFor="lastName">Last Name *</label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      value={contactData.lastName}
-                      onChange={handleChange}
-                      required
-                      aria-invalid={!!formErrors.lastName}
-                      aria-describedby={formErrors.lastName ? "lastName-error" : undefined}
-                    />
-                    {formErrors.lastName && (
-                      <ErrorMessage id="lastName-error">{formErrors.lastName}</ErrorMessage>
-                    )}
-                  </FormField>
-                </FormGrid>
-
-                <FormGrid>
-                  <FormField>
-                    <label htmlFor="email">Email Address *</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={contactData.email}
-                      onChange={handleChange}
-                      required
-                      aria-invalid={!!formErrors.email}
-                      aria-describedby={formErrors.email ? "email-error" : undefined}
-                    />
-                    {formErrors.email && (
-                      <ErrorMessage id="email-error">{formErrors.email}</ErrorMessage>
-                    )}
-                  </FormField>
-
-                  <FormField>
-                    <label htmlFor="phone">Phone Number *</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={contactData.phone}
-                      onChange={handleChange}
-                      placeholder="(555) 123-4567"
-                      maxLength={14}
-                      required
-                      aria-invalid={!!formErrors.phone}
-                      aria-describedby={formErrors.phone ? "phone-error" : undefined}
-                    />
-                    {formErrors.phone && (
-                      <ErrorMessage id="phone-error">{formErrors.phone}</ErrorMessage>
-                    )}
-                  </FormField>
-                </FormGrid>
-
-                <FormGrid>
-                  <FormField>
-                    <label htmlFor="company">Company/Organization *</label>
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      value={contactData.company}
-                      onChange={handleChange}
-                      required
-                      aria-invalid={!!formErrors.company}
-                      aria-describedby={formErrors.company ? "company-error" : undefined}
-                    />
-                    {formErrors.company && (
-                      <ErrorMessage id="company-error">{formErrors.company}</ErrorMessage>
-                    )}
-                  </FormField>
-
-                  <FormField>
-                    <label htmlFor="service">Service of Interest</label>
-                    <select
-                      id="service"
-                      name="service"
-                      value={contactData.service}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select a service...</option>
-                      {services.map((service) => (
-                        <option key={service.title} value={service.title}>
-                          {service.title}
-                        </option>
-                      ))}
-                      <option value="Hardware Solutions">Hardware Solutions</option>
-                      <option value="Consulting Services">Consulting Services</option>
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="Partnership">Partnership Opportunity</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </FormField>
-                </FormGrid>
-
-                <FormField>
-                  <label htmlFor="message">Project Details & Requirements</label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={6}
-                    value={contactData.message}
-                    onChange={handleChange}
-                    placeholder="Tell us about your data challenges, goals, and what you're hoping to achieve..."
-                  />
-                </FormField>
-
-                <SubmitBtn type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Sending...' : 'Start the Conversation'}
-                </SubmitBtn>
-              </Form>
+              <FormTitle>Ready to Get Started?</FormTitle>
+              <FormSubtitle>Schedule a free consultation and let&apos;s discuss how we can transform your data into results.</FormSubtitle>
+              <ConsultBtnRow>
+                <ConsultBtn href="/schedule-consult">Schedule a Free Consultation →</ConsultBtn>
+                <ConsultBtnSecondary href="/contact">Send Us a Message</ConsultBtnSecondary>
+              </ConsultBtnRow>
             </FormWrapper>
           </ContactSection>
         </Container>
@@ -1051,6 +911,38 @@ const FormSubtitle = styled.p`
   ${media.tablet(`
     font-size: 1.6rem;
   `)}
+`;
+
+const ConsultBtnRow = styled.div`
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
+const ConsultBtn = styled.a`
+  background: rgb(255, 125, 0);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.8rem;
+  padding: 1.5rem 3.5rem;
+  border-radius: 0.9rem;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+  &:hover { opacity: 0.9; transform: translateY(-2px); }
+`;
+
+const ConsultBtnSecondary = styled.a`
+  background: transparent;
+  color: rgb(var(--text));
+  font-weight: 700;
+  font-size: 1.8rem;
+  padding: 1.5rem 3.5rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(var(--text), 0.3);
+  text-decoration: none;
+  transition: border-color 0.2s;
+  &:hover { border-color: rgba(var(--text), 0.7); }
 `;
 
 const FormGrid = styled.div`

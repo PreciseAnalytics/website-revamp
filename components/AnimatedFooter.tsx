@@ -50,7 +50,7 @@ const footerNavigation = {
   },
   legal: {
     title: 'Legal',
-    href: null, // No main page for legal section
+    href: null,
     links: [
       { name: 'Privacy Policy', href: '/privacy-policy' },
       { name: 'Terms of Service', href: '/terms-of-service' },
@@ -109,116 +109,19 @@ export default function AnimatedFooter() {
     >
       <GradientTop />
       
-      <Container>
+      <FooterPane>
         <FooterContent>
           <CompanySection>
             <LogoSection>
               <LogoContainer onClick={() => handleNavigation('/')}>
-                <AnimatedLogo size="8rem" />
-                <CompanyName>
-                  <span>Precise</span>
-                  <AccentText>Analytics</AccentText>
-                </CompanyName>
+                <FooterLogo src="/PA-logo.png" alt="Precise Analytics" />
               </LogoContainer>
             </LogoSection>
             
             <CompanyDescription>
               Transforming complex data into actionable insights through cutting-edge analytics,
-              advanced analytics, custom dashboards, and AI/ML technologies. 
+              custom dashboards, and AI/ML technologies.
             </CompanyDescription>
-            
-            <ContactInfo>
-              <ContactItem>
-                <motion.div whileHover={{ scale: 1.1 }} className="icon">📧</motion.div>
-                <a href={`mailto:${EnvVars.CONTACT_EMAIL}`}>{EnvVars.CONTACT_EMAIL}</a>
-              </ContactItem>
-              <ContactItem>
-                <motion.div whileHover={{ scale: 1.1 }} className="icon">📞</motion.div>
-                <a href={`tel:${EnvVars.PHONE.replace(/\s+/g, '')}`}>{EnvVars.PHONE}</a>
-              </ContactItem>
-            </ContactInfo>
-            
-            <SocialIcons>
-              <SocialIconWrapper
-                onMouseEnter={() => setHoveredSocialIcon('linkedin')}
-                onMouseLeave={() => setHoveredSocialIcon(null)}
-                whileHover={{ y: -5 }}
-              >
-                <SocialIconLink
-                  href="https://www.linkedin.com/company/precise-analytics-llc/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="LinkedIn"
-                >
-                  <LinkedinIcon size={40} round={true} />
-                  <SocialIconHoverEffect 
-                    animate={{ 
-                      scale: hoveredSocialIcon === 'linkedin' ? 1.5 : 0,
-                      opacity: hoveredSocialIcon === 'linkedin' ? 0.2 : 0
-                    }}
-                  />
-                </SocialIconLink>
-              </SocialIconWrapper>
-              
-              <SocialIconWrapper
-                onMouseEnter={() => setHoveredSocialIcon('github')}
-                onMouseLeave={() => setHoveredSocialIcon(null)}
-                whileHover={{ y: -5 }}
-              >
-                <SocialIconLink
-                  href="https://github.com/preciseanalytics"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="GitHub"
-                >
-                  <div style={{ 
-                    width: '40px', 
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: '#333',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <svg 
-                      width="24" 
-                      height="24" 
-                      viewBox="0 0 24 24" 
-                      fill="white"
-                    >
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                  </div>
-                  <SocialIconHoverEffect 
-                    animate={{ 
-                      scale: hoveredSocialIcon === 'github' ? 1.5 : 0,
-                      opacity: hoveredSocialIcon === 'github' ? 0.2 : 0
-                    }}
-                  />
-                </SocialIconLink>
-              </SocialIconWrapper>
-              
-              <SocialIconWrapper
-                onMouseEnter={() => setHoveredSocialIcon('facebook')}
-                onMouseLeave={() => setHoveredSocialIcon(null)}
-                whileHover={{ y: -5 }}
-              >
-                <SocialIconLink
-                  href="https://www.facebook.com/PreciseAnalyticsLLC/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Facebook"
-                >
-                  <FacebookIcon size={40} round={true} />
-                  <SocialIconHoverEffect 
-                    animate={{ 
-                      scale: hoveredSocialIcon === 'facebook' ? 1.5 : 0,
-                      opacity: hoveredSocialIcon === 'facebook' ? 0.2 : 0
-                    }}
-                  />
-                </SocialIconLink>
-              </SocialIconWrapper>
-            </SocialIcons>
           </CompanySection>
           
           <NavSection>
@@ -251,7 +154,7 @@ export default function AnimatedFooter() {
                 )}
                 <NavLinks>
                   {categoryData.links.map((link, linkIndex) => (
-                    <NavLinkItem 
+                    <NavLinkItem
                       key={link.name}
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -271,41 +174,76 @@ export default function AnimatedFooter() {
                 </NavLinks>
               </NavColumn>
             ))}
+
+            {/* Contact Column */}
+            <NavColumn>
+              <CategoryTitle
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.4 }}
+              >
+                Contact
+              </CategoryTitle>
+              <NavLinks>
+                <NavLinkItem initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.1 }}>
+                  <ContactLinkItem href={`mailto:${EnvVars.CONTACT_EMAIL}`}>
+                    📧 {EnvVars.CONTACT_EMAIL}
+                  </ContactLinkItem>
+                </NavLinkItem>
+                <NavLinkItem initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.15 }}>
+                  <ContactLinkItem href={`tel:${EnvVars.PHONE.replace(/\s+/g, '')}`}>
+                    📞 {EnvVars.PHONE}
+                  </ContactLinkItem>
+                </NavLinkItem>
+                <NavLinkItem initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.2 }}>
+                  <ContactLinkItem href="https://www.linkedin.com/company/precise-analytics-llc/" target="_blank" rel="noopener noreferrer">
+                    <LinkedinIcon size={20} round={true} style={{ verticalAlign: 'middle', marginRight: '0.6rem' }} />
+                    LinkedIn
+                  </ContactLinkItem>
+                </NavLinkItem>
+                <NavLinkItem initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.25 }}>
+                  <ContactLinkItem href="https://www.facebook.com/PreciseAnalyticsLLC/" target="_blank" rel="noopener noreferrer">
+                    <FacebookIcon size={20} round={true} style={{ verticalAlign: 'middle', marginRight: '0.6rem' }} />
+                    Facebook
+                  </ContactLinkItem>
+                </NavLinkItem>
+                <NavLinkItem initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: 0.3 }}>
+                  <ContactLinkItem href="https://github.com/preciseanalytics" target="_blank" rel="noopener noreferrer">
+                    <GithubIcon aria-hidden="true" />
+                    GitHub
+                  </ContactLinkItem>
+                </NavLinkItem>
+              </NavLinks>
+            </NavColumn>
           </NavSection>
         </FooterContent>
-        
-        {/* Certification Logos Section */}
-        <CertificationSection>
-          <CertificationTitle
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            Certifications & Partnerships
-          </CertificationTitle>
-          <CertificationGrid>
+
+        {/* Certifications — same pane, compact strip */}
+        <CertStrip>
+          <CertStripLabel>Certifications &amp; Partnerships</CertStripLabel>
+          <CertLogoRow>
             {certifications.map((cert, index) => (
-              <CertificationBadge
+              <CertLogo
                 key={cert.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                whileHover={{ scale: 1.1, y: -5 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                whileHover={{ y: -3, scale: 1.08 }}
                 onClick={() => handleCertificationClick(cert.href)}
+                title={cert.name}
               >
-                <CertificationImage 
-                  src={cert.image} 
-                  alt={cert.name}
-                  title={cert.name}
-                />
+                <CertificationImage src={cert.image} alt={cert.name} />
                 <CertName>{cert.name}</CertName>
-              </CertificationBadge>
+              </CertLogo>
             ))}
-          </CertificationGrid>
-        </CertificationSection>
-        
+          </CertLogoRow>
+        </CertStrip>
+
+      </FooterPane>
+
+      <Container>
         <BottomBar>
           <Copyright>
             &copy; {new Date().getFullYear()} {EnvVars.SITE_NAME} | 
@@ -361,16 +299,32 @@ const GradientTop = styled.div`
 
 const FooterContent = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 6rem;
+  flex-wrap: nowrap;
+  gap: 4rem;
+  align-items: flex-start;
 
   ${media.desktop(`
-    gap: 4rem;
+    flex-wrap: wrap;
+    gap: 3rem;
   `)}
 `;
 
+const FooterPane = styled.div`
+  max-width: 160rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 5rem 5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+
+  ${media.desktop(`padding: 4rem 3rem 3rem;`)}
+  ${media.tablet(`padding: 3rem 2rem 2rem;`)}
+`;
+
 const CompanySection = styled.div`
-  flex: 0 0 30%;
+  flex: 0 0 22rem;
+  min-width: 0;
 
   ${media.desktop(`
     flex: 0 0 100%;
@@ -380,17 +334,25 @@ const CompanySection = styled.div`
 const NavSection = styled.div`
   flex: 1;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 2rem;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-width: 0;
 
   ${media.tablet(`
+    flex-wrap: wrap;
     flex-direction: column;
   `)}
 `;
 
 const LogoSection = styled.div`
   margin-bottom: 2rem;
+`;
+
+const FooterLogo = styled.img`
+  height: auto;
+  width: 15rem;
+  object-fit: contain;
 `;
 
 const LogoContainer = styled.div`
@@ -500,9 +462,11 @@ const SocialIconHoverEffect = styled(motion.div)`
 `;
 
 const NavColumn = styled.div`
-  min-width: 16rem;
-  
+  flex: 1;
+  min-width: 0;
+
   ${media.tablet(`
+    flex: unset;
     margin-bottom: 2rem;
   `)}
 `;
@@ -575,113 +539,58 @@ const NavLinkUnderline = styled(motion.div)`
   transform-origin: left;
 `;
 
-const CertificationSection = styled.div`
-  margin-top: 6rem;
-  border-top: 1px solid rgba(var(--text), 0.15);
-  padding-top: 4rem;
+const CertStrip = styled.div`
+  border-top: 1px solid rgba(var(--text), 0.1);
+  padding-top: 3rem;
 `;
 
-const CertificationTitle = styled(motion.h4)`
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 3.5rem;
-  text-align: center;
-  color: rgb(var(--accent));
+const CertStripLabel = styled.p`
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--text), 0.4);
+  margin-bottom: 2rem;
 `;
 
-const CertificationGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: 2.4rem;
-  justify-items: center;
-  max-width: 120rem;
-  margin: 0 auto;
+const CertLogoRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: center;
 `;
 
-const CertificationBadge = styled(motion.div)`
-  background: rgba(var(--cardBackground), 0.95);
-  border: 2px solid rgba(var(--accent), 0.2);
-  border-radius: 1.4rem;
-  padding: 2rem 1.5rem;
-  width: 14rem;
-  height: 11rem;
+const CertLogo = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(15px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px rgba(var(--accent), 0.08);
-  position: relative;
-  overflow: hidden;
+  gap: 0.6rem;
   cursor: pointer;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, rgb(var(--accent)), rgba(var(--accent), 0.6));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &:hover {
-    background: rgba(var(--cardBackground), 1);
-    border-color: rgba(var(--accent), 0.4);
-    box-shadow: 0 8px 32px rgba(var(--accent), 0.15);
-    transform: translateY(-4px) scale(1.02);
-  }
-  
-  &:hover::before {
-    opacity: 1;
-  }
+  width: 10rem;
 `;
 
 const CertificationImage = styled.img`
   height: 5.5rem;
   width: auto;
-  max-width: 10rem;
-  max-height: 100%;
+  max-width: 9rem;
   object-fit: contain;
-  border-radius: 0.6rem;
+  border-radius: 0.5rem;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
-  
-  &[src*=".svg"] {
-    filter: brightness(1.1) contrast(1.1);
-  }
-  
-  &[src*=".jpg"], &[src*=".jpeg"] {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    background: white;
-    padding: 0.3rem;
-  }
-  
-  &[src*=".png"] {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  }
-  
-  ${CertificationBadge}:hover & {
-    transform: scale(1.05);
-    filter: brightness(1.2) contrast(1.2);
-  }
+  background: white;
+  padding: 0.4rem 0.6rem;
 `;
 
 const CertName = styled.span`
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: rgb(var(--text));
+  color: rgba(var(--text), 0.6);
   text-align: center;
   line-height: 1.3;
-  opacity: 0.9;
-  transition: all 0.3s ease;
-  
-  ${CertificationBadge}:hover & {
+  transition: color 0.2s ease;
+
+  ${CertLogo}:hover & {
     color: rgb(var(--accent));
-    opacity: 1;
   }
 `;
 
@@ -751,3 +660,32 @@ const ArrowIcon = styled.svg`
   height: 2.4rem;
   fill: currentColor;
 `;
+
+const ContactLinkItem = styled.a`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: rgb(var(--text));
+  font-size: 1.35rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+
+  &:hover {
+    color: rgb(var(--accent));
+  }
+`;
+
+const GithubIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    style={{ marginRight: '0.6rem', verticalAlign: 'middle', flexShrink: 0 }}
+  >
+    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+  </svg>
+);

@@ -30,13 +30,13 @@ const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
   backdrop-filter: ${(p) => (p.$isScrolled ? 'blur(10px)' : 'none')};
   box-shadow: ${(p) => (p.$isScrolled ? 'var(--shadow-md)' : 'none')};
   transition: all 0.3s ease-in-out;
-  padding: ${(p) => (p.$isScrolled ? '1rem 0' : '2rem 0')};
+  padding: ${(p) => (p.$isScrolled ? '0.5rem 0' : '0.8rem 0')};
   border-bottom: ${(p) => (p.$isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none')};
 `;
 
 const HeaderPane = styled(Container)`
-  max-width: 160rem;
-  padding: 0 5rem;
+  max-width: 140rem;
+  padding: 0 3rem;
 
   ${media.desktop(`
     padding: 0 3rem;
@@ -56,18 +56,18 @@ const HeaderContent = styled.div`
 const HeaderInner = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  justify-content: flex-start;
+  gap: 3rem;
 `;
 
 const LeftSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 3rem;
-  flex: 1;
+  gap: 2rem;
+  flex-shrink: 0;
 
   ${media.desktop(`
-    gap: 2rem;
+    gap: 1.5rem;
   `)}
 `;
 
@@ -87,6 +87,7 @@ const RightSection = styled.div`
   display: flex;
   align-items: center;
   gap: 2rem;
+  flex-shrink: 0;
 
   ${media.desktop(`
     gap: 1.2rem;
@@ -451,7 +452,7 @@ export default function AnimatedHeader() {
             <HeaderInner>
               <LeftSection>
                 <LogoContainer onClick={handleLogoClick} aria-label="Precise Analytics Homepage">
-                  <AnimatedLogo size="14rem" />
+                  <AnimatedLogo size="10rem" />
                 </LogoContainer>
                 <Nav>
                   <NavList>

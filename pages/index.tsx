@@ -416,15 +416,15 @@ export default function HomePage() {
 
 // === Styled Components ===
 const PageWrapper = styled.div`
-  padding: 4rem 0;
+  padding: 2rem 0 0;
 `;
 
 const HeroSection = styled.section`
   text-align: center;
-  padding: 6rem 0 8rem;
+  padding: 2rem 0 6rem;
   background: linear-gradient(135deg, rgba(255, 125, 0, 0.05) 0%, rgba(255, 165, 0, 0.02) 100%);
   border-radius: 2rem;
-  margin-bottom: 8rem;
+  margin-bottom: 4rem;
 `;
 
 const HeroContent = styled.div`
@@ -536,7 +536,7 @@ const SecondaryButtonLink = styled.div`
 `;
 
 const ServicesSection = styled.section`
-  margin-bottom: 8rem;
+  margin-bottom: 4rem;
 `;
 
 const SectionTitle = styled.h2`
@@ -695,7 +695,7 @@ const LearnMoreButton = styled.button`
 `;
 
 const CertificationsSection = styled.section`
-  margin-bottom: 8rem;
+  margin-bottom: 4rem;
   padding: 6rem 0;
   background: rgba(var(--cardBackground), 0.5);
   border-radius: 2rem;
@@ -811,7 +811,7 @@ const CertLink = styled.a`
 `;
 
 const IndustriesSection = styled.section`
-  margin-bottom: 8rem;
+  margin-bottom: 4rem;
 `;
 
 const IndustriesGrid = styled.div`
@@ -874,7 +874,7 @@ const IndustryDescription = styled.p`
 `;
 
 const ContactSection = styled.section`
-  margin-bottom: 8rem;
+  margin-bottom: 2rem;
 `;
 
 const FormWrapper = styled.div`

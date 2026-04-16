@@ -281,11 +281,11 @@ export default function AnimatedFooter() {
 const FooterWrapper = styled(motion.footer)`
   position: relative;
   background: linear-gradient(180deg, rgba(var(--navbarBackground), 0.9) 0%, rgb(var(--secondBackground)) 100%);
-  padding: 8rem 0 4rem;
+  padding: 6rem 0 0;
   color: rgb(var(--text));
   overflow: hidden;
   border-top: 1px solid rgba(var(--accent), 0.1);
-  margin-top: 10rem;
+  margin-top: 4rem;
 `;
 
 const GradientTop = styled.div`
@@ -629,8 +629,8 @@ const BottomBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 5rem;
-  padding-top: 2rem;
+  margin-top: 3rem;
+  padding: 2rem 0;
   border-top: 1px solid rgba(var(--text), 0.1);
   font-size: 1.4rem;
   

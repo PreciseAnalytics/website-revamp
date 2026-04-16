@@ -7,6 +7,7 @@ import { EnvVars } from 'env';
 import { media } from 'utils/media';
 import Button from 'components/Button';
 import Container from 'components/Container';
+import AnimatedLogo from 'components/AnimatedLogo';
 import { HamburgerIcon } from './HamburgerIcon';
 import CloseIcon from 'components/CloseIcon';
 
@@ -17,7 +18,6 @@ const LINKS = [
   { label: 'Sectors', href: '/sectors' },
   { label: 'AI Workforce Solutions', href: '/ai-training', badge: 'NEW' },
   { label: 'Contact', href: '/contact' },
-  { label: 'Careers', href: '/careers' },
 ];
 
 const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
@@ -83,16 +83,6 @@ const LogoContainer = styled.div`
   }
 `;
 
-const CompanyLogo = styled.img`
-  height: auto;
-  width: 220px;
-  object-fit: contain;
-  display: block;
-
-  ${media.tablet(`
-    width: 160px;
-  `)}
-`;
 
 const Nav = styled.nav`
   ${media.tablet(`
@@ -460,7 +450,7 @@ export default function AnimatedHeader() {
             <HeaderInner>
               <LeftSection>
                 <LogoContainer onClick={handleLogoClick} aria-label="Precise Analytics Homepage">
-                  <CompanyLogo src="/PA-logo.png" alt="Precise Analytics" />
+                  <AnimatedLogo size="14rem" />
                 </LogoContainer>
                 <Nav>
                   <NavList>

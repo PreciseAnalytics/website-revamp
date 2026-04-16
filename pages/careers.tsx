@@ -15,6 +15,7 @@ import { PreciseAnalyticsLogo } from 'components/PreciseAnalyticsLogo';
 // ATS API Configuration
 const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
 const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
+const ATS_AUTH_BASE_URL = '/api/ats/auth';
 
 // Enhanced validation utilities
 const ValidationUtils = {
@@ -201,9 +202,7 @@ const mockAuthForDevelopment = {
       throw new Error('Incorrect password');
     }
     
-    if (!user.verified) {
-      throw new Error('Please verify your email before logging in. Check your inbox for the verification link.');
-    }
+    // In local fallback mode we don't send verification emails, so don't block login.
     
     const mockToken = 'dev-token-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
     console.log('✅ Mock login successful:', { id: user.id, name: user.name, email: user.email });
@@ -261,7 +260,7 @@ const mockAuthForDevelopment = {
       name: fullName,
       email: email.toLowerCase(),
       password: password,
-      verified: IS_DEVELOPMENT, // Auto-verify in development, require verification in production
+      verified: true, // Local fallback mode doesn't send verification emails
       createdAt: new Date()
     });
     
@@ -357,6 +356,7 @@ export default function CareersPage() {
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
+  const [pendingApplyPosition, setPendingApplyPosition] = useState<Position | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
@@ -610,6 +610,13 @@ export default function CareersPage() {
     }
   }, []);
 
+  // Clear any stale auth error when opening an auth modal
+  useEffect(() => {
+    if (showLoginModal || showRegisterModal || showResetModal) {
+      setAuthError(null);
+    }
+  }, [showLoginModal, showRegisterModal, showResetModal]);
+
   // Apply filters
   useEffect(() => {
     console.log('🔍 Applying filters:', filters);
@@ -739,12 +746,11 @@ export default function CareersPage() {
       
       try {
         // Try real API first
-        const response = await fetch(`${ATS_BASE_URL}/api/auth/login`, {
+        const response = await fetch(`${ATS_AUTH_BASE_URL}/login`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+            'Accept': 'application/json'
           },
           body: JSON.stringify(loginData),
         });
@@ -766,15 +772,28 @@ export default function CareersPage() {
         setShowLoginModal(false);
         setLoginData({ email: '', password: '' });
         console.log('✅ API Login successful:', data.user);
+
+        if (pendingApplyPosition) {
+          const positionToApply = pendingApplyPosition;
+          setPendingApplyPosition(null);
+          openApplicationForPosition(positionToApply, data.user, data.token);
+        }
         
         if (typeof window !== 'undefined' && (window as any).gtag) {
           (window as any).gtag('event', 'login', { method: 'email' });
         }
         
       } catch (apiError: any) {
-        console.log('🔄 API login failed, trying mock auth:', apiError.message);
-        
-        // Use mock auth as fallback
+        const isLocalhost =
+          typeof window !== 'undefined' &&
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+        if (!IS_DEVELOPMENT && !isLocalhost) {
+          throw apiError;
+        }
+
+        console.log('🔄 API login failed, trying local mock auth:', apiError.message);
+
         const mockResult = await mockAuthForDevelopment.login(loginData.email, loginData.password);
         localStorage.setItem('token', mockResult.token);
         localStorage.setItem('user', JSON.stringify(mockResult.user));
@@ -783,10 +802,14 @@ export default function CareersPage() {
         setShowLoginModal(false);
         setLoginData({ email: '', password: '' });
         console.log('✅ Mock login successful:', mockResult.user);
-        
-        if (IS_DEVELOPMENT) {
-          alert('✅ Development Mode: Login successful! (Using mock authentication)');
+
+        if (pendingApplyPosition) {
+          const positionToApply = pendingApplyPosition;
+          setPendingApplyPosition(null);
+          openApplicationForPosition(positionToApply, mockResult.user, mockResult.token);
         }
+        
+        alert('✅ Local fallback login used. No verification email is sent in this mode.');
       }
     } catch (error: any) {
       console.error('❌ Login error:', error);
@@ -836,12 +859,11 @@ export default function CareersPage() {
       
       try {
         // Try real API first
-        const response = await fetch(`${ATS_BASE_URL}/api/auth/register`, {
+        const response = await fetch(`${ATS_AUTH_BASE_URL}/register`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+            'Accept': 'application/json'
           },
           body: JSON.stringify({
             name: fullName,
@@ -878,9 +900,16 @@ export default function CareersPage() {
         }
         
       } catch (apiError: any) {
-        console.log('🔄 API registration failed, trying mock auth:', apiError.message);
-        
-        // Use mock auth as fallback
+        const isLocalhost =
+          typeof window !== 'undefined' &&
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+        if (!IS_DEVELOPMENT && !isLocalhost) {
+          throw apiError;
+        }
+
+        console.log('🔄 API registration failed, trying local mock auth:', apiError.message);
+
         const mockResult = await mockAuthForDevelopment.register(
           registerData.firstName, 
           registerData.lastName, 
@@ -900,7 +929,7 @@ export default function CareersPage() {
         });
         console.log('✅ Mock registration successful');
         
-        alert(mockResult.message);
+        alert('✅ Local fallback registration used. No verification email is sent in this mode.');
       }
     } catch (error: any) {
       console.error('❌ Registration error:', error);
@@ -925,12 +954,11 @@ export default function CareersPage() {
       
       try {
         // Try real API first
-        const response = await fetch(`${ATS_BASE_URL}/api/auth/reset-password`, {
+        const response = await fetch(`${ATS_AUTH_BASE_URL}/reset-password`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'
+            'Accept': 'application/json'
           },
           body: JSON.stringify({ email: resetEmail }),
         });
@@ -951,15 +979,22 @@ export default function CareersPage() {
         alert('Password reset instructions have been sent to your email.');
         
       } catch (apiError: any) {
-        console.log('🔄 API password reset failed, trying mock auth:', apiError.message);
-        
-        // Use mock auth as fallback
-        const mockResult = await mockAuthForDevelopment.resetPassword(resetEmail);
+        const isLocalhost =
+          typeof window !== 'undefined' &&
+          (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+        if (!IS_DEVELOPMENT && !isLocalhost) {
+          throw apiError;
+        }
+
+        console.log('🔄 API password reset failed, trying local mock auth:', apiError.message);
+
+        await mockAuthForDevelopment.resetPassword(resetEmail);
         setShowResetModal(false);
         setResetEmail('');
         console.log('✅ Mock password reset successful');
-        
-        alert(mockResult.message);
+
+        alert('✅ Local fallback password reset used. No email is sent in this mode.');
       }
     } catch (error: any) {
       console.error('❌ Password reset error:', error);
@@ -975,6 +1010,7 @@ export default function CareersPage() {
     localStorage.removeItem('user');
     setIsLoggedIn(false);
     setUser(null);
+    setPendingApplyPosition(null);
     console.log('✅ User logged out');
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'logout', { method: 'email' });
@@ -996,32 +1032,53 @@ export default function CareersPage() {
   };
 
   // Enhanced apply click handler
-  const handleApplyClick = (position: Position) => {
-    console.log('🚀 Apply clicked for:', position.title, 'User logged in:', isLoggedIn);
-    
+  function openApplicationForPosition(position: Position, userOverride?: any, tokenOverride?: string) {
     const baseApplicationUrl = `/application/${position.id}`;
-    
-    const applicationUrl = isLoggedIn && user 
-      ? `${baseApplicationUrl}?user=${encodeURIComponent(JSON.stringify(user))}&token=${encodeURIComponent(localStorage.getItem('token') || '')}`
+    const effectiveUser = userOverride ?? user;
+    const effectiveToken = tokenOverride ?? localStorage.getItem('token') ?? '';
+
+    const applicationUrl = effectiveUser && effectiveToken
+      ? `${baseApplicationUrl}?user=${encodeURIComponent(JSON.stringify(effectiveUser))}&token=${encodeURIComponent(effectiveToken)}`
       : baseApplicationUrl;
-    
+
     console.log('🚀 Navigating to application page:', applicationUrl);
-    
+
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (isMobile) {
       window.location.href = applicationUrl;
     } else {
       window.open(applicationUrl, '_blank', 'noopener,noreferrer');
     }
-    
+
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'apply_now_clicked', {
         job_position: position.title,
         job_id: position.id,
         source: showJobModal ? 'job_details_modal' : 'careers_page',
-        user_logged_in: isLoggedIn,
+        user_logged_in: Boolean(effectiveUser && effectiveToken),
       });
     }
+  }
+
+  const handleApplyClick = (position: Position) => {
+    console.log('🚀 Apply clicked for:', position.title, 'User logged in:', isLoggedIn);
+    openApplicationForPosition(position);
+  };
+
+  const handleRegisterToApplyClick = (position: Position) => {
+    setAuthError(null);
+    setPendingApplyPosition(position);
+    setShowJobModal(false);
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
+  const handleLoginToApplyClick = (position: Position) => {
+    setAuthError(null);
+    setPendingApplyPosition(position);
+    setShowJobModal(false);
+    setShowRegisterModal(false);
+    setShowLoginModal(true);
   };
 
   // Manual refresh function for debugging
@@ -1077,7 +1134,14 @@ export default function CareersPage() {
                     <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
                   </AuthContainer>
                 ) : (
-                  <LoginButton onClick={() => setShowLoginModal(true)}>Login</LoginButton>
+                  <AuthContainer>
+                    <LoginButton onClick={() => { setAuthError(null); setPendingApplyPosition(null); setShowRegisterModal(false); setShowResetModal(false); setShowLoginModal(true); }}>
+                      Login
+                    </LoginButton>
+                    <RegisterToApplyButton onClick={() => { setAuthError(null); setPendingApplyPosition(null); setShowLoginModal(false); setShowResetModal(false); setShowRegisterModal(true); }}>
+                      Register to Apply
+                    </RegisterToApplyButton>
+                  </AuthContainer>
                 )}
               </BadgesWrapper>
             </HeaderContent>
@@ -1298,7 +1362,7 @@ export default function CareersPage() {
                       {deptPositions.map((position) => (
                         <JobListRow key={position.id}>
                           <JobCell className="title">
-                            <JobTitle onClick={() => handleApplyClick(position)}>{position.title}</JobTitle>
+                            <JobTitle onClick={() => handleLearnMore(position)}>{position.title}</JobTitle>
                             <JobPreview>{position.description.substring(0, 120)}...</JobPreview>
                           </JobCell>
                           <JobCell className="department">
@@ -1316,7 +1380,13 @@ export default function CareersPage() {
                           <JobCell className="action">
                             <JobActions>
                               <LearnMoreButton onClick={() => handleLearnMore(position)}>Learn More</LearnMoreButton>
-                              <CompactApplyButton onClick={() => handleApplyClick(position)}>Apply Now</CompactApplyButton>
+                              {isLoggedIn ? (
+                                <CompactApplyButton onClick={() => handleApplyClick(position)}>Apply Now</CompactApplyButton>
+                              ) : (
+                                <CompactApplyButton onClick={() => handleRegisterToApplyClick(position)}>
+                                  Register to Apply
+                                </CompactApplyButton>
+                              )}
                             </JobActions>
                           </JobCell>
                         </JobListRow>
@@ -1345,7 +1415,7 @@ export default function CareersPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <JobModalHeader>
-                <JobModalTitle onClick={() => handleApplyClick(selectedPosition)}>
+                <JobModalTitle>
                   {selectedPosition.title}
                 </JobModalTitle>
                 <CloseButton onClick={() => setShowJobModal(false)}>×</CloseButton>
@@ -1381,9 +1451,20 @@ export default function CareersPage() {
                 )}
                 <JobModalActions>
                   <SecondaryButton onClick={() => setShowJobModal(false)}>Keep Browsing</SecondaryButton>
-                  <PrimaryButton onClick={() => handleApplyClick(selectedPosition)}>
-                    Apply for This Position
-                  </PrimaryButton>
+                  {isLoggedIn ? (
+                    <PrimaryButton onClick={() => handleApplyClick(selectedPosition)}>
+                      Apply for This Position
+                    </PrimaryButton>
+                  ) : (
+                    <>
+                      <SecondaryButton onClick={() => handleLoginToApplyClick(selectedPosition)}>
+                        Login to Apply
+                      </SecondaryButton>
+                      <PrimaryButton onClick={() => handleRegisterToApplyClick(selectedPosition)}>
+                        Register to Apply
+                      </PrimaryButton>
+                    </>
+                  )}
                 </JobModalActions>
               </JobModalBody>
             </JobModalContent>
@@ -1408,7 +1489,7 @@ export default function CareersPage() {
             >
               <AuthModalHeader>
                 <AuthModalTitle>Login</AuthModalTitle>
-                <CloseButton onClick={() => setShowLoginModal(false)}>×</CloseButton>
+                <AuthCloseButton onClick={() => setShowLoginModal(false)}>×</AuthCloseButton>
               </AuthModalHeader>
               <AuthModalBody>
                 {authError && <ErrorMessage>{authError}</ErrorMessage>}
@@ -1489,45 +1570,47 @@ export default function CareersPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <AuthModalHeader>
-                <AuthModalTitle>Create Account</AuthModalTitle>
-                <CloseButton onClick={() => setShowRegisterModal(false)}>×</CloseButton>
+                <AuthModalTitle>Create an account to apply for our available opportunities</AuthModalTitle>
+                <AuthCloseButton onClick={() => setShowRegisterModal(false)}>×</AuthCloseButton>
               </AuthModalHeader>
               <AuthModalBody>
                 {authError && <ErrorMessage>{authError}</ErrorMessage>}
-                <InputGroup>
-                  <InputLabel>First Name</InputLabel>
-                  <Input
-                    type="text"
-                    value={registerData.firstName}
-                    onChange={(e) => {
-                      setRegisterData({ ...registerData, firstName: e.target.value });
-                      validateField('firstName', e.target.value);
-                    }}
-                    placeholder="Enter your first name"
-                    disabled={authLoading}
-                    $hasError={!validationState.firstName.isValid}
-                  />
-                  {!validationState.firstName.isValid && (
-                    <ValidationError>{validationState.firstName.error}</ValidationError>
-                  )}
-                </InputGroup>
-                <InputGroup>
-                  <InputLabel>Last Name</InputLabel>
-                  <Input
-                    type="text"
-                    value={registerData.lastName}
-                    onChange={(e) => {
-                      setRegisterData({ ...registerData, lastName: e.target.value });
-                      validateField('lastName', e.target.value);
-                    }}
-                    placeholder="Enter your last name"
-                    disabled={authLoading}
-                    $hasError={!validationState.lastName.isValid}
-                  />
-                  {!validationState.lastName.isValid && (
-                    <ValidationError>{validationState.lastName.error}</ValidationError>
-                  )}
-                </InputGroup>
+                <AuthFormRow>
+                  <InputGroup>
+                    <InputLabel>First Name</InputLabel>
+                    <Input
+                      type="text"
+                      value={registerData.firstName}
+                      onChange={(e) => {
+                        setRegisterData({ ...registerData, firstName: e.target.value });
+                        validateField('firstName', e.target.value);
+                      }}
+                      placeholder="Enter your first name"
+                      disabled={authLoading}
+                      $hasError={!validationState.firstName.isValid}
+                    />
+                    {!validationState.firstName.isValid && (
+                      <ValidationError>{validationState.firstName.error}</ValidationError>
+                    )}
+                  </InputGroup>
+                  <InputGroup>
+                    <InputLabel>Last Name</InputLabel>
+                    <Input
+                      type="text"
+                      value={registerData.lastName}
+                      onChange={(e) => {
+                        setRegisterData({ ...registerData, lastName: e.target.value });
+                        validateField('lastName', e.target.value);
+                      }}
+                      placeholder="Enter your last name"
+                      disabled={authLoading}
+                      $hasError={!validationState.lastName.isValid}
+                    />
+                    {!validationState.lastName.isValid && (
+                      <ValidationError>{validationState.lastName.error}</ValidationError>
+                    )}
+                  </InputGroup>
+                </AuthFormRow>
                 <InputGroup>
                   <InputLabel>Email Address</InputLabel>
                   <Input
@@ -1657,7 +1740,7 @@ export default function CareersPage() {
                         Creating Account...
                       </>
                     ) : (
-                      'Create Account'
+                      'Create Account to Apply'
                     )}
                   </PrimaryButton>
                 </AuthModalActions>
@@ -1687,7 +1770,7 @@ export default function CareersPage() {
             >
               <AuthModalHeader>
                 <AuthModalTitle>Reset Password</AuthModalTitle>
-                <CloseButton onClick={() => setShowResetModal(false)}>×</CloseButton>
+                <AuthCloseButton onClick={() => setShowResetModal(false)}>×</AuthCloseButton>
               </AuthModalHeader>
               <AuthModalBody>
                 {authError && <ErrorMessage>{authError}</ErrorMessage>}
@@ -1831,6 +1914,23 @@ const LoginButton = styled.button`
   transition: all 0.3s ease;
   &:hover {
     background: rgb(230, 100, 0);
+    transform: translateY(-2px);
+  }
+`;
+
+const RegisterToApplyButton = styled.button`
+  padding: 0.8rem 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  background: transparent;
+  color: rgb(255, 125, 0);
+  border: 2px solid rgb(255, 125, 0);
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 125, 0, 0.1);
     transform: translateY(-2px);
   }
 `;
@@ -2500,7 +2600,7 @@ const ModalOverlay = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 12000;
   padding: 2rem;
 `;
 
@@ -2531,12 +2631,7 @@ const JobModalTitle = styled.h2`
   font-weight: 700;
   color: rgb(255, 125, 0);
   margin: 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  &:hover {
-    color: rgb(230, 100, 0);
-    text-decoration: underline;
-  }
+  cursor: default;
   ${mq('<=tablet', 'font-size: 2.4rem;')}
 `;
 
@@ -2557,6 +2652,15 @@ const CloseButton = styled.button`
   &:hover {
     background: rgba(var(--text), 0.1);
     color: rgb(var(--text));
+  }
+`;
+
+const AuthCloseButton = styled(CloseButton)`
+  color: rgba(17, 24, 39, 0.55);
+
+  &:hover {
+    background: rgba(17, 24, 39, 0.06);
+    color: #111827;
   }
 `;
 
@@ -2626,6 +2730,7 @@ const JobRequirementItem = styled.li`
 
 const JobModalActions = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin-top: 3rem;
   ${mq('<=tablet', 'flex-direction: column;')}
@@ -2692,15 +2797,16 @@ const SecondaryButton = styled.button`
 `;
 
 const AuthModalContent = styled(motion.div)`
-  background: rgba(var(--background), 0.98);
+  background: rgba(255, 255, 255, 0.98);
   border-radius: 2rem;
-  padding: 3rem;
-  max-width: 50rem;
+  padding: 3.5rem 4rem;
+  max-width: 70rem;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(var(--text), 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #111827;
   ${mq('<=tablet', 'max-width: 95vw; margin: 1rem; padding: 2rem;')}
 `;
 
@@ -2729,10 +2835,18 @@ const InputGroup = styled.div`
   gap: 0.5rem;
 `;
 
+const AuthFormRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+
+  ${mq('<=tablet', 'grid-template-columns: 1fr; gap: 1.5rem;')}
+`;
+
 const InputLabel = styled.label`
   font-size: 1.4rem;
   font-weight: 600;
-  color: rgb(var(--text));
+  color: #111827;
 `;
 
 const Input = styled.input<{ $hasError?: boolean }>`
@@ -2740,9 +2854,13 @@ const Input = styled.input<{ $hasError?: boolean }>`
   font-size: 1.4rem;
   border: 2px solid ${props => props.$hasError ? '#ef4444' : 'rgba(255, 125, 0, 0.3)'};
   border-radius: 0.8rem;
-  background: rgba(var(--cardBackground), 0.8);
-  color: rgb(var(--text));
+  background: #ffffff;
+  color: #111827;
   transition: all 0.3s ease;
+
+  &::placeholder {
+    color: rgba(17, 24, 39, 0.5);
+  }
   
   &:focus {
     outline: none;
@@ -2767,7 +2885,7 @@ const PasswordToggle = styled.button`
   right: 1rem;
   background: none;
   border: none;
-  color: rgb(var(--text), 0.6);
+  color: rgba(17, 24, 39, 0.55);
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
@@ -2776,7 +2894,7 @@ const PasswordToggle = styled.button`
   transition: all 0.3s ease;
   
   &:hover:not(:disabled) {
-    color: rgb(var(--text));
+    color: #111827;
   }
   
   &:disabled {
@@ -2835,8 +2953,8 @@ const PasswordStrengthText = styled.p<{ color: string }>`
 `;
 
 const PasswordRequirements = styled.div`
-  background: rgba(var(--cardBackground), 0.8);
-  border: 1px solid rgba(var(--text), 0.1);
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 0.8rem;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -2845,13 +2963,13 @@ const PasswordRequirements = styled.div`
 const RequirementTitle = styled.h4`
   font-size: 1.3rem;
   font-weight: 600;
-  color: rgb(var(--text));
+  color: #111827;
   margin: 0 0 1rem 0;
 `;
 
 const PasswordRequirementItem = styled.div<{ $met: boolean }>`
   font-size: 1.2rem;
-  color: ${props => props.$met ? '#10b981' : 'rgb(var(--text), 0.6)'};
+  color: ${props => props.$met ? '#10b981' : 'rgba(17, 24, 39, 0.65)'};
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -2860,13 +2978,13 @@ const PasswordRequirementItem = styled.div<{ $met: boolean }>`
   &:before {
     content: ${props => props.$met ? '"✓"' : '"○"'};
     font-weight: bold;
-    color: ${props => props.$met ? '#10b981' : 'rgb(var(--text), 0.4)'};
+    color: ${props => props.$met ? '#10b981' : 'rgba(17, 24, 39, 0.35)'};
   }
 `;
 
 const ResetPasswordInfo = styled.p`
   font-size: 1.4rem;
-  color: rgb(var(--text), 0.8);
+  color: rgba(17, 24, 39, 0.75);
   text-align: center;
   margin: 0;
   line-height: 1.5;

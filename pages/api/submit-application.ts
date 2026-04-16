@@ -86,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Send notification email to company
     const companyEmailResult = await resend.emails.send({
       from: 'careers@preciseanalytics.io', // This should be a verified domain in Resend
-      to: ['careers@preciseanalytics.io'],
+      to: ['apply@preciseanalytics.io'],
       subject: `New Application: ${applicationData.position} - ${applicationData.firstName} ${applicationData.lastName}`,
       html: generateCompanyNotificationEmail(applicationData),
       attachments: attachments,

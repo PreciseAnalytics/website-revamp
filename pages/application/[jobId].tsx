@@ -25,8 +25,6 @@ interface Position {
   employment_type: string;
   description: string;
   requirements: string[];
-  salary_min?: number;
-  salary_max?: number;
   benefits?: string;
 }
 
@@ -61,7 +59,6 @@ interface ApplicationFormData {
   highestEducation: string;
   positionApplyingFor: string;
   availableStartDate: string;
-  expectedSalaryRange: string;
   interviewAvailability: string;
   gender: string;
   raceEthnicity: string;
@@ -122,7 +119,6 @@ export default function ApplicationPage() {
     highestEducation: '',
     positionApplyingFor: '',
     availableStartDate: '',
-    expectedSalaryRange: '',
     interviewAvailability: '',
     gender: '',
     raceEthnicity: '',
@@ -258,11 +254,12 @@ export default function ApplicationPage() {
         location: jobData.location || '',
         employment_type: jobData.type || jobData.employment_type || 'full_time',
         description: jobData.description || '',
-        requirements: typeof jobData.requirements === 'string' 
-          ? jobData.requirements.split('\n').filter((req: string) => req.trim()) 
-          : jobData.requirements || [],
-        salary_min: parseSalaryRange(jobData.salary_range)?.min,
-        salary_max: parseSalaryRange(jobData.salary_range)?.max,
+        requirements: (() => {
+          const normalized = normalizeRequirements(jobData.requirements, jobData.description);
+          return normalized.length > 0
+            ? normalized
+            : ['Please refer to the job description above for requirements and qualifications.'];
+        })(),
         benefits: jobData.benefits || ''
       };
 
@@ -370,22 +367,54 @@ export default function ApplicationPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const parseSalaryRange = (salaryRange: string): { min: number; max: number } | null => {
-    if (!salaryRange) return null;
-    
-    const numbers = salaryRange.match(/\$[\d,]+/g);
-    if (numbers && numbers.length >= 2) {
-      const min = parseInt(numbers[0].replace(/[$,]/g, ''));
-      const max = parseInt(numbers[1].replace(/[$,]/g, ''));
-      return { min, max };
+  const normalizeRequirements = (rawRequirements: unknown, description: unknown): string[] => {
+    const normalizeLine = (line: string) =>
+      line
+        .replace(/^[\s•*\-\u2022]+/, '')
+        .replace(/^\d+\.\s+/, '')
+        .trim();
+
+    const fromString = (value: string) => {
+      const trimmed = value.trim();
+      if (!trimmed) return [];
+
+      const hasBullets = /[\n•\u2022-]/.test(trimmed);
+      const parts = hasBullets
+        ? trimmed.split(/\r?\n/)
+        : trimmed.split(/(?:\.\s+|;\s+)/);
+
+      return parts.map(normalizeLine).filter(Boolean);
+    };
+
+    const fromRaw =
+      typeof rawRequirements === 'string'
+        ? fromString(rawRequirements)
+        : Array.isArray(rawRequirements)
+          ? rawRequirements.map((req) => (typeof req === 'string' ? normalizeLine(req) : '')).filter(Boolean)
+          : [];
+
+    if (fromRaw.length > 0) return Array.from(new Set(fromRaw));
+
+    if (typeof description !== 'string') return [];
+
+    const lines = description.split(/\r?\n/).map((l) => l.trim());
+    const headerIndex = lines.findIndex((l) => /^(requirements|qualifications)\b/i.test(l));
+    if (headerIndex === -1) return [];
+
+    const extracted: string[] = [];
+    for (let i = headerIndex + 1; i < lines.length; i += 1) {
+      const line = lines[i];
+      if (!line) {
+        if (extracted.length > 0) break;
+        continue;
+      }
+      if (/^(benefits|responsibilities|key responsibilities)\b/i.test(line)) break;
+      const normalized = normalizeLine(line);
+      if (normalized) extracted.push(normalized);
+      if (extracted.length >= 12) break;
     }
-    
-    if (numbers && numbers.length === 1) {
-      const amount = parseInt(numbers[0].replace(/[$,]/g, ''));
-      return { min: amount, max: amount };
-    }
-    
-    return null;
+
+    return Array.from(new Set(extracted));
   };
 
   const uploadFile = async (file: File, type: string): Promise<string> => {
@@ -479,7 +508,6 @@ export default function ApplicationPage() {
         highest_education: formData.highestEducation,
         position_applying_for: formData.positionApplyingFor,
         available_start_date: formData.availableStartDate,
-        expected_salary_range: formData.expectedSalaryRange,
         interview_availability: formData.interviewAvailability,
         gender: formData.gender,
         race_ethnicity: formData.raceEthnicity,
@@ -706,10 +734,6 @@ export default function ApplicationPage() {
     );
   }
 
-  const salaryRange = position.salary_min && position.salary_max 
-    ? `$${position.salary_min.toLocaleString()} - $${position.salary_max.toLocaleString()}`
-    : '';
-
   return (
     <>
       <Head>
@@ -755,9 +779,6 @@ export default function ApplicationPage() {
                 {position.employment_type && (
                   <JobMetaItem>💼 {position.employment_type.replace('_', ' ').toUpperCase()}</JobMetaItem>
                 )}
-                {salaryRange && (
-                  <JobMetaItem>💰 {salaryRange}</JobMetaItem>
-                )}
               </JobMeta>
               <JobDescription>{position.description}</JobDescription>
               
@@ -777,29 +798,21 @@ export default function ApplicationPage() {
                     <OverviewLabel>Employment Type</OverviewLabel>
                     <OverviewValue>{position.employment_type?.replace('_', ' ').toUpperCase() || 'Full-time'}</OverviewValue>
                   </OverviewItem>
-                  <OverviewItem>
-                    <OverviewLabel>Salary Range</OverviewLabel>
-                    <OverviewValue>
-                      {position.salary_min && position.salary_max 
-                        ? `${position.salary_min.toLocaleString()} - ${position.salary_max.toLocaleString()}`
-                        : 'Competitive salary'
-                      }
-                    </OverviewValue>
-                  </OverviewItem>
                 </JobOverviewGrid>
               </JobOverviewSection>
               
               {/* Requirements Section */}
-              {position.requirements && position.requirements.length > 0 && (
-                <JobRequirementsSection>
-                  <RequirementsSectionTitle>Requirements & Qualifications</RequirementsSectionTitle>
-                  <JobRequirementsList>
-                    {position.requirements.map((req, index) => (
-                      <JobRequirementItem key={index}>{req}</JobRequirementItem>
-                    ))}
-                  </JobRequirementsList>
-                </JobRequirementsSection>
-              )}
+              <JobRequirementsSection>
+                <RequirementsSectionTitle>Requirements & Qualifications</RequirementsSectionTitle>
+                <JobRequirementsList>
+                  {(position.requirements && position.requirements.length > 0
+                    ? position.requirements
+                    : ['Please refer to the job description above for requirements and qualifications.']
+                  ).map((req, index) => (
+                    <JobRequirementItem key={index}>{req}</JobRequirementItem>
+                  ))}
+                </JobRequirementsList>
+              </JobRequirementsSection>
 
               {/* Benefits Section */}
               {position.benefits && (
@@ -1284,18 +1297,6 @@ export default function ApplicationPage() {
                     required
                   />
                   {formErrors.availableStartDate && <FieldError>{formErrors.availableStartDate}</FieldError>}
-                </FormField>
-                
-                <FormField>
-                  <label htmlFor="expectedSalaryRange">Expected Salary Range</label>
-                  <input
-                    type="text"
-                    id="expectedSalaryRange"
-                    name="expectedSalaryRange"
-                    value={formData.expectedSalaryRange}
-                    onChange={handleChange}
-                    placeholder="e.g., $75,000 - $85,000"
-                  />
                 </FormField>
               </FormGrid>
 

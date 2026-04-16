@@ -129,7 +129,6 @@ const MOCK_POSITIONS = [
       'Experience with federal contracting preferred',
       'Active security clearance preferred but not required'
     ],
-    salary_range: '$120,000 - $180,000',
     benefits: 'Comprehensive health insurance, retirement planning, professional development, flexible work arrangements',
     status: 'published',
     posted: true
@@ -148,7 +147,6 @@ const MOCK_POSITIONS = [
       'Experience with Infrastructure as Code (Terraform, CloudFormation)',
       'CI/CD pipeline development and maintenance'
     ],
-    salary_range: '$100,000 - $150,000',
     benefits: 'Full remote work options, professional development budget, health insurance',
     status: 'published',
     posted: true
@@ -167,7 +165,6 @@ const MOCK_POSITIONS = [
       'Experience with data visualization tools (Tableau, Power BI)',
       'Government contracting experience preferred'
     ],
-    salary_range: '$80,000 - $120,000',
     benefits: 'Hybrid work model, professional certifications, comprehensive benefits',
     status: 'published',
     posted: true
@@ -385,20 +382,54 @@ export default function CareersPage() {
   const positionsSectionRef = useRef<HTMLDivElement>(null);
   const departmentCounterRef = useRef<HTMLDivElement>(null);
 
-  // Parse salary range
-  const parseSalaryRange = (salaryRange: string | undefined): { min: number; max: number } | null => {
-    if (!salaryRange) return null;
-    const numbers = salaryRange.match(/\$[\d,]+/g);
-    if (numbers && numbers.length >= 2) {
-      const min = parseInt(numbers[0].replace(/[$,]/g, ''));
-      const max = parseInt(numbers[1].replace(/[$,]/g, ''));
-      return { min, max };
+  const normalizeRequirements = (rawRequirements: unknown, description: unknown): string[] => {
+    const normalizeLine = (line: string) =>
+      line
+        .replace(/^[\s•*\-\u2022]+/, '')
+        .replace(/^\d+\.\s+/, '')
+        .trim();
+
+    const fromString = (value: string) => {
+      const trimmed = value.trim();
+      if (!trimmed) return [];
+
+      const hasBullets = /[\n•\u2022-]/.test(trimmed);
+      const parts = hasBullets
+        ? trimmed.split(/\r?\n/)
+        : trimmed.split(/(?:\.\s+|;\s+)/);
+
+      return parts.map(normalizeLine).filter(Boolean);
+    };
+
+    const fromRaw =
+      typeof rawRequirements === 'string'
+        ? fromString(rawRequirements)
+        : Array.isArray(rawRequirements)
+          ? rawRequirements.map((req) => (typeof req === 'string' ? normalizeLine(req) : '')).filter(Boolean)
+          : [];
+
+    if (fromRaw.length > 0) return Array.from(new Set(fromRaw));
+
+    if (typeof description !== 'string') return [];
+
+    const lines = description.split(/\r?\n/).map((l) => l.trim());
+    const headerIndex = lines.findIndex((l) => /^(requirements|qualifications)\b/i.test(l));
+    if (headerIndex === -1) return [];
+
+    const extracted: string[] = [];
+    for (let i = headerIndex + 1; i < lines.length; i += 1) {
+      const line = lines[i];
+      if (!line) {
+        if (extracted.length > 0) break;
+        continue;
+      }
+      if (/^(benefits|responsibilities|key responsibilities)\b/i.test(line)) break;
+      const normalized = normalizeLine(line);
+      if (normalized) extracted.push(normalized);
+      if (extracted.length >= 12) break;
     }
-    if (numbers && numbers.length === 1) {
-      const amount = parseInt(numbers[0].replace(/[$,]/g, ''));
-      return { min: amount, max: amount };
-    }
-    return null;
+
+    return Array.from(new Set(extracted));
   };
 
   // Enhanced fetch positions with better error handling and fallbacks
@@ -487,31 +518,28 @@ export default function CareersPage() {
       let processedPositions: Position[] = [];
 
       if (apiResponse && apiResponse.jobs) {
-        processedPositions = apiResponse.jobs.map((job: any) => {
-          const salaryParsed = parseSalaryRange(job.salary_range);
-          return {
-            id: job.id || crypto.randomUUID(),
-            title: job.title || 'Untitled Position',
-            department: job.department?.trim().toLowerCase() || 'general',
-            location: job.location?.trim().toLowerCase() || 'location tbd',
-            employment_type: job.type?.trim().toLowerCase() || job.employment_type?.trim().toLowerCase() || 'full_time',
-            description: job.description || 'Job description coming soon.',
-            requirements: typeof job.requirements === 'string'
-              ? job.requirements.split('\n').filter((req: string) => req.trim())
-              : Array.isArray(job.requirements)
-                ? job.requirements
-                : [],
-            salary_min: salaryParsed?.min,
-            salary_max: salaryParsed?.max,
-            salary_range: job.salary_range || 'Competitive',
-            benefits: job.benefits || '',
-            status: job.status || 'published',
-            posted: job.posted ?? true,
-          };
-        });
+        const mappedPositions = apiResponse.jobs.map((job: any) => ({
+          id: job.id || crypto.randomUUID(),
+          title: job.title || 'Untitled Position',
+          department: job.department?.trim().toLowerCase() || 'general',
+          location: job.location?.trim().toLowerCase() || 'location tbd',
+          employment_type: job.type?.trim().toLowerCase() || job.employment_type?.trim().toLowerCase() || 'full_time',
+          description: job.description || 'Job description coming soon.',
+          requirements: normalizeRequirements(job.requirements, job.description),
+          benefits: job.benefits || '',
+          status: job.status || 'published',
+          posted: job.posted ?? true,
+        })) as Position[];
+
+        const excludedCount = mappedPositions.filter((pos) => !pos.requirements || pos.requirements.length === 0).length;
+        processedPositions = mappedPositions.filter((pos) => pos.requirements && pos.requirements.length > 0);
 
         console.log('✅ Processed API positions:', processedPositions.length);
-        setDebugInfo(`✅ Loaded ${processedPositions.length} positions from API`);
+        setDebugInfo(
+          excludedCount > 0
+            ? `✅ Loaded ${processedPositions.length} positions from API (${excludedCount} hidden due to missing requirements)`
+            : `✅ Loaded ${processedPositions.length} positions from API`
+        );
 
       } else {
         console.log('🔄 Using mock data as fallback');
@@ -1290,7 +1318,6 @@ export default function CareersPage() {
                   <HeaderCell className="department">Department</HeaderCell>
                   <HeaderCell className="location">Location</HeaderCell>
                   <HeaderCell className="type">Type</HeaderCell>
-                  <HeaderCell className="salary">Salary</HeaderCell>
                   <HeaderCell className="action">Actions</HeaderCell>
                 </JobListHeader>
                 {filteredPositions.map((position) => (
@@ -1307,9 +1334,6 @@ export default function CareersPage() {
                     </JobCell>
                     <JobCell className="type">
                       <TypeBadge>{position.employment_type.replace('_', ' ').toUpperCase()}</TypeBadge>
-                    </JobCell>
-                    <JobCell className="salary">
-                      <SalaryText>{position.salary_range}</SalaryText>
                     </JobCell>
                     <JobCell className="action">
                       <JobActions>
@@ -1351,9 +1375,6 @@ export default function CareersPage() {
                   <JobModalMetaItem>🏢 {selectedPosition.department}</JobModalMetaItem>
                   <JobModalMetaItem>📍 {selectedPosition.location}</JobModalMetaItem>
                   <JobModalMetaItem>💼 {selectedPosition.employment_type.replace('_', ' ').toUpperCase()}</JobModalMetaItem>
-                  {selectedPosition.salary_range && (
-                    <JobModalMetaItem>💰 {selectedPosition.salary_range}</JobModalMetaItem>
-                  )}
                 </JobModalMeta>
                 <JobModalSection>
                   <JobModalSectionTitle>Job Description</JobModalSectionTitle>
@@ -2241,7 +2262,7 @@ const JobListContainer = styled.div`
 
 const JobListHeader = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 0.8fr;
+  grid-template-columns: 2.2fr 1fr 1fr 0.9fr 1fr;
   background: linear-gradient(135deg, rgba(255, 125, 0, 0.1), rgba(255, 165, 0, 0.05));
   border-bottom: 2px solid rgba(255, 125, 0, 0.2);
   padding: 1.5rem 2rem;
@@ -2258,13 +2279,12 @@ const HeaderCell = styled.div`
   &.department { justify-self: center; }
   &.location { justify-self: center; }
   &.type { justify-self: center; }
-  &.salary { justify-self: center; }
   &.action { justify-self: end; }
 `;
 
 const JobListRow = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.8fr 1fr 0.8fr;
+  grid-template-columns: 2.2fr 1fr 1fr 0.9fr 1fr;
   padding: 2rem;
   border-bottom: 1px solid rgba(var(--text), 0.1);
   align-items: center;
@@ -2294,7 +2314,6 @@ const JobCell = styled.div`
   &.department { justify-self: center; }
   &.location { justify-self: center; }
   &.type { justify-self: center; }
-  &.salary { justify-self: center; }
   &.action { justify-self: end; }
   ${mq('<=tablet', 'justify-self: start !important; width: 100%;')}
 `;
@@ -2371,14 +2390,6 @@ const TypeBadge = styled.span`
   font-weight: 600;
   white-space: nowrap;
   ${mq('<=tablet', 'font-size: 1.3rem; padding: 0.8rem 1.5rem;')}
-`;
-
-const SalaryText = styled.span`
-  font-size: 1.4rem;
-  color: rgb(var(--text), 0.9);
-  font-weight: 600;
-  text-align: center;
-  ${mq('<=tablet', 'text-align: left; font-size: 1.5rem;')}
 `;
 
 const JobActions = styled.div`

@@ -17,6 +17,7 @@ const LINKS = [
   { label: 'Capabilities Statement', href: '/capabilities-statement' },
   { label: 'Sectors', href: '/sectors' },
   { label: 'AI Workforce Solutions', href: '/ai-training', badge: 'NEW' },
+  { label: 'Careers', href: '/careers' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -116,10 +117,10 @@ const NavList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 2rem;
+  gap: 1.6rem;
 
   ${media.desktop(`
-    gap: 1.5rem;
+    gap: 1.2rem;
   `)}
 `;
 
@@ -134,6 +135,7 @@ const NavLinkText = styled.span<{ $active: boolean }>`
   padding: 0.5rem 0;
   transition: all 0.3s ease;
   cursor: pointer;
+  white-space: nowrap;
 
   &:hover {
     color: rgb(var(--accent));
@@ -264,56 +266,6 @@ const ScheduleButtonContainer = styled.div`
   ${media.desktop(`
     padding: 1rem 1.8rem;
     font-size: 1.45rem;
-  `)}
-`;
-
-const CertificationLogos = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-
-  ${media.desktop(`
-    gap: 1rem;
-  `)}
-  ${media.tablet(`
-    display: none;
-  `)}
-`;
-
-const CertificationLink = styled.a`
-  display: inline-block;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const SBACertLogo = styled.img`
-  height: 85px;
-  object-fit: contain;
-
-  ${media.desktop(`
-    height: 70px;
-  `)}
-  ${media.tablet(`
-    height: 36px;
-  `)}
-`;
-
-const SWAMCertLogo = styled.img`
-  height: 85px;
-  object-fit: contain;
-  background-color: white;
-  border-radius: 6px;
-  padding: 4px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-
-  ${media.desktop(`
-    height: 70px;
-  `)}
-  ${media.tablet(`
-    height: 50px;
   `)}
 `;
 
@@ -469,7 +421,7 @@ function useScrollTrigger(threshold = 20) {
 export default function AnimatedHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isScrolled, isClient } = useScrollTrigger(20);
+  const { isScrolled } = useScrollTrigger(20);
 
   useEffect(() => {
     const handleRouteChange = () => setIsMenuOpen(false);
@@ -533,27 +485,6 @@ export default function AnimatedHeader() {
                     Schedule a Consultation
                   </ScheduleButtonContainer>
                 </ButtonContainer>
-
-                {isClient && (
-                  <CertificationLogos>
-                    <CertificationLink
-                      href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="View SBA Certification"
-                    >
-                      <SBACertLogo src="/Veteran-Owned-Certified.png" alt="Veteran-Owned Certified" />
-                    </CertificationLink>
-                    <CertificationLink
-                      href="https://directory.sbsd.virginia.gov/#/directory"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="View SWaM Certification"
-                    >
-                      <SWAMCertLogo src="/SWAM_LOGO.jpg" alt="SWaM Certified" />
-                    </CertificationLink>
-                  </CertificationLogos>
-                )}
 
                 <MobileMenuButton onClick={toggleMobileMenu}>
                   <MenuIconWrapper>

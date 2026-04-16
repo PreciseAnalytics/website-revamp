@@ -33,6 +33,19 @@ const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
   border-bottom: ${(p) => (p.$isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none')};
 `;
 
+const HeaderPane = styled(Container)`
+  max-width: 160rem;
+  padding: 0 5rem;
+
+  ${media.desktop(`
+    padding: 0 3rem;
+  `)}
+
+  ${media.tablet(`
+    padding: 0 2rem;
+  `)}
+`;
+
 const HeaderContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -51,6 +64,10 @@ const LeftSection = styled.div`
   align-items: center;
   gap: 3rem;
   flex: 1;
+
+  ${media.desktop(`
+    gap: 2rem;
+  `)}
 `;
 
 const CenterSection = styled.div`
@@ -69,6 +86,10 @@ const RightSection = styled.div`
   display: flex;
   align-items: center;
   gap: 2rem;
+
+  ${media.desktop(`
+    gap: 1.2rem;
+  `)}
 `;
 
 const LogoContainer = styled.div`
@@ -96,6 +117,10 @@ const NavList = styled.ul`
   margin: 0;
   padding: 0;
   gap: 2rem;
+
+  ${media.desktop(`
+    gap: 1.5rem;
+  `)}
 `;
 
 const NavItem = styled.li`
@@ -113,6 +138,10 @@ const NavLinkText = styled.span<{ $active: boolean }>`
   &:hover {
     color: rgb(var(--accent));
   }
+
+  ${media.desktop(`
+    font-size: 1.45rem;
+  `)}
 `;
 
 const NavLinkHighlight = styled.span<{ $active: boolean }>`
@@ -135,6 +164,11 @@ const NavLinkHighlight = styled.span<{ $active: boolean }>`
     background: #f5f5f5;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
+
+  ${media.desktop(`
+    font-size: 1.45rem;
+    padding: 0.35rem 0.8rem;
+  `)}
 `;
 
 const NavBadge = styled.span`
@@ -226,12 +260,21 @@ const ScheduleButtonContainer = styled.div`
   &:active {
     transform: translateY(0);
   }
+
+  ${media.desktop(`
+    padding: 1rem 1.8rem;
+    font-size: 1.45rem;
+  `)}
 `;
 
 const CertificationLogos = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
+
+  ${media.desktop(`
+    gap: 1rem;
+  `)}
   ${media.tablet(`
     display: none;
   `)}
@@ -250,6 +293,9 @@ const SBACertLogo = styled.img`
   height: 85px;
   object-fit: contain;
 
+  ${media.desktop(`
+    height: 70px;
+  `)}
   ${media.tablet(`
     height: 36px;
   `)}
@@ -263,6 +309,9 @@ const SWAMCertLogo = styled.img`
   padding: 4px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 
+  ${media.desktop(`
+    height: 70px;
+  `)}
   ${media.tablet(`
     height: 50px;
   `)}
@@ -445,7 +494,7 @@ export default function AnimatedHeader() {
   return (
     <>
       <HeaderWrapper $isScrolled={isScrolled}>
-        <Container>
+        <HeaderPane>
           <HeaderContent>
             <HeaderInner>
               <LeftSection>
@@ -515,7 +564,7 @@ export default function AnimatedHeader() {
             </HeaderInner>
 
           </HeaderContent>
-        </Container>
+        </HeaderPane>
         <AnimatePresence>
           {isMenuOpen && (
             <MobileNav

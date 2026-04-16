@@ -304,6 +304,10 @@ const FooterContent = styled.div`
   align-items: flex-start;
 
   ${media.desktop(`
+    gap: 2.5rem;
+  `)}
+
+  ${media.tablet(`
     flex-wrap: wrap;
     gap: 3rem;
   `)}
@@ -325,8 +329,11 @@ const FooterPane = styled.div`
 const CompanySection = styled.div`
   flex: 0 0 22rem;
   min-width: 0;
-
   ${media.desktop(`
+    flex: 0 0 18rem;
+  `)}
+
+  ${media.tablet(`
     flex: 0 0 100%;
   `)}
 `;
@@ -338,6 +345,10 @@ const NavSection = styled.div`
   justify-content: space-between;
   gap: 1.5rem;
   min-width: 0;
+
+  ${media.desktop(`
+    gap: 1rem;
+  `)}
 
   ${media.tablet(`
     flex-wrap: wrap;
@@ -395,6 +406,12 @@ const CompanyDescription = styled.p`
   max-width: 42rem;
   opacity: 0.85;
   line-height: 1.6;
+
+  ${media.desktop(`
+    font-size: 1.45rem;
+    max-width: 34rem;
+    margin-bottom: 2rem;
+  `)}
 `;
 
 const ContactInfo = styled.div`
@@ -478,6 +495,11 @@ const CategoryTitle = styled(motion.h4)`
   border-bottom: 2px solid rgba(var(--accent), 0.3);
   padding-bottom: 0.5rem;
   display: inline-block;
+
+  ${media.desktop(`
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  `)}
 `;
 
 const CategoryTitleLink = styled(motion.div)`
@@ -495,6 +517,11 @@ const CategoryTitleLink = styled(motion.div)`
   &:hover {
     color: rgb(var(--accent));
   }
+
+  ${media.desktop(`
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  `)}
 `;
 
 const CategoryTitleUnderline = styled(motion.div)`
@@ -527,6 +554,10 @@ const NavLinkText = styled.div`
   &:hover {
     color: rgb(var(--accent));
   }
+
+  ${media.desktop(`
+    font-size: 1.35rem;
+  `)}
 `;
 
 const NavLinkUnderline = styled(motion.div)`
@@ -676,6 +707,10 @@ const ContactLinkItem = styled.a`
   &:hover {
     color: rgb(var(--accent));
   }
+
+  ${media.desktop(`
+    font-size: 1.25rem;
+  `)}
 `;
 
 const GithubIcon = () => (

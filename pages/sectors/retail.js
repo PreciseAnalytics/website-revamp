@@ -54,9 +54,10 @@ const RetailPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <HeroTitle>Retail Analytics Solutions</HeroTitle>
+              <HeroTitle>Retail Analytics Built for the Commissary, the Exchange, and the Mission Behind Them</HeroTitle>
               <HeroSubtitle>
-                Advanced retail analytics for federal commissaries, exchanges, and government retail operations
+                Inventory optimization, customer behavior analytics, and POS intelligence for military exchanges
+                and federal commissaries — where serving the warfighter means getting the numbers right.
               </HeroSubtitle>
             </motion.div>
           </HeroSection>
@@ -69,22 +70,17 @@ const RetailPage = () => {
             <NextLink href="/sectors/finance">financial analytics</NextLink>.
           </IntroLinks>
           {/* SEO AUTHORITY INTRO */}
-          <SectionIntro>  
-            <h2>
-              Federal Retail Analytics Solutions for Military Exchanges and Commissaries
-            </h2>
-            <strong>Precise Analytics</strong> delivers specialized retail analytics solutions for
-            <strong> federal commissaries, military exchanges, and government-operated retail environments</strong>.
-            Our retail analytics capabilities support data-driven decision-making across customer behavior analysis,
-            inventory optimization, pricing strategy, and operational performance measurement.
-
+          <SectionIntro>
+            Federal retail is not commercial retail. Stockouts at a commissary affect service members
+            who can&apos;t just drive to the next store. Shrinkage at an exchange carries accountability
+            to appropriators, not shareholders. The data environment is mission-critical — and most
+            commercial analytics tools weren&apos;t built for it.
             <br /><br />
-
-            We work with highly regulated retail organizations that operate at national scale, including
-            military exchange systems, commissary agencies, and federal facilities. Our analytics solutions
-            transform point-of-sale (POS), supply chain, merchandising, and customer engagement data into
-            actionable intelligence that improves efficiency, reduces waste, and enhances the customer experience.
-
+            Precise Analytics delivers retail analytics purpose-built for military exchanges, commissary
+            agencies, and government-operated retail at national scale. We connect POS systems, supply
+            chain records, and customer transaction data into pipelines that reduce overstock, surface
+            demand signals before shelves run dry, and give merchandising teams the visibility to serve
+            military families the way they deserve to be served.
             <br /><br />
 
             From demand forecasting and inventory planning to customer segmentation and revenue performance

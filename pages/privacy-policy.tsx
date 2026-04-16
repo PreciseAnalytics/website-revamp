@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
           >
             <PageTitle>Privacy Policy</PageTitle>
             <PageSubtitle>
-              Effective Date: June 25, 2025
+              Effective Date: April 16, 2026
             </PageSubtitle>
           </HeaderSection>
 

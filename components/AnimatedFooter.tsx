@@ -571,24 +571,25 @@ const NavLinkUnderline = styled(motion.div)`
 `;
 
 const CertStrip = styled.div`
-  border-top: 1px solid rgba(var(--text), 0.1);
-  padding-top: 3rem;
+  border-top: 1px solid rgba(var(--text), 0.15);
+  padding: 3.5rem 0 2rem;
 `;
 
 const CertStripLabel = styled.p`
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(var(--text), 0.4);
-  margin-bottom: 2rem;
+  color: rgba(var(--text), 0.6);
+  margin-bottom: 2.5rem;
+  text-align: center;
 `;
 
 const CertLogoRow = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
-  align-items: flex-start;
+  gap: 3rem;
+  align-items: flex-end;
   justify-content: center;
 `;
 
@@ -596,28 +597,29 @@ const CertLogo = styled(motion.div)`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
+  gap: 1rem;
   cursor: pointer;
-  width: 10rem;
+  width: 12rem;
 `;
 
 const CertificationImage = styled.img`
-  height: 5.5rem;
+  height: 7rem;
   width: auto;
-  max-width: 9rem;
+  max-width: 11rem;
   object-fit: contain;
-  border-radius: 0.5rem;
+  border-radius: 0.6rem;
   transition: all 0.3s ease;
   background: white;
-  padding: 0.4rem 0.6rem;
+  padding: 0.6rem 0.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 `;
 
 const CertName = styled.span`
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: rgba(var(--text), 0.6);
+  color: rgba(var(--text), 0.85);
   text-align: center;
-  line-height: 1.3;
+  line-height: 1.4;
   transition: color 0.2s ease;
 
   ${CertLogo}:hover & {

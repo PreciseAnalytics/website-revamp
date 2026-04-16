@@ -64,23 +64,24 @@ export default function HealthcarePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <HeroTitle>Healthcare Analytics Solutions</HeroTitle>
+              <HeroTitle>Healthcare Analytics That Meets You Where Compliance Lives</HeroTitle>
               <HeroSubtitle>
-                Transforming healthcare data into actionable insights for federal agencies and healthcare organizations.
+                HIPAA-compliant data engineering, clinical analytics, and population health intelligence
+                for VA, CDC, NIH, FDA, and healthcare institutions that cannot afford to get data wrong.
               </HeroSubtitle>
             </motion.div>
           </HeroSection>
 
           <SectionIntro>
-            Precise Analytics delivers healthcare analytics solutions designed for highly regulated, data-intensive
-            environments where accuracy, compliance, and security are critical. We support federal agencies, public
-            health organizations, and healthcare institutions in transforming complex clinical, claims, and population
-            health data into actionable insights.
+            Healthcare data is high-stakes. A misconfigured pipeline doesn&apos;t just slow reporting — it can delay
+            care decisions, trigger compliance violations, or compromise PHI. Precise Analytics engineers
+            healthcare data infrastructure built for exactly this pressure: HIPAA-compliant by design,
+            auditable end-to-end, and fast enough to support real-time clinical operations.
             <br /><br />
-            Our healthcare expertise spans HIPAA-compliant analytics, public health reporting, clinical research
-            analytics, and regulatory data support for agencies such as the VA, CDC, NIH, and FDA. By combining deep
-            domain knowledge with advanced analytics and modern data platforms, we enable healthcare organizations to
-            improve outcomes, meet compliance requirements, and drive measurable impact.
+            We have delivered clinical data pipelines, population health dashboards, and regulatory reporting
+            platforms for federal health agencies and healthcare organizations. Our work spans EHR integration,
+            claims analytics, public health surveillance, and FDA-aligned clinical research reporting. We don&apos;t
+            just move data — we make it usable, defensible, and fast.
           </SectionIntro>
 
 

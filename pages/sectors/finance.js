@@ -49,35 +49,26 @@ export default function FinancePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <HeroTitle>Finance Analytics Solutions</HeroTitle>
+              <HeroTitle>Financial Analytics Built for Regulatory Scrutiny</HeroTitle>
               <HeroSubtitle>
-                Data-driven solutions for public finance, fraud detection, risk modeling, and regulatory compliance across the federal and commercial sectors.
+                Fraud detection, risk modeling, audit automation, and compliance reporting for federal financial
+                agencies and regulated institutions — where every number has to be right and every audit trail has to hold.
               </HeroSubtitle>
             </motion.div>
           </HeroSection>
 
-          <SectionTitle>Analytics for Financial Integrity</SectionTitle> 
+          <SectionTitle>From Raw Transactions to Audit-Ready Intelligence</SectionTitle>
 
           <SectionIntro>
-              <strong>Precise Analytics</strong> delivers advanced financial analytics solutions
-              for <strong>federal financial agencies, public finance organizations, and regulated
-              financial institutions</strong>. Our finance analytics capabilities support fraud
-              detection, audit automation, regulatory reporting, and risk management across
-              large-scale government and commercial environments.
-
-              <br /><br />
-
-              We support organizations responsible for financial oversight, revenue collection,
-              public spending transparency, and market regulation. Our solutions transform
-              transactional, treasury, audit, and compliance data into actionable intelligence
-              that strengthens financial integrity and operational accountability.
-
-              <br /><br />
-
-              From fraud analytics and anomaly detection to forecasting, compliance automation,
-              and financial performance dashboards, Precise Analytics helps finance organizations
-              modernize data infrastructure and meet evolving regulatory demands.
-            </SectionIntro>
+            Financial data environments are unforgiving. Regulatory deadlines don&apos;t move, auditors
+            expect clean lineage, and anomaly detection has to be accurate enough to act on. Precise Analytics
+            builds financial analytics systems that hold up under scrutiny — from ingestion to the executive dashboard.
+            <br /><br />
+            We deliver fraud detection pipelines, automated compliance reporting (FFIEC, GAAP, OMB Circular A-123),
+            treasury analytics, and risk modeling platforms for federal financial agencies and commercial institutions.
+            We cut manual reporting cycles, surface anomalies before auditors do, and give finance teams
+            the real-time visibility their stakeholders demand.
+          </SectionIntro>
 
           <ServicesGrid>
             <ServiceCard as={motion.div} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>

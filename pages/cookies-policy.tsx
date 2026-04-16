@@ -5,7 +5,6 @@ import AnimatedHeader from 'components/AnimatedHeader';
 
 import Container from 'components/Container';
 import { media } from 'utils/media';
-import { mq } from 'utils/media';
 
 
 export default function CookiesPolicy() {
@@ -23,7 +22,7 @@ export default function CookiesPolicy() {
         <Container>
           <ContentWrapper>
             <PageTitle>Cookies Policy</PageTitle>
-            <LastUpdated>Last updated: July 01, 2025</LastUpdated>
+            <LastUpdated>Last updated: April 16, 2026</LastUpdated>
 
             <Section>
               <SectionTitle>1. Introduction</SectionTitle>
@@ -145,14 +144,6 @@ const SectionTitle = styled.h2`
   margin-bottom: 1.5rem;
 `;
 
-const Title = styled.h1`
-  font-size: 5rem;
-  text-align: center;
-
-  ${mq('<=tablet', `
-    font-size: 3.6rem;
-  `)}
-`;
 
 
 const SectionContent = styled.div`

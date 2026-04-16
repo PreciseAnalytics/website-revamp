@@ -42,27 +42,28 @@ export default function ManufacturingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <HeroTitle>Manufacturing Analytics Solutions</HeroTitle>
+              <HeroTitle>Manufacturing Analytics That Holds Up Under ITAR Audits</HeroTitle>
               <HeroSubtitle>
-                Advanced analytics for defense manufacturing, industrial operations, and supply chain optimization
+                Predictive maintenance, supply chain intelligence, and quality analytics for defense contractors
+                and federal production facilities — where compliance isn&apos;t optional and downtime costs missions.
               </HeroSubtitle>
             </motion.div>
           </HeroSection>
 
-          <SectionTitle>Manufacturing Excellence Through Data</SectionTitle>
+          <SectionTitle>From Shop Floor Sensors to Mission-Ready Intelligence</SectionTitle>
 
           <SectionIntro>
-            <strong>Precise Analytics</strong> provides advanced manufacturing analytics solutions
-            for <strong>defense manufacturers, federal production facilities, and regulated
-            industrial organizations</strong>. We help manufacturing leaders transform operational,
-            supply chain, quality, and compliance data into actionable intelligence that improves
-            efficiency, resilience, and mission readiness.
+            Defense manufacturing environments don&apos;t tolerate data gaps. An undetected equipment
+            anomaly becomes a production halt. A supplier risk missed in the data becomes a program delay.
+
+            Precise Analytics builds manufacturing analytics systems designed for the traceability,
+            classification, and audit requirements that come with ITAR/EAR-controlled environments.
             <br /><br />
-            Our manufacturing analytics capabilities support highly regulated environments where
-            security, traceability, and compliance are non-negotiable. From ITAR/EAR-controlled
-            production data to industrial IoT telemetry and supplier risk analytics, we enable
-            organizations to modernize manufacturing operations while meeting strict federal and
-            defense requirements.
+            We integrate industrial IoT telemetry, MES/ERP data, and supplier records into unified
+            pipelines that surface quality issues before they leave the floor, flag supply chain
+            disruptions before they hit schedules, and give program managers the operational
+            visibility their government customers demand. Less manual reconciliation. Fewer surprises.
+            Cleaner compliance packages.
           </SectionIntro>
 
           <ServicesGrid>

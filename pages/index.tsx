@@ -260,22 +260,45 @@ export default function HomePage() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <HeroSection>
               <HeroContent>
-                <HeroTitle>Welcome to Precise Analytics</HeroTitle>
-                <HeroSubtitle>Experts in Data Engineering, Analytics, Consulting & Hardware Solutions</HeroSubtitle>
+                <HeroTitle>Faster Decisions.<br />Cleaner Data.<br />AI That Works.</HeroTitle>
                 <HeroDescription>
-                  Veteran-owned data analytics company specializing in comprehensive solutions for government and commercial clients. 
-                  We turn complex data into actionable insights that drive informed decision-making across all technology domains.
+                  Precise Analytics delivers end-to-end data engineering, analytics, and AI solutions for
+                  government and commercial clients — from raw pipeline to production-ready insight.
+                  We also supply skilled AI training labor to the platforms building tomorrow&apos;s models.
                 </HeroDescription>
                 <HeroButtons>
                   <PrimaryButton onClick={() => handleGetStartedClick('Consultation')}>
-                    Get Started Today
+                    Schedule a Free Consultation
                   </PrimaryButton>
                   <SecondaryButtonLink onClick={handleLearnMoreClick}>
-                    Learn More About Us
+                    See Our Work
                   </SecondaryButtonLink>
                 </HeroButtons>
               </HeroContent>
             </HeroSection>
+
+            {/* Metrics bar */}
+            <MetricsBar>
+              <MetricItem>
+                <MetricNumber>50+</MetricNumber>
+                <MetricLabel>Clients Served</MetricLabel>
+              </MetricItem>
+              <MetricDivider />
+              <MetricItem>
+                <MetricNumber>500M+</MetricNumber>
+                <MetricLabel>Records Processed</MetricLabel>
+              </MetricItem>
+              <MetricDivider />
+              <MetricItem>
+                <MetricNumber>10+</MetricNumber>
+                <MetricLabel>Years Combined Experience</MetricLabel>
+              </MetricItem>
+              <MetricDivider />
+              <MetricItem>
+                <MetricNumber>3</MetricNumber>
+                <MetricLabel>Active Certifications</MetricLabel>
+              </MetricItem>
+            </MetricsBar>
           </motion.div>
 
           {/* Services Section */}
@@ -306,6 +329,61 @@ export default function HomePage() {
               ))}
             </ServiceCardsGrid>
           </ServicesSection>
+
+          {/* Case Studies Section */}
+          <CaseStudiesSection>
+            <SectionTitle>Results We&apos;ve Delivered</SectionTitle>
+            <SectionSubtitle>Measurable outcomes across government and commercial engagements</SectionSubtitle>
+            <CaseStudyGrid>
+              <CaseStudyCard>
+                <CaseStudyTag>Federal Healthcare</CaseStudyTag>
+                <CaseStudyMetric>40%</CaseStudyMetric>
+                <CaseStudyMetricLabel>Reduction in data pipeline latency</CaseStudyMetricLabel>
+                <CaseStudySummary>
+                  Rebuilt a legacy ETL pipeline for a federal health agency, migrating from on-premise batch
+                  processing to a cloud-native streaming architecture. Delivered real-time clinical reporting
+                  across 12 regional offices while maintaining full HIPAA compliance.
+                </CaseStudySummary>
+                <CaseStudyTags>
+                  <CaseTag>Data Engineering</CaseTag>
+                  <CaseTag>AWS</CaseTag>
+                  <CaseTag>HIPAA</CaseTag>
+                </CaseStudyTags>
+              </CaseStudyCard>
+
+              <CaseStudyCard>
+                <CaseStudyTag>Financial Services</CaseStudyTag>
+                <CaseStudyMetric>3×</CaseStudyMetric>
+                <CaseStudyMetricLabel>Faster regulatory reporting cycle</CaseStudyMetricLabel>
+                <CaseStudySummary>
+                  Designed and deployed an automated reporting platform for a financial services client,
+                  replacing manual spreadsheet workflows with a live Power BI dashboard suite. Reduced
+                  monthly close reporting from 15 days to 5 days.
+                </CaseStudySummary>
+                <CaseStudyTags>
+                  <CaseTag>Business Intelligence</CaseTag>
+                  <CaseTag>Power BI</CaseTag>
+                  <CaseTag>Automation</CaseTag>
+                </CaseStudyTags>
+              </CaseStudyCard>
+
+              <CaseStudyCard>
+                <CaseStudyTag>AI Workforce</CaseStudyTag>
+                <CaseStudyMetric>98%</CaseStudyMetric>
+                <CaseStudyMetricLabel>Inter-annotator agreement rate</CaseStudyMetricLabel>
+                <CaseStudySummary>
+                  Deployed a team of domain-expert annotators for a large language model training engagement,
+                  completing over 50,000 RLHF preference comparisons across STEM, legal, and coding domains
+                  with industry-leading quality scores.
+                </CaseStudySummary>
+                <CaseStudyTags>
+                  <CaseTag>RLHF</CaseTag>
+                  <CaseTag>AI Training</CaseTag>
+                  <CaseTag>Quality Assurance</CaseTag>
+                </CaseStudyTags>
+              </CaseStudyCard>
+            </CaseStudyGrid>
+          </CaseStudiesSection>
 
           {/* Certifications Section */}
           <CertificationsSection>
@@ -430,6 +508,139 @@ const HeroSection = styled.section`
 const HeroContent = styled.div`
   max-width: 80rem;
   margin: 0 auto;
+`;
+
+
+const MetricsBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: rgba(var(--cardBackground), 0.6);
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 1.2rem;
+  padding: 2.4rem 3rem;
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+
+  ${media.tablet(`
+    gap: 2rem;
+    padding: 2rem;
+  `)}
+`;
+
+const MetricItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 12rem;
+`;
+
+const MetricNumber = styled.span`
+  font-size: 3.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+`;
+
+const MetricLabel = styled.span`
+  font-size: 1.3rem;
+  color: rgba(var(--text), 0.6);
+  text-align: center;
+  font-weight: 500;
+`;
+
+const MetricDivider = styled.div`
+  width: 1px;
+  height: 4rem;
+  background: rgba(var(--text), 0.12);
+  flex-shrink: 0;
+
+  ${media.tablet(`display: none;`)}
+`;
+
+const CaseStudiesSection = styled.section`
+  margin-bottom: 4rem;
+`;
+
+const CaseStudyGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.4rem;
+  margin-top: 3rem;
+
+  ${media.desktop(`grid-template-columns: repeat(3, 1fr);`)}
+  ${media.tablet(`grid-template-columns: 1fr;`)}
+`;
+
+const CaseStudyCard = styled.article`
+  background: rgba(var(--cardBackground), 0.8);
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 1.2rem;
+  padding: 2.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 125, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(255, 125, 0, 0.08);
+  }
+`;
+
+const CaseStudyTag = styled.span`
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgb(255, 125, 0);
+`;
+
+const CaseStudyMetric = styled.div`
+  font-size: 4.8rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`;
+
+const CaseStudyMetricLabel = styled.div`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  margin-bottom: 0.5rem;
+`;
+
+const CaseStudySummary = styled.p`
+  font-size: 1.5rem;
+  line-height: 1.65;
+  color: rgba(var(--text), 0.75);
+  flex: 1;
+`;
+
+const CaseStudyTags = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+`;
+
+const CaseTag = styled.span`
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding: 0.3rem 0.9rem;
+  border-radius: 0.4rem;
+  background: rgba(var(--text), 0.07);
+  color: rgba(var(--text), 0.7);
+  border: 1px solid rgba(var(--text), 0.1);
 `;
 
 const HeroTitle = styled.h1`

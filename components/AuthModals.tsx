@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { useAuth } from 'contexts/auth.context';
 import { media } from 'utils/media';
 
-type Mode = 'login' | 'register';
+type Mode = 'login' | 'register' | 'reset';
 
 interface Props {
   mode: Mode;
@@ -89,8 +89,14 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
   const [regDone, setRegDone] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
+  // reset password
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetDone, setResetDone] = useState(false);
+
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsVerify, setNeedsVerify] = useState(false);
 
   const strength = useMemo(() => passwordStrength(regPassword), [regPassword]);
   const passwordsMatch = regConfirm === '' || regPassword === regConfirm;
@@ -115,6 +121,8 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setNotice('');
+    setNeedsVerify(false);
     setLoading(true);
     try {
       const res = await fetch('/api/auth/login', {
@@ -123,7 +131,10 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
         body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed.');
+      if (!res.ok) {
+        if (res.status === 403) setNeedsVerify(true);
+        throw new Error(data.error || 'Login failed.');
+      }
       login({ firstName: data.firstName, lastName: data.lastName, email: data.email, phone: data.phone });
       onClose();
     } catch (err: any) {
@@ -136,6 +147,7 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    setNotice('');
     if (!validateEmail(regEmail)) { setError('Please enter a valid email address.'); return; }
     if (!phoneValid) { setError('Phone must be in format (804) 555-0100.'); return; }
     if (strength.score < 2) { setError('Please choose a stronger password.'); return; }
@@ -163,6 +175,55 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
     }
   }
 
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setNotice('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/reset-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: resetEmail.trim(),
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Password reset failed.');
+      setResetDone(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendVerification(email: string) {
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
+      setError('Enter your email address first.');
+      return;
+    }
+    setError('');
+    setNotice('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Could not resend verification email.');
+      setNotice('Verification link sent. Please check your inbox.');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <Overlay
       onClick={onClose}
@@ -179,7 +240,13 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
       >
         <Header>
           <Title>
-            {mode === 'login' ? 'Sign In' : regDone ? 'Check Your Email' : 'Create Account'}
+            {mode === 'login'
+              ? 'Sign In'
+              : mode === 'reset'
+                ? 'Reset Password'
+                : regDone
+                  ? 'Check Your Email'
+                  : 'Create an account to apply for our available opportunities'}
           </Title>
           <Close onClick={onClose}>&times;</Close>
         </Header>
@@ -188,6 +255,7 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
         {mode === 'login' && (
           <form onSubmit={handleLogin} autoComplete="on">
             {error && <ErrBox>{error}</ErrBox>}
+            {notice && <NoticeBox>{notice}</NoticeBox>}
             <Field>
               <Label htmlFor="login-email">Email</Label>
               <Input
@@ -196,7 +264,7 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
                 type="email"
                 autoComplete="email"
                 value={loginEmail}
-                onChange={e => setLoginEmail(e.target.value)}
+                onChange={e => { setLoginEmail(e.target.value); setNeedsVerify(false); }}
                 placeholder="you@example.com"
                 required
               />
@@ -225,16 +293,100 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
                 {loading ? 'Signing in…' : 'Sign In'}
               </PrimaryBtn>
             </Actions>
-            <FooterLink type="button" onClick={() => { setError(''); onSwitch('register'); }}>
+            {needsVerify && (
+              <InlineActionRow>
+                <InlineActionBtn
+                  type="button"
+                  onClick={() => handleResendVerification(loginEmail)}
+                  disabled={loading}
+                >
+                  Resend verification link
+                </InlineActionBtn>
+              </InlineActionRow>
+            )}
+            <LinkRow>
+              <LinkBtn
+                type="button"
+                onClick={() => {
+                  setError('');
+                  setNotice('');
+                  setResetDone(false);
+                  setResetEmail(loginEmail.trim());
+                  onSwitch('reset');
+                }}
+              >
+                Forgot your password?
+              </LinkBtn>
+            </LinkRow>
+            <FooterLink type="button" onClick={() => { setError(''); setNotice(''); onSwitch('register'); }}>
               No account? Create one here
             </FooterLink>
           </form>
+        )}
+
+        {/* ── Reset Password ── */}
+        {mode === 'reset' && !resetDone && (
+          <form onSubmit={handleResetPassword} autoComplete="on">
+            {error && <ErrBox>{error}</ErrBox>}
+            {notice && <NoticeBox>{notice}</NoticeBox>}
+            <ResetHint>
+              Enter the email address you used to register. We’ll email you a link to reset your password.
+            </ResetHint>
+            <Field>
+              <Label htmlFor="reset-email">Email</Label>
+              <Input
+                id="reset-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={resetEmail}
+                onChange={e => setResetEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+              />
+            </Field>
+            <Actions>
+              <PrimaryBtn type="submit" disabled={loading}>
+                {loading ? 'Sending reset link…' : 'Send Reset Link'}
+              </PrimaryBtn>
+            </Actions>
+            <FooterLink
+              type="button"
+              onClick={() => {
+                setError('');
+                setNotice('');
+                onSwitch('login');
+              }}
+            >
+              Back to sign in
+            </FooterLink>
+          </form>
+        )}
+
+        {mode === 'reset' && resetDone && (
+          <SuccessBox>
+            <SuccessIcon>✓</SuccessIcon>
+            <SuccessTitle>Check Your Email</SuccessTitle>
+            <SuccessText>
+              If an account exists for <strong>{resetEmail}</strong>, we sent a password reset link.
+            </SuccessText>
+            <PrimaryBtn
+              onClick={() => {
+                setError('');
+                setResetDone(false);
+                onSwitch('login');
+              }}
+            >
+              Back to Sign In
+            </PrimaryBtn>
+          </SuccessBox>
         )}
 
         {/* ── Register ── */}
         {mode === 'register' && !regDone && (
           <form onSubmit={handleRegister} autoComplete="on">
             {error && <ErrBox>{error}</ErrBox>}
+            {notice && <NoticeBox>{notice}</NoticeBox>}
 
             <Row>
               <Field>
@@ -376,7 +528,7 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
                 {loading ? 'Creating account…' : 'Create Account'}
               </PrimaryBtn>
             </Actions>
-            <FooterLink type="button" onClick={() => { setError(''); onSwitch('login'); }}>
+            <FooterLink type="button" onClick={() => { setError(''); setNotice(''); onSwitch('login'); }}>
               Already have an account? Sign in
             </FooterLink>
           </form>
@@ -391,6 +543,11 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
               We sent a verification link to <strong>{regEmail}</strong>.
               Click it to activate your account, then sign in to apply.
             </SuccessText>
+            {error && <ErrBox>{error}</ErrBox>}
+            {notice && <NoticeBox>{notice}</NoticeBox>}
+            <FooterLink type="button" onClick={() => handleResendVerification(regEmail)} disabled={loading}>
+              {loading ? 'Resending…' : 'Resend verification email'}
+            </FooterLink>
             <PrimaryBtn onClick={onClose}>Close</PrimaryBtn>
           </SuccessBox>
         )}
@@ -434,6 +591,41 @@ const ErrBox = styled.div`
   background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c;
   padding: 1rem 1.4rem; border-radius: 0.7rem;
   font-size: 1.4rem; margin-bottom: 1.5rem;
+`;
+
+const NoticeBox = styled.div`
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  color: #065f46;
+  padding: 1rem 1.4rem;
+  border-radius: 0.7rem;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+`;
+
+const InlineActionRow = styled.div`
+  margin-top: 1.1rem;
+  display: flex;
+  justify-content: center;
+`;
+
+const InlineActionBtn = styled.button`
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: rgb(255, 125, 0);
+  background: rgba(255, 125, 0, 0.08);
+  border: 1px solid rgba(255, 125, 0, 0.25);
+  padding: 0.7rem 1.2rem;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  &:hover:not(:disabled) {
+    background: rgba(255, 125, 0, 0.12);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 const Field = styled.div`
@@ -502,6 +694,32 @@ const FooterLink = styled.button`
   font-size: 1.4rem; color: rgb(255,125,0); background: none; border: none;
   cursor: pointer; text-align: center;
   &:hover { text-decoration: underline; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+`;
+
+const LinkRow = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 1.2rem;
+`;
+
+const LinkBtn = styled.button`
+  font-size: 1.35rem;
+  color: rgba(17, 17, 17, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    color: rgb(255, 125, 0);
+    text-decoration: underline;
+  }
+`;
+
+const ResetHint = styled.p`
+  margin: -0.6rem 0 1.6rem;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: rgba(17, 17, 17, 0.65);
 `;
 
 const SuccessBox = styled.div`

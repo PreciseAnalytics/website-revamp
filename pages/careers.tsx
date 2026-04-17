@@ -1,33 +1,47 @@
-import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { AnimatePresence } from 'framer-motion';
+
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
-import { media } from 'utils/media';
-import { JOBS } from 'lib/jobsData';
 import AuthModal from 'components/AuthModals';
 import { useAuth } from 'contexts/auth.context';
+import { JOBS } from 'lib/jobsData';
+import { media } from 'utils/media';
+
+type AuthModalMode = 'login' | 'register' | 'reset' | null;
 
 export default function CareersPage() {
   const { user, logout } = useAuth();
-  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
-  const openJobs = JOBS.filter((j) => j.status === 'open');
+  const [authModal, setAuthModal] = useState<AuthModalMode>(null);
+
+  const openJobs = useMemo(() => {
+    return JOBS.filter((job: any) => {
+      if (typeof job.isOpen === 'boolean') return job.isOpen;
+      if (typeof job.status === 'string') return job.status.toLowerCase() !== 'closed';
+      return true;
+    });
+  }, []);
 
   return (
     <>
       <Head>
-        <title>Careers – Precise Analytics</title>
+        <title>Careers | Precise Analytics</title>
         <meta
           name="description"
-          content="Explore open positions at Precise Analytics. We are hiring data scientists, AI annotation specialists, data engineers, and business analysts."
+          content="Browse open positions at Precise Analytics and apply online. Richmond, VA, remote, and hybrid opportunities available."
         />
       </Head>
 
       <AnimatePresence>
         {authModal && (
-          <AuthModal mode={authModal} onClose={() => setAuthModal(null)} onSwitch={setAuthModal} />
+          <AuthModal
+            mode={authModal}
+            onClose={() => setAuthModal(null)}
+            onSwitch={setAuthModal}
+          />
         )}
       </AnimatePresence>
 
@@ -35,6 +49,30 @@ export default function CareersPage() {
 
       <PageWrapper>
         <Container>
+          <AuthBar>
+            {user ? (
+              <>
+                <AuthBarText>
+                  Signed in as <strong>{user.firstName} {user.lastName}</strong> ({user.email})
+                </AuthBarText>
+                <AuthBarProfileLink href="/careers/profile">
+                  My Profile &amp; Applications
+                </AuthBarProfileLink>
+                <AuthBarLink onClick={logout}>Sign out</AuthBarLink>
+              </>
+            ) : (
+              <>
+                <AuthBarText>
+                  Have an account? Sign in to apply to any open position.
+                </AuthBarText>
+                <AuthBarBtn onClick={() => setAuthModal('login')}>Sign In</AuthBarBtn>
+                <AuthBarBtnPrimary onClick={() => setAuthModal('register')}>
+                  Create Account
+                </AuthBarBtnPrimary>
+              </>
+            )}
+          </AuthBar>
+
           <PageHeader>
             <PageHeaderLeft>
               <PageTitle>Work at Precise Analytics</PageTitle>
@@ -42,47 +80,45 @@ export default function CareersPage() {
                 Richmond, VA &mdash; Remote &amp; Hybrid Roles Available
               </PageSubtitle>
             </PageHeaderLeft>
+
             <PageHeaderPillars>
               <Pillar>
                 <PillarLabel>What We Do</PillarLabel>
-                <PillarText>End-to-end data engineering, analytics, and AI solutions for government and commercial clients.</PillarText>
+                <PillarText>
+                  End-to-end data engineering, analytics, and AI solutions for government and
+                  commercial clients.
+                </PillarText>
               </Pillar>
+
               <Pillar>
                 <PillarLabel>Who We Hire</PillarLabel>
-                <PillarText>Data scientists, engineers, AI specialists, and analysts who want their work to matter.</PillarText>
+                <PillarText>
+                  Data scientists, engineers, AI specialists, and analysts who want their work to
+                  matter.
+                </PillarText>
               </Pillar>
+
               <Pillar>
                 <PillarLabel>How to Apply</PillarLabel>
-                <PillarText>Browse open positions, create a free account, and submit your application directly below.</PillarText>
+                <PillarText>
+                  Browse open positions, create a free account, and submit your application
+                  directly below.
+                </PillarText>
               </Pillar>
             </PageHeaderPillars>
           </PageHeader>
-
-          <AuthBar>
-            {user ? (
-              <>
-                <AuthBarText>Signed in as <strong>{user.firstName} {user.lastName}</strong> ({user.email})</AuthBarText>
-                <AuthBarLink onClick={logout}>Sign out</AuthBarLink>
-              </>
-            ) : (
-              <>
-                <AuthBarText>Have an account? Sign in to apply to any open position.</AuthBarText>
-                <AuthBarBtn onClick={() => setAuthModal('login')}>Sign In</AuthBarBtn>
-                <AuthBarBtnPrimary onClick={() => setAuthModal('register')}>Create Account</AuthBarBtnPrimary>
-              </>
-            )}
-          </AuthBar>
 
           <ContentLayout>
             <Sidebar>
               <SidebarCard>
                 <SidebarTitle>Our Work</SidebarTitle>
                 <SidebarText>
-                  We build data pipelines, analytics platforms, and AI systems for demanding clients
-                  — and operate a specialized division supplying skilled AI training talent to leading
-                  AI platforms.
+                  We build data pipelines, analytics platforms, and AI systems for demanding
+                  clients — and operate a specialized division supplying skilled AI training talent
+                  to leading AI platforms.
                 </SidebarText>
               </SidebarCard>
+
               <SidebarCard>
                 <SidebarTitle>Questions?</SidebarTitle>
                 <SidebarText>
@@ -115,29 +151,40 @@ export default function CareersPage() {
                   <JobTableHead>
                     <JobTableHeadRow>
                       <Th>Position</Th>
-                      <Th hide="mobile">Department</Th>
-                      <Th hide="mobile">Location</Th>
-                      <Th hide="mobile">Type</Th>
+                      <Th $hide="mobile">Department</Th>
+                      <Th $hide="mobile">Location</Th>
+                      <Th $hide="mobile">Type</Th>
                       <Th></Th>
                     </JobTableHeadRow>
                   </JobTableHead>
+
                   <tbody>
-                    {openJobs.map((job) => (
+                    {openJobs.map((job: any) => (
                       <JobRow key={job.id}>
                         <Td>
                           <JobRowTitle>{job.title}</JobRowTitle>
                           <JobRowMeta>
                             <span>{job.jobNumber}</span>
-                            <MobileOnly> · {job.departmentLabel} · {job.locationLabel}</MobileOnly>
+                            <MobileOnly>
+                              {' '}
+                              · {job.departmentLabel} · {job.locationLabel}
+                            </MobileOnly>
                           </JobRowMeta>
                         </Td>
-                        <Td hide="mobile">{job.departmentLabel}</Td>
-                        <Td hide="mobile">{job.locationLabel}</Td>
-                        <Td hide="mobile">
-                          <TypeBadge type={job.employmentType}>{job.employmentTypeLabel}</TypeBadge>
+
+                        <Td $hide="mobile">{job.departmentLabel}</Td>
+                        <Td $hide="mobile">{job.locationLabel}</Td>
+
+                        <Td $hide="mobile">
+                          <TypeBadge type={job.employmentType}>
+                            {job.employmentTypeLabel}
+                          </TypeBadge>
                         </Td>
-                        <Td align="right">
-                          <ViewLink href={`/careers/${job.id}`}>View &amp; Apply &rarr;</ViewLink>
+
+                        <Td $align="right">
+                          <ViewLink href={`/careers/${job.id}`}>
+                            View &amp; Apply &rarr;
+                          </ViewLink>
                         </Td>
                       </JobRow>
                     ))}
@@ -157,6 +204,18 @@ export default function CareersPage() {
 const PageWrapper = styled.div`
   padding: 4rem 0 6rem;
   min-height: 80vh;
+`;
+
+const AuthBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 1.2rem 1.8rem;
+  background: rgba(255, 125, 0, 0.05);
+  border: 1px solid rgba(255, 125, 0, 0.15);
+  border-radius: 0.8rem;
+  margin-bottom: 3rem;
 `;
 
 const PageHeader = styled.header`
@@ -215,18 +274,6 @@ const PillarText = styled.p`
   color: rgba(var(--text), 0.8);
 `;
 
-const AuthBar = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  padding: 1.2rem 1.8rem;
-  background: rgba(255, 125, 0, 0.05);
-  border: 1px solid rgba(255, 125, 0, 0.15);
-  border-radius: 0.8rem;
-  margin-bottom: 3rem;
-`;
-
 const AuthBarText = styled.p`
   font-size: 1.4rem;
   color: rgba(var(--text), 0.75);
@@ -244,7 +291,9 @@ const AuthBarBtn = styled.button`
   cursor: pointer;
   white-space: nowrap;
   transition: border-color 0.2s;
-  &:hover { border-color: rgba(var(--text), 0.6); }
+  &:hover {
+    border-color: rgba(var(--text), 0.6);
+  }
 `;
 
 const AuthBarBtnPrimary = styled.button`
@@ -258,7 +307,9 @@ const AuthBarBtnPrimary = styled.button`
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.2s;
-  &:hover { background: rgb(230, 100, 0); }
+  &:hover {
+    background: rgb(230, 100, 0);
+  }
 `;
 
 const AuthBarLink = styled.button`
@@ -267,7 +318,23 @@ const AuthBarLink = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  &:hover { color: rgb(var(--text)); text-decoration: underline; }
+  &:hover {
+    color: rgb(var(--text));
+    text-decoration: underline;
+  }
+`;
+
+const AuthBarProfileLink = styled(Link)`
+  font-size: 1.3rem;
+  color: rgb(255, 125, 0);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const ContentLayout = styled.div`
@@ -308,7 +375,9 @@ const SidebarText = styled.p`
 const SidebarLink = styled.a`
   color: rgb(255, 125, 0);
   text-decoration: none;
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const MainContent = styled.main`
@@ -337,7 +406,7 @@ const JobTableHead = styled.thead`
 
 const JobTableHeadRow = styled.tr``;
 
-const Th = styled.th<{ hide?: string }>`
+const Th = styled.th<{ $hide?: string }>`
   text-align: left;
   padding: 0 1.4rem 1.4rem;
   font-size: 1.3rem;
@@ -347,10 +416,7 @@ const Th = styled.th<{ hide?: string }>`
   color: rgba(var(--text), 0.45);
   white-space: nowrap;
 
-  ${({ hide }) =>
-    hide === 'mobile'
-      ? `${media.tablet(`display: none;`)}`
-      : ''}
+  ${({ $hide }) => ($hide === 'mobile' ? `${media.tablet(`display: none;`)}` : '')}
 `;
 
 const JobRow = styled.tr`
@@ -362,17 +428,14 @@ const JobRow = styled.tr`
   }
 `;
 
-const Td = styled.td<{ hide?: string; align?: string }>`
+const Td = styled.td<{ $hide?: string; $align?: string }>`
   padding: 2rem 1.4rem;
   vertical-align: middle;
   color: rgba(var(--text), 0.85);
   font-size: 1.6rem;
-  text-align: ${({ align }) => align || 'left'};
+  text-align: ${({ $align }) => $align || 'left'};
 
-  ${({ hide }) =>
-    hide === 'mobile'
-      ? `${media.tablet(`display: none;`)}`
-      : ''}
+  ${({ $hide }) => ($hide === 'mobile' ? `${media.tablet(`display: none;`)}` : '')}
 `;
 
 const JobRowTitle = styled.span`
@@ -402,9 +465,7 @@ const TypeBadge = styled.span<{ type: string }>`
   padding: 0.3rem 0.9rem;
   border-radius: 2rem;
   background: ${({ type }) =>
-    type === 'contract'
-      ? 'rgba(99, 102, 241, 0.1)'
-      : 'rgba(34, 197, 94, 0.1)'};
+    type === 'contract' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(34, 197, 94, 0.1)'};
   color: ${({ type }) =>
     type === 'contract' ? 'rgb(99, 102, 241)' : 'rgb(22, 163, 74)'};
 `;
@@ -444,9 +505,12 @@ const EmptyStateText = styled.p`
   font-size: 1.6rem;
   line-height: 1.65;
   color: rgba(var(--text), 0.75);
+
   a {
     color: rgb(255, 125, 0);
     text-decoration: none;
-    &:hover { text-decoration: underline; }
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;

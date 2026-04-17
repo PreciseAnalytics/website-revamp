@@ -18,7 +18,7 @@ interface Props {
 export default function JobDetailPage({ job }: Props) {
   const { user, logout } = useAuth();
   const [modal, setModal] = useState<'apply' | null>(null);
-  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
+  const [authModal, setAuthModal] = useState<'login' | 'register' | 'reset' | null>(null);
 
   // apply form — pre-fill phone from profile
   const [applyMessage, setApplyMessage] = useState('');

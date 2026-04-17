@@ -32,7 +32,7 @@ const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
   backdrop-filter: ${(p) => (p.$isScrolled ? 'blur(10px)' : 'none')};
   box-shadow: ${(p) => (p.$isScrolled ? 'var(--shadow-md)' : 'none')};
   transition: all 0.3s ease-in-out;
-  padding: ${(p) => (p.$isScrolled ? '0.5rem 0' : '0.8rem 0')};
+  padding: ${(p) => (p.$isScrolled ? '0.4rem 0' : '0.65rem 0')};
   border-bottom: ${(p) => (p.$isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none')};
 `;
 
@@ -52,21 +52,22 @@ const HeaderPane = styled(Container)`
 const HeaderContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 0;
 `;
 
 const HeaderInner = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 3rem;
+  justify-content: space-between;
+  gap: 2rem;
 `;
 
 const LeftSection = styled.div`
   display: flex;
   align-items: center;
   gap: 2rem;
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
 
   ${media.desktop(`
     gap: 1.5rem;
@@ -110,6 +111,7 @@ const LogoContainer = styled.div`
 
 
 const Nav = styled.nav`
+  flex: 1;
   ${media.tablet(`
     display: none;
   `)}
@@ -120,6 +122,10 @@ const NavList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+  width: 100%;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  row-gap: 0.8rem;
   gap: 1.6rem;
 
   ${media.desktop(`
@@ -545,7 +551,7 @@ function useScrollTrigger(threshold = 20) {
 export default function AnimatedHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
+  const [authModal, setAuthModal] = useState<'login' | 'register' | 'reset' | null>(null);
   const { isScrolled } = useScrollTrigger(20);
 
   useEffect(() => {
@@ -586,7 +592,7 @@ export default function AnimatedHeader() {
             <HeaderInner>
               <LeftSection>
                 <LogoContainer onClick={handleLogoClick} aria-label="Precise Analytics Homepage">
-                  <AnimatedLogo size="10rem" />
+                  <AnimatedLogo size="8.5rem" />
                 </LogoContainer>
                 <Nav>
                   <NavList>

@@ -118,12 +118,12 @@ export default function Hero() {
 
 const HeroWrapper = styled(Container)`
   display: flex;
-  padding-top: 8rem;
+  padding-top: 4.5rem;
   padding-bottom: 5rem;
   position: relative;
-  
+   
   ${media.desktop(`
-    padding-top: 3rem;
+    padding-top: 2.5rem;
     flex-direction: column;
     align-items: center;
   `)}

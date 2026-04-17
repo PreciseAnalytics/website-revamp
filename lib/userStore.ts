@@ -12,6 +12,8 @@ export interface UserRecord {
   verified: boolean;
   verifyToken: string | null;
   verifyTokenExpires: number | null;
+  resetToken?: string | null;
+  resetTokenExpires?: number | null;
   createdAt: string;
 }
 
@@ -38,6 +40,10 @@ export function findByVerifyToken(token: string): UserRecord | undefined {
   return readAll().find(u => u.verifyToken === token);
 }
 
+export function findByResetToken(token: string): UserRecord | undefined {
+  return readAll().find(u => u.resetToken === token);
+}
+
 export function createUser(
   firstName: string,
   lastName: string,
@@ -57,11 +63,27 @@ export function createUser(
     verified: false,
     verifyToken,
     verifyTokenExpires: Date.now() + 24 * 60 * 60 * 1000,
+    resetToken: null,
+    resetTokenExpires: null,
     createdAt: new Date().toISOString(),
   };
   users.push(user);
   writeAll(users);
   return user;
+}
+
+export function reissueVerifyToken(email: string): { token: string; expiresAt: number } | null {
+  const users = readAll();
+  const u = users.find(x => x.email === email.toLowerCase());
+  if (!u) return null;
+  if (u.verified) return null;
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+  u.verifyToken = token;
+  u.verifyTokenExpires = expiresAt;
+  writeAll(users);
+  return { token, expiresAt };
 }
 
 export function markVerified(userId: string): void {
@@ -73,6 +95,32 @@ export function markVerified(userId: string): void {
     u.verifyTokenExpires = null;
     writeAll(users);
   }
+}
+
+export function setResetToken(email: string): { token: string; expiresAt: number } | null {
+  const users = readAll();
+  const u = users.find(x => x.email === email.toLowerCase());
+  if (!u) return null;
+
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = Date.now() + 60 * 60 * 1000; // 1 hour
+  u.resetToken = token;
+  u.resetTokenExpires = expiresAt;
+  writeAll(users);
+  return { token, expiresAt };
+}
+
+export function resetPasswordByToken(token: string, newPasswordHash: string): UserRecord | null {
+  const users = readAll();
+  const u = users.find(x => x.resetToken === token);
+  if (!u) return null;
+  if (u.resetTokenExpires && Date.now() > u.resetTokenExpires) return null;
+
+  u.passwordHash = newPasswordHash;
+  u.resetToken = null;
+  u.resetTokenExpires = null;
+  writeAll(users);
+  return u;
 }
 
 export function hashPassword(password: string): string {

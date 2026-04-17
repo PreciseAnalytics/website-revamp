@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import * as nodemailer from 'nodemailer';
 import formidable from 'formidable';
 import fs from 'fs';
+import { saveApplication } from 'lib/applicationsStore';
 
 export const config = {
   api: {
@@ -168,6 +169,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
   }
+
+  // Persist application record
+  saveApplication({
+    applicantEmail: email.toLowerCase(),
+    applicantName: name,
+    phone: sanitize(get('phone') || ''),
+    jobTitle,
+    jobNumber,
+    submittedAt: new Date().toISOString(),
+    hasResume: Boolean(files.resume),
+    hasCoverLetter: Boolean(files.coverLetter),
+    hasCerts: Boolean(files.certifications),
+  });
 
   console.log(`Application submitted: ${name} <${email}> for ${jobTitle} (${jobNumber}) at ${submittedAt}`);
 

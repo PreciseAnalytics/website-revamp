@@ -21,11 +21,6 @@ export default function FinancePage() {
           content="Financial analytics solutions for federal agencies and regulated institutions. Fraud detection, risk modeling, public finance analytics, and regulatory compliance reporting."
         />
 
-        <link
-          rel="canonical"
-          href="https://preciseanalytics.io/sectors/finance"
-        />
-
         <meta name="robots" content="index, follow" />
       </Head>
       <AnimatedHeader />

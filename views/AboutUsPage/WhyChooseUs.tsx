@@ -121,7 +121,7 @@ const Content = styled.div`
   text-align: center;
 `;
 
-const Subtitle = styled.h3`
+const Subtitle = styled.h2`
   font-size: 3rem;
   font-weight: 700;
   color: rgb(255, 125, 0);

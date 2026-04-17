@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { EnvVars } from 'env';
 import AnimatedHeader from 'components/AnimatedHeader';
@@ -24,7 +25,13 @@ export default function AboutUsPage() {
       <PageWrapper>
         <Hero />
         <WhyChooseUs />
-        {/* Add more components for Mission, Team, Culture, etc. */}
+        <RelatedLinks>
+          <Link href="/solutions">Our Solutions</Link>
+          <Link href="/sectors">Sectors We Serve</Link>
+          <Link href="/certifications">Certifications</Link>
+          <Link href="/schedule-consult">Schedule a Consultation</Link>
+          <Link href="/careers">Careers</Link>
+        </RelatedLinks>
       </PageWrapper>
       
     </>
@@ -33,4 +40,18 @@ export default function AboutUsPage() {
 
 const PageWrapper = styled.div`
   position: relative;
+`;
+
+const RelatedLinks = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding: 4rem 2rem 6rem;
+
+  a {
+    font-size: 1.6rem;
+    color: rgb(var(--accent));
+    text-decoration: underline;
+  }
 `;

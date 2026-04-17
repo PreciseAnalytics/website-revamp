@@ -21,10 +21,6 @@ export default function HealthcarePage() {
           content="Federal healthcare analytics solutions for VA, CDC, NIH, FDA, and public health agencies. HIPAA-compliant clinical analytics, population health insights, and regulatory reporting."
         />
 
-        <link
-          rel="canonical"
-          href="https://preciseanalytics.io/sectors/healthcare"
-        />
         <meta name="robots" content="index, follow" />
       </Head>
 

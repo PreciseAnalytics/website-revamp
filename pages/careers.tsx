@@ -133,6 +133,7 @@ export default function CareersPage() {
             </Sidebar>
 
             <MainContent>
+              <OpenPositionsHeading>Open Positions</OpenPositionsHeading>
               <ResultsBar>
                 <ResultsCount>
                   {openJobs.length} open position{openJobs.length !== 1 ? 's' : ''}
@@ -234,6 +235,14 @@ const PageHeader = styled.header`
 const PageHeaderLeft = styled.div`
   flex: 0 0 26rem;
   ${media.tablet(`flex: unset;`)}
+`;
+
+const OpenPositionsHeading = styled.h2`
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+  ${media.tablet(`font-size: 2rem;`)}
 `;
 
 const PageTitle = styled.h1`

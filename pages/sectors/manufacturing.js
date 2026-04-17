@@ -21,10 +21,6 @@ export default function ManufacturingPage() {
           content="ITAR and EAR compliant manufacturing analytics for defense contractors and federal agencies. Industrial IoT analytics, supply chain intelligence, quality management, and compliance reporting."
         />
 
-        <link
-          rel="canonical"
-          href="https://preciseanalytics.io/sectors/manufacturing"
-        />
         <meta name="robots" content="index, follow" />
       </Head>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useAuth } from 'contexts/auth.context';
@@ -410,12 +411,32 @@ export default function MyAccountPage() {
             </Panel>
           </Layout>
         </Container>
+        <AccountNav>
+          <Link href="/careers">Browse Open Positions</Link>
+          <Link href="/solutions">Our Solutions</Link>
+          <Link href="/schedule-consult">Schedule a Consultation</Link>
+          <Link href="/about-us">About Us</Link>
+        </AccountNav>
       </PageWrapper>
     </>
   );
 }
 
 // ── Styled components ─────────────────────────────────────────────────────────
+
+const AccountNav = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding: 3rem 2rem;
+
+  a {
+    font-size: 1.5rem;
+    color: rgb(var(--accent));
+    text-decoration: underline;
+  }
+`;
 
 const PageWrapper = styled.div`
   padding: 4rem 0 6rem;

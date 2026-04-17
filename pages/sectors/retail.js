@@ -20,7 +20,6 @@ const RetailPage = () => {
           content="Federal retail analytics solutions for military exchanges, commissaries, and government retail operations. Customer analytics, inventory optimization, POS insights, and performance intelligence."
         />
 
-        <link rel="canonical" href="https://preciseanalytics.io/sectors/retail" />
         <meta name="robots" content="index, follow" />
       </Head>
 

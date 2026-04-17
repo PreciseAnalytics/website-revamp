@@ -13,12 +13,12 @@ export default function ManufacturingPage() {
     <>
       <Head>
         <title>
-          Manufacturing Analytics for Defense & Federal Agencies | {EnvVars.SITE_NAME}
+          Federal Manufacturing Analytics | {EnvVars.SITE_NAME}
         </title>
 
         <meta
           name="description"
-          content="ITAR/EAR compliant manufacturing analytics for defense and federal agencies. Industrial IoT, supply chain intelligence, quality management, and compliance reporting."
+          content="ITAR/EAR compliant manufacturing analytics for defense and federal agencies. IoT, supply chain, quality management, and compliance reporting."
         />
 
         <meta name="robots" content="index, follow" />

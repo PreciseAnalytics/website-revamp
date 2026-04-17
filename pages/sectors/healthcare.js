@@ -13,7 +13,7 @@ export default function HealthcarePage() {
     <>
       <Head>
         <title>
-          Healthcare Analytics for Federal Agencies | {EnvVars.SITE_NAME}
+          Federal Healthcare Analytics | {EnvVars.SITE_NAME}
         </title>
 
         <meta

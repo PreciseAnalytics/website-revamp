@@ -128,7 +128,7 @@ export default function AITrainingPage() {
         <title>AI Workforce Solutions | Precise Analytics</title>
         <meta
           name="description"
-          content="Vetted contributors for RLHF, data annotation, code review, and model evaluation. Purpose-built for Outlier AI, Scale AI, Remotasks, Surge, and similar AI training platforms."
+          content="Vetted contributors for RLHF, annotation, and model evaluation. Purpose-built for Outlier AI, Scale AI, Remotasks, and Surge AI training platforms."
         />
         <meta
           name="keywords"

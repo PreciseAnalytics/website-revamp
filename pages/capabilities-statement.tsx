@@ -116,7 +116,7 @@ export default function CapabilitiesStatementPage() {
         <title>Capabilities Statement - {EnvVars.SITE_NAME}</title>
         <meta
           name="description"
-          content="Precise Analytics capabilities statement — data engineering, analytics, and consulting for federal, state, and local government agencies. VOSB and SWaM certified."
+          content="Precise Analytics capabilities statement — data engineering and analytics for federal, state, and local agencies. VOSB and SWaM certified."
         />
         <meta
           name="keywords"

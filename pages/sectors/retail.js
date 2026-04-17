@@ -12,12 +12,12 @@ const RetailPage = () => {
     <>
       <Head>
         <title>
-          Retail Analytics for Federal & Government Operations | {EnvVars.SITE_NAME}
+          Federal Retail Analytics | {EnvVars.SITE_NAME}
         </title>
 
         <meta
           name="description"
-          content="Federal retail analytics for military exchanges, commissaries, and government operations. Customer analytics, inventory optimization, POS insights, and performance intelligence."
+          content="Federal retail analytics for military exchanges and government operations. Customer analytics, inventory optimization, and performance intelligence."
         />
 
         <meta name="robots" content="index, follow" />

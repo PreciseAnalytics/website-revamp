@@ -28,7 +28,7 @@ export default function CareersPage() {
   return (
     <>
       <Head>
-        <title>Careers | Precise Analytics</title>
+        <title>Careers at Precise Analytics | Data & AI Jobs</title>
         <meta
           name="description"
           content="Browse open positions at Precise Analytics and apply online. Richmond, VA, remote, and hybrid opportunities available."

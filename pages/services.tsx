@@ -13,7 +13,7 @@ export default function ServicesPage() {
         <title>{`${EnvVars.SITE_NAME} - Data Analytics Services`}</title>
         <meta
           name="description"
-          content="Precise Analytics delivers data strategy, business intelligence, predictive analytics, visualization, warehousing, and quality management for government and commercial clients."
+          content="Data strategy, business intelligence, predictive analytics, visualization, and data warehousing for government and commercial clients."
         />
         <meta
           name="keywords" 

@@ -100,7 +100,7 @@ const certifications = [
     details: 'SBA-verified Service-Disabled Veteran-Owned Small Business providing access to federal set-aside contracts and veteran business opportunities.',
     benefits: ['Federal set-aside contracts', 'SDVOSB preferences', 'Veteran business network', 'Government contracting advantages'],
     logo: '/sba-logo.png',
-    verificationLink: 'https://dsbs.sba.gov/search/dsp_profile.cfm?SAM_UEI=ZRCYVLWCXL57'
+    verificationLink: 'https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1'
   }
 ];
 
@@ -116,7 +116,7 @@ export default function CertificationsPage() {
   return (
     <>
       <Head>
-        <title>Certifications & Compliance - {EnvVars.SITE_NAME}</title>
+        <title>{`Certifications & Compliance - ${EnvVars.SITE_NAME}`}</title>
         <meta
           name="description"
           content="Precise Analytics holds NIST, HIPAA, ISO 27001, SOC 2, CMMI, and FedRAMP certifications. SDVOSB and SWaM certified data analytics firm."

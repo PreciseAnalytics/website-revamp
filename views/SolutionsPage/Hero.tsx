@@ -33,7 +33,7 @@ export default function SolutionsHero() {
                 <NextLink href="/contact" passHref>
                   <Button accent>Request a Demo</Button>
                 </NextLink>
-                <NextLink href="/resources" passHref>
+                <NextLink href="/capabilities-statement" passHref>
                   <Button transparent>Explore Resources</Button>
                 </NextLink>
               </ButtonGroup>

@@ -58,7 +58,7 @@ export default function Footer() {
             <FooterLinks>
               <FooterLink href="/services">View Services</FooterLink>
               <FooterLink href="/contact">Contact Us</FooterLink>
-              <FooterLink href="/about">About</FooterLink>
+              <FooterLink href="/about-us">About</FooterLink>
               <FooterLink href="/careers">Careers</FooterLink>
             </FooterLinks>
           </FooterSection>
@@ -67,7 +67,7 @@ export default function Footer() {
           <FooterSection>
             <SectionTitle>Company</SectionTitle>
             <FooterLinks>
-              <FooterLink href="/about">About Us</FooterLink>
+              <FooterLink href="/about-us">About Us</FooterLink>
               <FooterLink href="/team">Our Team</FooterLink>
               <FooterLink href="/careers">Careers</FooterLink>
               <FooterLink href="/schedule-consult">Schedule a Consult</FooterLink>

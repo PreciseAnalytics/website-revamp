@@ -1,6 +1,7 @@
 'use client'; // Optional if you're using client hooks
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { MouseEventHandler } from 'react';
 
 interface LogoProps {
@@ -31,9 +32,9 @@ export const PreciseAnalyticsLogo = ({
 
   if (clickable && onClick) {
     return (
-      <a href="#" onClick={onClick} style={{ cursor: 'pointer' }}>
+      <Link href="/" onClick={onClick} style={{ cursor: 'pointer' }} aria-label="Precise Analytics homepage">
         {logoContent}
-      </a>
+      </Link>
     );
   }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Image from 'next/image';
 import { 
   FacebookIcon, 
   LinkedinIcon
@@ -7,10 +8,8 @@ import {
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import Container from 'components/Container';
-import AnimatedLogo from 'components/AnimatedLogo';
 import { media } from 'utils/media';
 import { EnvVars } from 'env';
-import { usePrivacyPolicyContext } from 'contexts/privacy-policy.context';
 
 
 
@@ -42,7 +41,7 @@ const footerNavigation = {
     href: '/about-us',
     links: [
       { name: 'About Us', href: '/about-us' },
-      { name: 'Our Team', href: '/about-us/team' },
+      { name: 'Our Team', href: '/team' },
       { name: 'Careers', href: '/careers' },
       { name: 'Schedule a Consult', href: '/schedule-consult' },
       { name: 'Capabilities Statement', href: '/capabilities-statement' },
@@ -61,23 +60,19 @@ const footerNavigation = {
 
 // Updated certification badges
 const certifications = [
-  { name: 'NIST Cybersecurity Framework', image: '/certifications/nist.svg', href: '/certifications' },
-  { name: 'HIPAA', image: '/certifications/hipaa.svg', href: '/certifications' },
-  { name: 'ITAR/EAR', image: '/certifications/itar.svg', href: '/certifications' },
-  { name: 'ISO/IEC 27001', image: '/certifications/iso-27001.svg', href: '/certifications' },
-  { name: 'SOC 2 Type II', image: '/certifications/soc2.svg', href: '/certifications' },
-  { name: 'CMMI', image: '/CMMI_LOGO.png', href: '/certifications' },
-  { name: 'FedRAMP', image: '/fedramp-logo-vert.svg', href: '/certifications' },
-  { name: 'Small Business', image: '/sba-logo.png', href: '/certifications' },
-  { name: 'SWAM Certified', image: '/SWAM_LOGO.jpg', href: '/certifications' },
+  { name: 'NIST Cybersecurity Framework', image: '/certifications/nist.svg', href: '/capabilities-statement' },
+  { name: 'HIPAA', image: '/certifications/hipaa.svg', href: '/capabilities-statement' },
+  { name: 'ITAR/EAR', image: '/certifications/itar.svg', href: '/capabilities-statement' },
+  { name: 'ISO/IEC 27001', image: '/certifications/iso-27001.svg', href: '/capabilities-statement' },
+  { name: 'SOC 2 Type II', image: '/certifications/soc2.svg', href: '/capabilities-statement' },
+  { name: 'CMMI', image: '/CMMI_LOGO.png', href: '/capabilities-statement' },
+  { name: 'FedRAMP', image: '/fedramp-logo-vert.svg', href: '/capabilities-statement' },
+  { name: 'Small Business', image: '/sba-logo.png', href: '/capabilities-statement' },
+  { name: 'SWAM Certified', image: '/SWAM_LOGO.jpg', href: '/capabilities-statement' },
 ];
 
 export default function AnimatedFooter() {
-  const router = useRouter();
-  const { openPrivacyPolicy } = usePrivacyPolicyContext();
-  const [hoveredSocialIcon, setHoveredSocialIcon] = useState<string | null>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,19 +81,6 @@ export default function AnimatedFooter() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Navigation handlers using router.push
-  const handleNavigation = (href: string) => {
-    router.push(href);
-  };
-
-  const handleCertificationClick = (href: string) => {
-    router.push(href);
-  };
 
   return (
     <FooterWrapper
@@ -113,9 +95,9 @@ export default function AnimatedFooter() {
         <FooterContent>
           <CompanySection>
             <LogoSection>
-              <LogoContainer onClick={() => handleNavigation('/')}>
+              <LogoLink href="/" aria-label="Precise Analytics homepage">
                 <FooterLogo src="/PA-logo.png" alt="Precise Analytics" width={150} height={50} />
-              </LogoContainer>
+              </LogoLink>
             </LogoSection>
             
             <CompanyDescription>
@@ -128,20 +110,21 @@ export default function AnimatedFooter() {
             {Object.entries(footerNavigation).map(([category, categoryData], categoryIndex) => (
               <NavColumn key={category}>
                 {categoryData.href ? (
-                  <CategoryTitleLink
-                    onClick={() => handleNavigation(categoryData.href!)}
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.4, delay: 0.1 * categoryIndex }}
                   >
-                    {categoryData.title}
-                    <CategoryTitleUnderline
-                      initial={{ scaleX: 0 }}
-                      whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </CategoryTitleLink>
+                    <CategoryTitleLink href={categoryData.href!}>
+                      {categoryData.title}
+                      <CategoryTitleUnderline
+                        initial={{ scaleX: 0 }}
+                        whileHover={{ scaleX: 1 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </CategoryTitleLink>
+                  </motion.div>
                 ) : (
                   <CategoryTitle
                     initial={{ opacity: 0, y: 20 }}
@@ -161,7 +144,7 @@ export default function AnimatedFooter() {
                       viewport={{ once: true }}
                       transition={{ duration: 0.3, delay: 0.1 * linkIndex + 0.2 * categoryIndex }}
                     >
-                      <NavLinkText onClick={() => handleNavigation(link.href)}>
+                      <NavLinkText href={link.href}>
                         {link.name}
                         <NavLinkUnderline
                           initial={{ scaleX: 0 }}
@@ -231,11 +214,18 @@ export default function AnimatedFooter() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 whileHover={{ y: -3, scale: 1.08 }}
-                onClick={() => handleCertificationClick(cert.href)}
                 title={cert.name}
               >
-                <CertificationImage src={cert.image} alt={cert.name} width={110} height={70} />
-                <CertName>{cert.name}</CertName>
+                <CertLogoLink href={cert.href} aria-label={cert.name}>
+                  <CertificationImage
+                    src={cert.image}
+                    alt={cert.name}
+                    width={110}
+                    height={70}
+                    style={{ width: 'auto', height: '7rem', maxWidth: '11rem' }}
+                  />
+                  <CertName>{cert.name}</CertName>
+                </CertLogoLink>
               </CertLogo>
             ))}
           </CertLogoRow>
@@ -247,12 +237,8 @@ export default function AnimatedFooter() {
         <BottomBar>
           <Copyright>
             &copy; {new Date().getFullYear()} {EnvVars.SITE_NAME} | 
-            <BottomLink onClick={() => handleNavigation('/privacy-policy')}>
-              Privacy Policy
-            </BottomLink> | 
-            <BottomLink onClick={() => handleNavigation('/cookies-policy')}>
-              Cookies Policy
-            </BottomLink>
+            <BottomLink href="/privacy-policy">Privacy Policy</BottomLink> | 
+            <BottomLink href="/cookies-policy">Cookies Policy</BottomLink>
           </Copyright>
         </BottomBar>
       </BottomPane>
@@ -366,38 +352,16 @@ const FooterLogo = styled.img`
   object-fit: contain;
 `;
 
-const LogoContainer = styled.div`
+const LogoLink = styled(Link)`
   display: flex;
   align-items: center;
-  cursor: pointer;
+  text-decoration: none;
   transition: all 0.3s ease;
   
   &:hover {
     transform: translateY(-2px);
     filter: brightness(1.1);
   }
-`;
-
-const CompanyName = styled.h3`
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-left: 1.5rem;
-  display: flex;
-  gap: 0.5rem;
-  color: rgb(var(--text));
-  transition: color 0.3s ease;
-
-  ${LogoContainer}:hover & {
-    color: rgb(var(--accent));
-  }
-
-  ${media.tablet(`
-    font-size: 2rem;
-  `)}
-`;
-
-const AccentText = styled.span`
-  color: rgb(var(--accent));
 `;
 
 const CompanyDescription = styled.p`
@@ -502,7 +466,7 @@ const CategoryTitle = styled(motion.h4)`
   `)}
 `;
 
-const CategoryTitleLink = styled(motion.div)`
+const CategoryTitleLink = styled(Link)`
   font-size: 1.65rem;
   font-weight: 600;
   margin-bottom: 2rem;
@@ -513,6 +477,7 @@ const CategoryTitleLink = styled(motion.div)`
   cursor: pointer;
   position: relative;
   transition: color 0.3s ease;
+  text-decoration: none;
   
   &:hover {
     color: rgb(var(--accent));
@@ -544,12 +509,13 @@ const NavLinkItem = styled(motion.li)`
   margin-bottom: 1rem;
 `;
 
-const NavLinkText = styled.div`
+const NavLinkText = styled(Link)`
   color: rgb(var(--text));
   font-size: 1.35rem;
   position: relative;
   display: inline-block;
   cursor: pointer;
+  text-decoration: none;
   
   &:hover {
     color: rgb(var(--accent));
@@ -598,14 +564,18 @@ const CertLogo = styled(motion.div)`
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  cursor: pointer;
   width: 12rem;
 `;
 
-const CertificationImage = styled.img`
-  height: 7rem;
-  width: auto;
-  max-width: 11rem;
+const CertLogoLink = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+`;
+
+const CertificationImage = styled(Image)`
   object-fit: contain;
   border-radius: 0.6rem;
   transition: all 0.3s ease;
@@ -655,12 +625,13 @@ const Copyright = styled.div`
   text-align: center;
 `;
 
-const BottomLink = styled.span`
+const BottomLink = styled(Link)`
   color: rgb(var(--text));
   opacity: 0.8;
   transition: all 0.2s ease;
   cursor: pointer;
   margin-left: 8px;
+  text-decoration: none;
   
   &:hover {
     color: rgb(var(--accent));

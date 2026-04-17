@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import styled from 'styled-components';
 import Link from 'next/link';
+import Image from 'next/image';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
@@ -696,7 +697,7 @@ export default function ServiceDetailPage() {
     return (
       <>
         <Head>
-          <title>Service Not Found | {EnvVars.SITE_NAME}</title>
+          <title>{`Service Not Found | ${EnvVars.SITE_NAME}`}</title>
           <meta name="robots" content="noindex, nofollow" />
         </Head>
         <AnimatedHeader />
@@ -742,7 +743,15 @@ export default function ServiceDetailPage() {
       </TopNav>
 
       {/* Hero Section */}
-      <Hero style={{ backgroundImage: `url(${service.image})` }}>
+      <Hero>
+        <Image
+          src={service.image}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: 'cover' }}
+        />
         <Overlay />
         <HeroContent>
           <HeroInner>
@@ -972,8 +981,6 @@ const BackDestination = styled.span`
 const Hero = styled.section`
   position: relative;
   min-height: 60vh;
-  background-size: cover;
-  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;

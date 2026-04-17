@@ -26,7 +26,7 @@ export default function SolutionsCta() {
               <NextLink href="/contact" passHref>
                 <CtaButton accent>Schedule a Consultation</CtaButton>
               </NextLink>
-              <NextLink href="/resources/capabilities-statement" passHref>
+              <NextLink href="/capabilities-statement" passHref>
                 <CtaButton transparent>Download Capabilities Statement</CtaButton>
               </NextLink>
             </ButtonsGroup>

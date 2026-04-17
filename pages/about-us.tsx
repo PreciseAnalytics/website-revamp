@@ -28,7 +28,7 @@ export default function AboutUsPage() {
         <RelatedLinks>
           <Link href="/solutions">Our Solutions</Link>
           <Link href="/sectors">Sectors We Serve</Link>
-          <Link href="/certifications">Certifications</Link>
+          <Link href="/capabilities-statement">Certifications</Link>
           <Link href="/schedule-consult">Schedule a Consultation</Link>
           <Link href="/careers">Careers</Link>
         </RelatedLinks>

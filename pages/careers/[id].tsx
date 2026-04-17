@@ -10,6 +10,7 @@ import { media } from 'utils/media';
 import { JOBS, getJobById, Job } from 'lib/jobsData';
 import { useAuth } from 'contexts/auth.context';
 import AuthModal from 'components/AuthModals';
+import { truncateForMeta } from 'utils/seo';
 
 interface Props {
   job: Job;
@@ -30,6 +31,17 @@ export default function JobDetailPage({ job }: Props) {
 
   const [authError, setAuthError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const seoTitle = (() => {
+    const suffix = 'Careers | Precise Analytics';
+    const maxJobTitleLen = Math.max(20, 60 - (suffix.length + 3)); // " – "
+    return `${truncateForMeta(job.title, maxJobTitleLen)} – ${suffix}`;
+  })();
+
+  const metaDescription = truncateForMeta(
+    `${job.title} — ${job.locationLabel} — ${job.employmentTypeLabel}. ${job.summary}`,
+    155
+  );
 
   function openModal(m: 'apply') {
     setAuthError('');
@@ -91,11 +103,9 @@ export default function JobDetailPage({ job }: Props) {
   return (
     <>
       <Head>
-        <title>{job.title} – Careers at Precise Analytics</title>
-        <meta
-          name="description"
-          content={`${job.title} — ${job.locationLabel} — ${job.employmentTypeLabel}. ${job.summary}`}
-        />
+        <title>{seoTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta name="robots" content="index, follow" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

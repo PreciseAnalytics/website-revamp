@@ -11,6 +11,7 @@ interface YoutubeVideoProps {
 export default function YoutubeVideo(props: YoutubeVideoProps) {
   const { title, url } = props;
   const videoHash = extractVideoHashFromUrl(url);
+  const safeTitle = escapeHtmlAttr(title || 'YouTube video');
   const srcDoc = `<style>
   * {
     padding: 0;
@@ -45,9 +46,9 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
     width: 100%;
   }
   </style>
-  <a style="color: rgb(var(--primary))" href=https://www.youtube.com/embed/${videoHash}?autoplay=1>
-    <img class="thumbnail" src="https://img.youtube.com/vi/${videoHash}/hqdefault.jpg" alt='${title || ''}'>
-    <img class="play" src="${playIcon}" alt="Play the video">
+  <a style="color: rgb(var(--primary))" href="https://www.youtube.com/embed/${videoHash}?autoplay=1">
+    <img class="thumbnail" src="https://img.youtube.com/vi/${videoHash}/hqdefault.jpg" width="1280" height="720" alt="${safeTitle} thumbnail">
+    <img class="play" src="${playIcon}" width="256" height="256" alt="Play the video">
   </a>`;
   return (
     <VideoContainer>
@@ -68,9 +69,34 @@ export default function YoutubeVideo(props: YoutubeVideoProps) {
 }
 
 function extractVideoHashFromUrl(url: string) {
-  const videoHashQueryParamKey = 'v';
-  const searchParams = new URL(url).search;
-  return new URLSearchParams(searchParams).getAll(videoHashQueryParamKey);
+  try {
+    const u = new URL(url);
+
+    // Standard watch URL: https://www.youtube.com/watch?v=VIDEO_ID
+    const v = u.searchParams.get('v');
+    if (v) return v;
+
+    // Short URL: https://youtu.be/VIDEO_ID
+    if (u.hostname === 'youtu.be') return u.pathname.replace('/', '');
+
+    // Embed URL: https://www.youtube.com/embed/VIDEO_ID
+    const parts = u.pathname.split('/').filter(Boolean);
+    const embedIndex = parts.indexOf('embed');
+    if (embedIndex !== -1 && parts[embedIndex + 1]) return parts[embedIndex + 1];
+
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+function escapeHtmlAttr(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 export const VideoContainer = styled.div`

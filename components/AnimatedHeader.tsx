@@ -95,10 +95,10 @@ const RightSection = styled.div`
   `)}
 `;
 
-const LogoContainer = styled.div`
+const LogoLink = styled(Link)`
   display: flex;
   align-items: center;
-  cursor: pointer;
+  text-decoration: none;
   transition: transform 0.2s ease;
   gap: 0;
 
@@ -135,7 +135,7 @@ const NavItem = styled.li`
   position: relative;
 `;
 
-const NavLinkText = styled.span<{ $active: boolean }>`
+const NavLinkText = styled(Link)<{ $active: boolean }>`
   color: ${(p) => (p.$active ? 'rgb(var(--accent))' : 'rgb(var(--text))')};
   font-weight: 600;
   font-size: 1.6rem;
@@ -143,6 +143,8 @@ const NavLinkText = styled.span<{ $active: boolean }>`
   transition: all 0.3s ease;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
 
   &:hover {
     color: rgb(var(--accent));
@@ -153,7 +155,7 @@ const NavLinkText = styled.span<{ $active: boolean }>`
   `)}
 `;
 
-const NavLinkHighlight = styled.span<{ $active: boolean }>`
+const NavLinkHighlight = styled(Link)<{ $active: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -168,6 +170,7 @@ const NavLinkHighlight = styled.span<{ $active: boolean }>`
   transition: all 0.2s ease;
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  text-decoration: none;
 
   &:hover {
     background: #f5f5f5;
@@ -192,7 +195,7 @@ const NavBadge = styled.span`
   line-height: 1.4;
 `;
 
-const MobileNavLinkHighlight = styled.span<{ $active: boolean }>`
+const MobileNavLinkHighlight = styled(Link)<{ $active: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -205,6 +208,7 @@ const MobileNavLinkHighlight = styled.span<{ $active: boolean }>`
   border: 1px solid rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
 
   &:hover {
     background: #f5f5f5;
@@ -247,7 +251,7 @@ const ButtonContainer = styled.div`
   `)}
 `;
 
-const ScheduleButtonContainer = styled.div`
+const ScheduleButtonContainer = styled(Link)`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -258,8 +262,8 @@ const ScheduleButtonContainer = styled.div`
   background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
   box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
-  cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
 
   &:hover {
     transform: translateY(-2px);
@@ -320,13 +324,14 @@ const MobileNavItem = styled(motion.li)`
   margin: 1.5rem 0;
 `;
 
-const MobileNavLinkText = styled.span<{ $active: boolean }>`
+const MobileNavLinkText = styled(Link)<{ $active: boolean }>`
   font-size: 2rem;
   color: ${(p) => (p.$active ? 'rgb(var(--accent))' : 'rgb(var(--text))')};
   font-weight: 500;
   display: block;
   padding: 0.8rem 0;
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     color: rgb(var(--accent));
@@ -485,7 +490,7 @@ const UserDropdownItem = styled.button`
   &:hover { background: rgba(var(--text), 0.06); }
 `;
 
-const MobileScheduleButtonContainer = styled.div`
+const MobileScheduleButtonContainer = styled(Link)`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -497,8 +502,8 @@ const MobileScheduleButtonContainer = styled.div`
   background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
   box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
-  cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
 
   &:hover {
     transform: translateY(-2px);
@@ -559,18 +564,6 @@ export default function AnimatedHeader() {
 
   const toggleMobileMenu = () => setIsMenuOpen(prev => !prev);
 
-  const handleLogoClick = () => {
-    router.push('/');
-  };
-
-  const handleNavClick = (href: string) => {
-    router.push(href);
-  };
-
-  const handleScheduleClick = () => {
-    router.push('/schedule-consult');
-  };
-
   return (
     <>
       <HeaderWrapper $isScrolled={isScrolled}>
@@ -578,9 +571,10 @@ export default function AnimatedHeader() {
           <HeaderContent>
             <HeaderInner>
               <LeftSection>
-                <LogoContainer onClick={handleLogoClick} aria-label="Precise Analytics Homepage">
+                <LogoLink href="/" aria-label="Precise Analytics homepage">
+                  <span className="sr-only">Home</span>
                   <AnimatedLogo size="8.5rem" />
-                </LogoContainer>
+                </LogoLink>
                 <Nav>
                   <NavList>
                     {LINKS.map(link => (
@@ -588,7 +582,7 @@ export default function AnimatedHeader() {
                         {link.badge ? (
                           <NavLinkHighlight
                             $active={router.pathname === link.href}
-                            onClick={() => handleNavClick(link.href)}
+                            href={link.href}
                           >
                             {link.label}
                             <NavBadge>{link.badge}</NavBadge>
@@ -596,7 +590,7 @@ export default function AnimatedHeader() {
                         ) : (
                           <NavLinkText
                             $active={router.pathname === link.href}
-                            onClick={() => handleNavClick(link.href)}
+                            href={link.href}
                           >
                             {link.label}
                           </NavLinkText>
@@ -609,7 +603,7 @@ export default function AnimatedHeader() {
 
               <RightSection>
                 <ButtonContainer>
-                  <ScheduleButtonContainer onClick={handleScheduleClick}>
+                  <ScheduleButtonContainer href="/schedule-consult">
                     Schedule a Consultation
                   </ScheduleButtonContainer>
                 </ButtonContainer>
@@ -644,7 +638,7 @@ export default function AnimatedHeader() {
                       {link.badge ? (
                         <MobileNavLinkHighlight
                           $active={router.pathname === link.href}
-                          onClick={() => handleNavClick(link.href)}
+                          href={link.href}
                         >
                           {link.label}
                           <NavBadge>{link.badge}</NavBadge>
@@ -652,7 +646,7 @@ export default function AnimatedHeader() {
                       ) : (
                         <MobileNavLinkText
                           $active={router.pathname === link.href}
-                          onClick={() => handleNavClick(link.href)}
+                          href={link.href}
                         >
                           {link.label}
                         </MobileNavLinkText>
@@ -664,7 +658,7 @@ export default function AnimatedHeader() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: (LINKS.length + 1) * 0.1 }}
                   >
-                    <MobileScheduleButtonContainer onClick={handleScheduleClick}>
+                    <MobileScheduleButtonContainer href="/schedule-consult">
                       Schedule a Consultation
                     </MobileScheduleButtonContainer>
                   </MobileNavItem>

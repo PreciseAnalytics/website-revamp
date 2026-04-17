@@ -10,6 +10,7 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { mq } from 'utils/media';
+import { truncateForMeta } from 'utils/seo';
 import { PreciseAnalyticsLogo } from '../../components/PreciseAnalyticsLogo';
 import { Loader2, AlertCircle, CheckCircle, Link, User, ArrowLeft } from 'lucide-react';
 
@@ -600,7 +601,7 @@ export default function ApplicationPage() {
     return (
       <>
         <Head>
-          <title>Loading Application - {EnvVars.SITE_NAME}</title>
+          <title>{`Loading Application - ${EnvVars.SITE_NAME}`}</title>
         </Head>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
           <header className="bg-white shadow-sm border-b border-gray-200">
@@ -623,7 +624,7 @@ export default function ApplicationPage() {
     return (
       <>
         <Head>
-          <title>Job Not Found - {EnvVars.SITE_NAME}</title>
+          <title>{`Job Not Found - ${EnvVars.SITE_NAME}`}</title>
         </Head>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
           <header className="bg-white shadow-sm border-b border-gray-200">
@@ -654,7 +655,7 @@ export default function ApplicationPage() {
     return (
       <>
         <Head>
-          <title>Application Submitted - {EnvVars.SITE_NAME}</title>
+          <title>{`Application Submitted - ${EnvVars.SITE_NAME}`}</title>
         </Head>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
           <header className="bg-white shadow-sm border-b border-gray-200">
@@ -734,11 +735,21 @@ export default function ApplicationPage() {
     );
   }
 
+  const seoTitle = (() => {
+    const maxPositionTitleLen = Math.max(
+      20,
+      60 - ('Apply: '.length + 3 + EnvVars.SITE_NAME.length) // " | "
+    );
+    return `Apply: ${truncateForMeta(position.title, maxPositionTitleLen)} | ${EnvVars.SITE_NAME}`;
+  })();
+
+  const metaDescription = truncateForMeta(`Apply for ${position.title} at ${EnvVars.SITE_NAME}.`, 155);
+
   return (
     <>
       <Head>
-        <title>Apply for {position.title} - {EnvVars.SITE_NAME}</title>
-        <meta name="description" content={`Apply for ${position.title} position at Precise Analytics`} />
+        <title>{seoTitle}</title>
+        <meta name="description" content={metaDescription} />
       </Head>
 
       <AnimatedHeader />

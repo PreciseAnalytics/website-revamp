@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import Container from 'components/Container';
@@ -113,10 +114,10 @@ export default function ContactHero() {
 
             <CertRow>
               <CertLink href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1" target="_blank" rel="noopener noreferrer">
-                <CertImg src="/sba-logo.png" alt="SBA Certified" />
+                <CertImg src="/sba-logo.png" alt="SBA Certified" width={120} height={80} />
               </CertLink>
               <CertLink href="https://directory.sbsd.virginia.gov/#/executiveExport" target="_blank" rel="noopener noreferrer">
-                <CertImg src="/SWAM_LOGO.jpg" alt="SWAM Certified" />
+                <CertImg src="/SWAM_LOGO.jpg" alt="SWAM Certified" width={120} height={80} />
               </CertLink>
             </CertRow>
           </LeftCol>
@@ -402,7 +403,7 @@ const CertLink = styled.a`
   &:hover { transform: scale(1.05); }
 `;
 
-const CertImg = styled.img`
+const CertImg = styled(Image)`
   height: 5rem;
   width: auto;
   object-fit: contain;

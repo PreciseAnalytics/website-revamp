@@ -23,6 +23,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/blog/:path*',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/about',
+        destination: '/about-us',
+        permanent: true,
+      },
+      {
         source: '/features',
         destination: '/services',
         permanent: true,
@@ -34,6 +44,16 @@ const nextConfig = {
       },
       {
         source: '/certifications',
+        destination: '/capabilities-statement',
+        permanent: true,
+      },
+      {
+        source: '/resources',
+        destination: '/capabilities-statement',
+        permanent: true,
+      },
+      {
+        source: '/resources/:path*',
         destination: '/capabilities-statement',
         permanent: true,
       },

@@ -27,7 +27,7 @@ export const industries: IndustryType[] = [
       'Medical research data analysis',
       'Pharmaceutical supply chain optimization'
     ],
-    href: '/industries/healthcare',
+    href: '/sectors/healthcare',
     imageUrl: '/demo-illustration-1.svg'
   },
   {
@@ -42,7 +42,7 @@ export const industries: IndustryType[] = [
       'Inventory optimization',
       'Manufacturing KPI dashboards'
     ],
-    href: '/industries/manufacturing',
+    href: '/sectors/manufacturing',
     imageUrl: '/demo-illustration-2.svg'
   },
   {
@@ -57,7 +57,7 @@ export const industries: IndustryType[] = [
       'Investment portfolio analytics',
       'Real-time transaction monitoring'
     ],
-    href: '/industries/fintech',
+    href: '/sectors/finance',
     imageUrl: '/demo-illustration-3.png'
   },
   {
@@ -72,7 +72,7 @@ export const industries: IndustryType[] = [
       'E-commerce conversion optimization',
       'Marketing campaign effectiveness'
     ],
-    href: '/industries/retail',
+    href: '/sectors/retail',
     imageUrl: '/demo-illustration-4.png'
   }
 ];

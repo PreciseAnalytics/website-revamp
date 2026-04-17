@@ -13,12 +13,12 @@ export default function FinancePage() {
     <>
       <Head>
         <title>
-          Financial Analytics Solutions for Federal Agencies | {EnvVars.SITE_NAME}
+          Financial Analytics for Federal Agencies | {EnvVars.SITE_NAME}
         </title>
 
         <meta
           name="description"
-          content="Financial analytics solutions for federal agencies and regulated institutions. Fraud detection, risk modeling, public finance analytics, and regulatory compliance reporting."
+          content="Financial analytics for federal agencies and regulated institutions. Fraud detection, risk modeling, public finance analytics, and compliance reporting."
         />
 
         <meta name="robots" content="index, follow" />

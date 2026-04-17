@@ -11,7 +11,7 @@ export default function AboutUsPage() {
   return (
     <>
       <Head>
-        <title>{`${EnvVars.SITE_NAME} - About Us`}</title>
+        <title>{`About Precise Analytics | Veteran-Owned Data Firm`}</title>
         <meta
           name="description"
           content="Learn about Precise Analytics, our mission, values, team, and our commitment to transforming data into strategic insights for businesses."

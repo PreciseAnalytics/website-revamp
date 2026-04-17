@@ -13,12 +13,12 @@ export default function HealthcarePage() {
     <>
       <Head>
         <title>
-          Healthcare Analytics Solutions for Federal Agencies | {EnvVars.SITE_NAME}
+          Healthcare Analytics for Federal Agencies | {EnvVars.SITE_NAME}
         </title>
 
         <meta
           name="description"
-          content="Federal healthcare analytics solutions for VA, CDC, NIH, FDA, and public health agencies. HIPAA-compliant clinical analytics, population health insights, and regulatory reporting."
+          content="Federal healthcare analytics for VA, CDC, NIH, and FDA. HIPAA-compliant clinical analytics, population health insights, and regulatory reporting."
         />
 
         <meta name="robots" content="index, follow" />

@@ -46,7 +46,7 @@ export default function SectorsPage() {
         <title>Sectors We Serve | Precise Analytics</title>
         <meta
           name="description"
-          content="Discover how Precise Analytics delivers specialized data analytics and decision intelligence solutions across healthcare, manufacturing, finance, and retail sectors."
+          content="Precise Analytics delivers specialized analytics for healthcare, manufacturing, finance, and retail sectors — purpose-built for government and enterprise clients."
         />
         <meta
           name="keywords"

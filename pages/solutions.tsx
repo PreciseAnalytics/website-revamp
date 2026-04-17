@@ -198,7 +198,7 @@ export default function SolutionsPage() {
   return (
     <>
       <Head>
-        <title>{`Analytics Solutions: ETL, Dashboards & AI/ML | ${EnvVars.SITE_NAME}`}</title>
+        <title>{`ETL, Dashboards & AI/ML Solutions | ${EnvVars.SITE_NAME}`}</title>
         <meta name="description" content="Comprehensive data analytics solutions including ETL, custom dashboards, AI/ML, and business intelligence for government and commercial clients." />
       </Head>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import Image from 'next/image';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -43,7 +44,7 @@ export default function OurTeamPage() {
   return (
     <>
       <Head>
-        <title>{`${EnvVars.SITE_NAME} - Our Team`}</title>
+        <title>{`Meet Our Team | ${EnvVars.SITE_NAME}`}</title>
         <meta name="description" content="Meet the dedicated professionals driving Precise Analytics forward." />
       </Head>
 
@@ -53,6 +54,7 @@ export default function OurTeamPage() {
         <Container>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <PageTitle>Meet Our Team</PageTitle>
+            <TeamH2>Data Professionals Driving Real Results</TeamH2>
             <PageSubtitle>Passionate. Experienced. Mission-Driven.</PageSubtitle>
           </motion.div>
 
@@ -79,12 +81,30 @@ export default function OurTeamPage() {
             ))}
           </TeamGrid>
         </Container>
+        <TeamPageNav>
+          <Link href="/about-us">About Us</Link>
+          <Link href="/solutions">Our Solutions</Link>
+          <Link href="/careers">Join Our Team</Link>
+          <Link href="/schedule-consult">Schedule a Consultation</Link>
+        </TeamPageNav>
       </PageWrapper>
-
-      
     </>
   );
 }
+
+const TeamPageNav = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding: 3rem 2rem 5rem;
+
+  a {
+    font-size: 1.6rem;
+    color: rgb(var(--accent));
+    text-decoration: underline;
+  }
+`;
 
 const PageWrapper = styled.div`
   padding: 6rem 0;
@@ -98,6 +118,14 @@ const PageTitle = styled.h1`
   -webkit-text-fill-color: transparent;
   text-align: center;
   margin-bottom: 1rem;
+`;
+
+const TeamH2 = styled.h2`
+  font-size: 2.4rem;
+  font-weight: 600;
+  text-align: center;
+  color: rgb(var(--text));
+  margin-bottom: 0.8rem;
 `;
 
 const PageSubtitle = styled.p`

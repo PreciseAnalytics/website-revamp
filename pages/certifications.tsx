@@ -119,7 +119,7 @@ export default function CertificationsPage() {
         <title>Certifications & Compliance - {EnvVars.SITE_NAME}</title>
         <meta
           name="description"
-          content="Precise Analytics maintains the highest standards of security and compliance with industry certifications including NIST, HIPAA, ISO 27001, SOC 2, CMMI, and FedRAMP. SDVOSB and SWaM certified."
+          content="Precise Analytics holds NIST, HIPAA, ISO 27001, SOC 2, CMMI, and FedRAMP certifications. SDVOSB and SWaM certified data analytics firm."
         />
         <meta
           name="keywords"

@@ -43,7 +43,7 @@ export default function OurTeamPage() {
   return (
     <>
       <Head>
-        <title>{`${EnvVars.SITE_NAME} - Our Team`}</title>
+        <title>{`Meet Our Team | ${EnvVars.SITE_NAME}`}</title>
         <meta name="description" content="Meet the dedicated professionals driving Precise Analytics forward." />
       </Head>
 

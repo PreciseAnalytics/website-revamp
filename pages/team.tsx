@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
@@ -74,12 +75,30 @@ export default function OurTeamPage() {
             ))}
           </TeamGrid>
         </Container>
+        <TeamNav>
+          <Link href="/about-us">About Us</Link>
+          <Link href="/solutions">Our Solutions</Link>
+          <Link href="/careers">Join Our Team</Link>
+          <Link href="/schedule-consult">Schedule a Consultation</Link>
+        </TeamNav>
       </PageWrapper>
-
-      
     </>
   );
 }
+
+const TeamNav = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding: 3rem 2rem 5rem;
+
+  a {
+    font-size: 1.6rem;
+    color: rgb(var(--accent));
+    text-decoration: underline;
+  }
+`;
 
 const PageWrapper = styled.div`
   padding: 6rem 0;

@@ -13,7 +13,7 @@ export default function TermsOfService() {
         <title>{`Terms of Service - ${EnvVars.SITE_NAME}`}</title>
         <meta
           name="description"
-          content="Terms of Service for Precise Analytics data consulting services."
+          content="Read the Terms of Service for Precise Analytics, including service scope, confidentiality, liability limits, and contact information."
         />
       </Head>
       <AnimatedHeader />

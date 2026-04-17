@@ -414,7 +414,7 @@ const CertImg = styled(Image)`
 
 const RightCol = styled.div``;
 
-const CalendlyLabel = styled.p`
+const CalendlyLabel = styled.h2`
   font-size: 1.4rem;
   font-weight: 700;
   text-transform: uppercase;

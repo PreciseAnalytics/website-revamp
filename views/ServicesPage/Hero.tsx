@@ -50,7 +50,7 @@ const ContentWrapper = styled.div`
   margin: 0 auto;
 `;
 
-const TagLine = styled.h2`
+const TagLine = styled.p`
   font-size: 1.8rem;
   color: rgb(var(--accent));
   font-weight: 600;

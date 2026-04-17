@@ -53,7 +53,7 @@ const RetailPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <HeroTitle>Retail Analytics Built for the Commissary, the Exchange, and the Mission Behind Them</HeroTitle>
+              <HeroTitle>Federal Retail Analytics for Commissaries and Military Exchanges</HeroTitle>
               <HeroSubtitle>
                 Inventory optimization, customer behavior analytics, and POS intelligence for military exchanges
                 and federal commissaries — where serving the warfighter means getting the numbers right.

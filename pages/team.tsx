@@ -44,7 +44,10 @@ export default function OurTeamPage() {
     <>
       <Head>
         <title>{`Meet Our Team | ${EnvVars.SITE_NAME}`}</title>
-        <meta name="description" content="Meet the dedicated professionals driving Precise Analytics forward." />
+        <meta
+          name="description"
+          content="Meet the leadership and technical experts behind Precise Analytics, delivering secure, mission-focused data and AI solutions."
+        />
       </Head>
 
       <AnimatedHeader />
@@ -114,11 +117,12 @@ const PageTitle = styled.h1`
   margin-bottom: 1rem;
 `;
 
-const PageSubtitle = styled.p`
+const PageSubtitle = styled.h2`
   font-size: 2rem;
   text-align: center;
   margin-bottom: 5rem;
   color: rgb(var(--text), 0.8);
+  font-weight: 500;
 `;
 
 const TeamGrid = styled.div`

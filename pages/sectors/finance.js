@@ -13,7 +13,7 @@ export default function FinancePage() {
     <>
       <Head>
         <title>
-          Financial Analytics for Federal Agencies | {EnvVars.SITE_NAME}
+          Federal Finance Analytics | {EnvVars.SITE_NAME}
         </title>
 
         <meta

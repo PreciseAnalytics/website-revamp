@@ -418,13 +418,13 @@ const DetailCard = styled.div`
   border-radius: 1rem;
   padding: 2rem;
 `;
-const DetailCardTitle = styled.h3`
+const DetailCardTitle = styled.p`
   font-size: 1.3rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: rgb(255,125,0);
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(var(--text),0.1);
 `;
@@ -441,7 +441,7 @@ const ApplyBox = styled.div`
   flex-direction: column;
   gap: 1rem;
 `;
-const ApplyBoxTitle = styled.h3`font-size: 1.6rem; font-weight: 700; color: rgb(var(--text));`;
+const ApplyBoxTitle = styled.p`font-size: 1.6rem; font-weight: 700; color: rgb(var(--text)); margin: 0;`;
 const ApplyBoxSubtitle = styled.p`font-size: 1.4rem; line-height: 1.6; color: rgba(var(--text),0.7);`;
 const WelcomeText = styled.p`font-size: 1.4rem; color: rgba(var(--text),0.75);`;
 

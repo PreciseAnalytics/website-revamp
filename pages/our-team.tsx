@@ -14,25 +14,25 @@ const teamMembers = [
   {
     name: 'Norman Tanui',
     title: 'CTO & Founder',
-    image: '/images/team/norman.jpg',
+    image: '/PA-logo.png',
     bio: 'Veteran technologist passionate about data, strategy, and delivering analytics that matter.',
   },
   {
     name: 'Krishna Bhatt',
     title: 'Chief Data Scientist',
-    image: '/images/team/krishna.jpg',
+    image: '/PA-logo.png',
     bio: 'Leading AI and machine learning innovation across federal and commercial sectors.',
   },
   {
     name: 'Vivek Pokhrel',
     title: 'Director of BI Solutions',
-    image: '/images/team/vivek.jpg',
+    image: '/PA-logo.png',
     bio: 'Expert in business intelligence systems, dashboards, and data storytelling.',
   },
   {
     name: 'Prashant Bhatta',
     title: 'Full Stack Engineer',
-    image: '/images/team/prashant.jpg',
+    image: '/PA-logo.png',
     bio: 'Crafting scalable analytics platforms and user-friendly frontend experiences.',
   },
 ];

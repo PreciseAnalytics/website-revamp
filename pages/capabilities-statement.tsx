@@ -112,7 +112,6 @@ export default function CapabilitiesStatementPage() {
   return (
     <>
       <Head>
-        <link rel="canonical" href="https://preciseanalytics.io/capabilities-statement" />
         <meta name="robots" content="index, follow" />
         <title>Capabilities Statement - {EnvVars.SITE_NAME}</title>
         <meta

@@ -139,7 +139,6 @@ export default function AITrainingPage() {
           property="og:description"
           content="Vetted, domain-expert contributors for RLHF, annotation, code review, and model evaluation. Purpose-built for AI training platforms."
         />
-        <link rel="canonical" href={`${EnvVars.URL}ai-training`} />
       </Head>
 
       <AnimatedHeader />

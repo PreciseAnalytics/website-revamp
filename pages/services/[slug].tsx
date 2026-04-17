@@ -716,10 +716,6 @@ export default function ServiceDetailPage() {
       <Head>
         <title>{`${service.title} | ${EnvVars.SITE_NAME}`}</title>
         <meta name="description" content={service.description} />
-        <link
-          rel="canonical"
-          href={`https://preciseanalytics.io/services/${slug}`}
-        />
         <meta name="robots" content="index, follow" />
       </Head>
 

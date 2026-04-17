@@ -5,9 +5,8 @@ export default function CanonicalTag() {
   const router = useRouter();
   const baseUrl = 'https://preciseanalytics.io';
   
-  // Remove all query parameters for canonical URL
-  // This ensures ?webfcid=1, ?fbclid=, ?post_type=, etc. all point to clean URL
-  const canonicalUrl = `${baseUrl}${router.pathname}`;
+  // Use asPath for actual URL (handles dynamic routes), strip query params
+  const canonicalUrl = `${baseUrl}${router.asPath.split('?')[0]}`;
   
   return (
     <Head>

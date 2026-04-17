@@ -34,9 +34,6 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          {/* Global Canonical Baseline */}
-          <link rel="canonical" href="https://preciseanalytics.io" />
-
           {/* Fonts */}
           <link
             href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"

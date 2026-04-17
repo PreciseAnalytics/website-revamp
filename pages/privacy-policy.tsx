@@ -207,7 +207,7 @@ export default function PrivacyPolicyPage() {
               </Section>
 
               <LastUpdated>
-                <p><em>This Privacy Policy was last updated on June 25, 2025.</em></p>
+                <p><em>This Privacy Policy was last updated on April 16, 2026.</em></p>
               </LastUpdated>
             </PrivacyContent>
           </ContentSection>

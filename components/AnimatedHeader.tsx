@@ -14,13 +14,13 @@ import AuthModal from 'components/AuthModals';
 import { useAuth } from 'contexts/auth.context';
 
 const LINKS = [
+  { label: 'About', href: '/about-us' },
   { label: 'Services', href: '/services' },
   { label: 'Solutions', href: '/solutions' },
   { label: 'Capabilities Statement', href: '/capabilities-statement' },
   { label: 'Sectors', href: '/sectors' },
   { label: 'AI Workforce Solutions', href: '/ai-training', badge: 'NEW' },
   { label: 'Careers', href: '/careers' },
-  { label: 'Contact', href: '/contact' },
 ];
 
 const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
@@ -123,10 +123,10 @@ const NavList = styled.ul`
   margin: 0;
   padding: 0;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: space-between;
   flex-wrap: wrap;
   row-gap: 0.8rem;
-  gap: 1.6rem;
+  gap: 0.8rem;
 
   ${media.desktop(`
     gap: 1.2rem;
@@ -552,7 +552,20 @@ export default function AnimatedHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authModal, setAuthModal] = useState<'login' | 'register' | 'reset' | null>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const { isScrolled } = useScrollTrigger(20);
+  const { user, logout } = useAuth();
+
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!showUserMenu) return;
+    const handle = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-user-menu]')) setShowUserMenu(false);
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [showUserMenu]);
 
   useEffect(() => {
     const handleRouteChange = () => setIsMenuOpen(false);
@@ -622,9 +635,54 @@ export default function AnimatedHeader() {
 
               <RightSection>
                 <ButtonContainer>
+                  {!user && (
+                    <AuthBtns>
+                      <LoginBtn onClick={() => setAuthModal('login')}>Sign In</LoginBtn>
+                      <RegisterBtn onClick={() => setAuthModal('register')}>Create Account</RegisterBtn>
+                    </AuthBtns>
+                  )}
+                </ButtonContainer>
+
+                <ButtonContainer>
                   <ScheduleButtonContainer onClick={handleScheduleClick}>
                     Schedule a Consultation
                   </ScheduleButtonContainer>
+                </ButtonContainer>
+
+                <ButtonContainer>
+                  {user && (
+                    <UserMenuWrapper data-user-menu>
+                      <UserMenuBtn onClick={() => setShowUserMenu(p => !p)}>
+                        <UserAvatar>{user.firstName[0]}{user.lastName[0]}</UserAvatar>
+                        <UserName>{user.firstName}</UserName>
+                        <UserChevron>{showUserMenu ? '▲' : '▼'}</UserChevron>
+                      </UserMenuBtn>
+                      <AnimatePresence>
+                        {showUserMenu && (
+                          <UserDropdown
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ duration: 0.15 }}
+                          >
+                            <UserDropdownName>{user.firstName} {user.lastName}</UserDropdownName>
+                            <UserDropdownEmail>{user.email}</UserDropdownEmail>
+                            <UserDropdownDivider />
+                            <UserDropdownItem onClick={() => { setShowUserMenu(false); router.push('/my-account'); }}>
+                              My Account
+                            </UserDropdownItem>
+                            <UserDropdownItem onClick={() => { setShowUserMenu(false); router.push('/careers/profile'); }}>
+                              My Applications
+                            </UserDropdownItem>
+                            <UserDropdownDivider />
+                            <UserDropdownItem onClick={() => { setShowUserMenu(false); logout(); }} style={{ color: '#e53e3e' }}>
+                              Sign Out
+                            </UserDropdownItem>
+                          </UserDropdown>
+                        )}
+                      </AnimatePresence>
+                    </UserMenuWrapper>
+                  )}
                 </ButtonContainer>
 
                 <MobileMenuButton onClick={toggleMobileMenu}>

@@ -588,9 +588,9 @@ const Close = styled.button`
 `;
 
 const ErrBox = styled.div`
-  background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c;
+  background: #fee2e2; border: 2px solid #f87171; color: #991b1b;
   padding: 1rem 1.4rem; border-radius: 0.7rem;
-  font-size: 1.4rem; margin-bottom: 1.5rem;
+  font-size: 1.4rem; font-weight: 600; margin-bottom: 1.5rem;
 `;
 
 const NoticeBox = styled.div`
@@ -654,11 +654,11 @@ const Input = styled.input<{ $invalid?: boolean }>`
 
 const PasswordWrap = styled.div`position: relative; display: flex; align-items: center;`;
 const EyeBtn = styled.button`
-  position: absolute; right: 1rem;
-  background: none; border: none; cursor: pointer;
-  color: #888; display: flex; align-items: center;
-  padding: 0;
-  &:hover { color: #333; }
+  position: absolute; right: 0.8rem;
+  background: rgba(0,0,0,0.06); border: none; cursor: pointer;
+  color: #444; display: flex; align-items: center;
+  padding: 0.4rem; border-radius: 0.4rem;
+  &:hover { color: #111; background: rgba(0,0,0,0.1); }
 `;
 
 const ValidationMsg = styled.p<{ $error?: boolean; $success?: boolean }>`

@@ -300,7 +300,7 @@ export default function JobDetailPage({ job }: Props) {
 
                   <Field>
                     <FieldLabel>Resume / CV <RequiredStar>*</RequiredStar></FieldLabel>
-                    <FileHint>PDF, DOC, or DOCX — max 5 MB</FileHint>
+                    <FileHint>PDF, DOC, or DOCX — max 10 MB</FileHint>
                     <FieldFileInput
                       type="file"
                       accept=".pdf,.doc,.docx"
@@ -311,7 +311,7 @@ export default function JobDetailPage({ job }: Props) {
 
                   <Field>
                     <FieldLabel>Cover Letter (optional)</FieldLabel>
-                    <FileHint>PDF, DOC, or DOCX — max 5 MB</FileHint>
+                    <FileHint>PDF, DOC, or DOCX — max 10 MB</FileHint>
                     <FieldFileInput
                       type="file"
                       accept=".pdf,.doc,.docx"
@@ -321,7 +321,7 @@ export default function JobDetailPage({ job }: Props) {
 
                   <Field>
                     <FieldLabel>Certifications / Additional Documents (optional)</FieldLabel>
-                    <FileHint>PDF — max 5 MB</FileHint>
+                    <FileHint>PDF — max 10 MB</FileHint>
                     <FieldFileInput
                       type="file"
                       accept=".pdf"

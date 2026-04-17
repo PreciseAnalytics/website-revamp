@@ -20,5 +20,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     lastName: user.lastName,
     email: user.email,
     phone: user.phone,
+    recoveryEmail: user.recoveryEmail ?? null,
   });
 }

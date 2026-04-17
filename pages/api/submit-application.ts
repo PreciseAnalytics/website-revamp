@@ -22,8 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const form = formidable({
     uploadDir: '/tmp',
     keepExtensions: true,
-    maxFileSize: 5 * 1024 * 1024, // 5 MB per file
-    maxTotalFileSize: 15 * 1024 * 1024,
+    maxFileSize: 10 * 1024 * 1024, // 10 MB per file
+    maxTotalFileSize: 30 * 1024 * 1024,
   });
 
   let fields: formidable.Fields;
@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     [fields, files] = await form.parse(req);
   } catch (err) {
-    return res.status(400).json({ error: 'Failed to parse form data. Files must be under 5 MB each.' });
+    return res.status(400).json({ error: 'Failed to parse form data. Files must be under 10 MB each.' });
   }
 
   const get = (key: string) => {

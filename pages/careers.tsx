@@ -62,10 +62,12 @@ export default function CareersPage() {
               </>
             ) : (
               <>
-                <AuthBarText>
-                  Have an account? Sign in to apply to any open position.
-                </AuthBarText>
-                <AuthBarBtn onClick={() => setAuthModal('login')}>Sign In</AuthBarBtn>
+                <AuthBarLeft>
+                  <AuthBarText>
+                    Have an account? Sign in to apply to any open position.
+                  </AuthBarText>
+                  <AuthBarBtn onClick={() => setAuthModal('login')}>Sign In</AuthBarBtn>
+                </AuthBarLeft>
                 <AuthBarBtnPrimary onClick={() => setAuthModal('register')}>
                   Create Account
                 </AuthBarBtnPrimary>
@@ -209,6 +211,7 @@ const PageWrapper = styled.div`
 const AuthBar = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1.2rem;
   flex-wrap: wrap;
   padding: 1.2rem 1.8rem;
@@ -274,25 +277,32 @@ const PillarText = styled.p`
   color: rgba(var(--text), 0.8);
 `;
 
+const AuthBarLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+
 const AuthBarText = styled.p`
   font-size: 1.4rem;
-  color: rgba(var(--text), 0.75);
-  flex: 1;
+  color: rgba(var(--text), 0.85);
 `;
 
 const AuthBarBtn = styled.button`
   padding: 0.6rem 1.4rem;
   font-size: 1.4rem;
-  font-weight: 600;
-  background: transparent;
+  font-weight: 700;
+  background: rgb(var(--cardBackground));
   color: rgb(var(--text));
-  border: 1.5px solid rgba(var(--text), 0.25);
+  border: 1.5px solid rgba(var(--text), 0.5);
   border-radius: 0.6rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
   &:hover {
-    border-color: rgba(var(--text), 0.6);
+    border-color: rgba(var(--text), 0.9);
+    background: rgba(var(--text), 0.06);
   }
 `;
 

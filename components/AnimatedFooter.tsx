@@ -243,7 +243,7 @@ export default function AnimatedFooter() {
 
       </FooterPane>
 
-      <Container>
+      <BottomPane>
         <BottomBar>
           <Copyright>
             &copy; {new Date().getFullYear()} {EnvVars.SITE_NAME} | 
@@ -255,7 +255,7 @@ export default function AnimatedFooter() {
             </BottomLink>
           </Copyright>
         </BottomBar>
-      </Container>
+      </BottomPane>
 
     
       {showBackToTop && (
@@ -280,12 +280,14 @@ export default function AnimatedFooter() {
 // Footer Styled Components
 const FooterWrapper = styled(motion.footer)`
   position: relative;
-  background: linear-gradient(180deg, rgba(var(--navbarBackground), 0.9) 0%, rgb(var(--secondBackground)) 100%);
+  z-index: 10;
+  background: rgb(var(--navbarBackground));
   padding: 6rem 0 0;
   color: rgb(var(--text));
   overflow: hidden;
   border-top: 1px solid rgba(var(--accent), 0.1);
   margin-top: 4rem;
+  padding-bottom: 0;
 `;
 
 const GradientTop = styled.div`
@@ -300,7 +302,7 @@ const GradientTop = styled.div`
 const FooterContent = styled.div`
   display: flex;
   flex-wrap: nowrap;
-  gap: 4rem;
+  gap: 3rem;
   align-items: flex-start;
 
   ${media.desktop(`
@@ -313,11 +315,9 @@ const FooterContent = styled.div`
   `)}
 `;
 
-const FooterPane = styled.div`
-  max-width: 160rem;
-  width: 100%;
-  margin: 0 auto;
-  padding: 5rem 5rem 4rem;
+const FooterPane = styled(Container)`
+  max-width: 140rem;
+  padding: 4.5rem 3rem 3.5rem;
   display: flex;
   flex-direction: column;
   gap: 4rem;
@@ -327,7 +327,7 @@ const FooterPane = styled.div`
 `;
 
 const CompanySection = styled.div`
-  flex: 0 0 22rem;
+  flex: 0 0 20rem;
   min-width: 0;
   ${media.desktop(`
     flex: 0 0 18rem;
@@ -343,11 +343,11 @@ const NavSection = styled.div`
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1.2rem;
   min-width: 0;
 
   ${media.desktop(`
-    gap: 1rem;
+    gap: 0.9rem;
   `)}
 
   ${media.tablet(`
@@ -401,7 +401,7 @@ const AccentText = styled.span`
 `;
 
 const CompanyDescription = styled.p`
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   margin-bottom: 2.5rem;
   max-width: 42rem;
   opacity: 0.85;
@@ -489,7 +489,7 @@ const NavColumn = styled.div`
 `;
 
 const CategoryTitle = styled(motion.h4)`
-  font-size: 1.8rem;
+  font-size: 1.65rem;
   font-weight: 600;
   margin-bottom: 2rem;
   border-bottom: 2px solid rgba(var(--accent), 0.3);
@@ -497,13 +497,13 @@ const CategoryTitle = styled(motion.h4)`
   display: inline-block;
 
   ${media.desktop(`
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     margin-bottom: 1.5rem;
   `)}
 `;
 
 const CategoryTitleLink = styled(motion.div)`
-  font-size: 1.8rem;
+  font-size: 1.65rem;
   font-weight: 600;
   margin-bottom: 2rem;
   border-bottom: 2px solid rgba(var(--accent), 0.3);
@@ -519,7 +519,7 @@ const CategoryTitleLink = styled(motion.div)`
   }
 
   ${media.desktop(`
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     margin-bottom: 1.5rem;
   `)}
 `;
@@ -546,7 +546,7 @@ const NavLinkItem = styled(motion.li)`
 
 const NavLinkText = styled.div`
   color: rgb(var(--text));
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -556,7 +556,7 @@ const NavLinkText = styled.div`
   }
 
   ${media.desktop(`
-    font-size: 1.35rem;
+    font-size: 1.25rem;
   `)}
 `;
 
@@ -572,7 +572,7 @@ const NavLinkUnderline = styled(motion.div)`
 
 const CertStrip = styled.div`
   border-top: 1px solid rgba(var(--text), 0.15);
-  padding: 3.5rem 0 2rem;
+  padding: 3.2rem 0 2rem;
 `;
 
 const CertStripLabel = styled.p`
@@ -588,7 +588,7 @@ const CertStripLabel = styled.p`
 const CertLogoRow = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 3rem;
+  gap: 2.4rem;
   align-items: flex-end;
   justify-content: center;
 `;
@@ -629,21 +629,30 @@ const CertName = styled.span`
 
 const BottomBar = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-top: 3rem;
-  padding: 2rem 0;
+  padding: 1.6rem 0;
   border-top: 1px solid rgba(var(--text), 0.1);
   font-size: 1.4rem;
-  
+
   ${media.tablet(`
     flex-direction: column;
     gap: 1.5rem;
   `)}
 `;
 
+const BottomPane = styled(Container)`
+  max-width: 140rem;
+  padding: 0 3rem;
+
+  ${media.tablet(`
+    padding: 0 2rem;
+  `)}
+`;
+
 const Copyright = styled.div`
   opacity: 0.8;
+  text-align: center;
 `;
 
 const BottomLink = styled.span`
@@ -699,7 +708,7 @@ const ContactLinkItem = styled.a`
   align-items: flex-start;
   gap: 0.4rem;
   color: rgb(var(--text));
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   text-decoration: none;
   transition: color 0.2s ease;
   word-break: break-word;
@@ -711,7 +720,7 @@ const ContactLinkItem = styled.a`
   }
 
   ${media.desktop(`
-    font-size: 1.25rem;
+    font-size: 1.15rem;
   `)}
 `;
 

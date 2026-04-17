@@ -8,6 +8,7 @@ export interface UserRecord {
   lastName: string;
   email: string;
   phone: string;
+  recoveryEmail?: string | null;
   passwordHash: string;
   verified: boolean;
   verifyToken: string | null;
@@ -126,4 +127,55 @@ export function resetPasswordByToken(token: string, newPasswordHash: string): Us
 export function hashPassword(password: string): string {
   const salt = process.env.PASSWORD_SALT || 'pa_salt_2026';
   return crypto.createHash('sha256').update(password + salt).digest('hex');
+}
+
+export function findById(id: string): UserRecord | undefined {
+  return readAll().find(u => u.id === id);
+}
+
+export function updateProfile(
+  email: string,
+  fields: { firstName?: string; lastName?: string; phone?: string; recoveryEmail?: string | null }
+): UserRecord | null {
+  const users = readAll();
+  const u = users.find(x => x.email === email.toLowerCase());
+  if (!u) return null;
+  if (fields.firstName !== undefined) u.firstName = fields.firstName.trim();
+  if (fields.lastName !== undefined) u.lastName = fields.lastName.trim();
+  if (fields.phone !== undefined) u.phone = fields.phone.trim();
+  if (fields.recoveryEmail !== undefined) u.recoveryEmail = fields.recoveryEmail ? fields.recoveryEmail.toLowerCase().trim() : null;
+  writeAll(users);
+  return u;
+}
+
+export function changePassword(
+  email: string,
+  currentHash: string,
+  newHash: string
+): UserRecord | null {
+  const users = readAll();
+  const u = users.find(x => x.email === email.toLowerCase());
+  if (!u || u.passwordHash !== currentHash) return null;
+  u.passwordHash = newHash;
+  writeAll(users);
+  return u;
+}
+
+export function updateEmail(
+  currentEmail: string,
+  newEmail: string,
+  passwordHash: string
+): { user: UserRecord; verifyToken: string } | null {
+  const users = readAll();
+  const u = users.find(x => x.email === currentEmail.toLowerCase());
+  if (!u || u.passwordHash !== passwordHash) return null;
+  const taken = users.find(x => x.email === newEmail.toLowerCase());
+  if (taken) return null;
+  const verifyToken = crypto.randomBytes(32).toString('hex');
+  u.email = newEmail.toLowerCase().trim();
+  u.verified = false;
+  u.verifyToken = verifyToken;
+  u.verifyTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
+  writeAll(users);
+  return { user: u, verifyToken };
 }

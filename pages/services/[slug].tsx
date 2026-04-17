@@ -870,7 +870,7 @@ export default function ServiceDetailPage() {
               Let&apos;s discuss how {service.title.toLowerCase()} can transform your organization&apos;s data capabilities.
             </CtaDescription>
             <CtaActions>
-              <CtaButtonPrimary href={`/schedule-consult?service=${slug}`}>
+              <CtaButtonPrimary href="/schedule-consult">
                 Schedule a Consultation
               </CtaButtonPrimary>
               <CtaButtonSecondary href="/services">

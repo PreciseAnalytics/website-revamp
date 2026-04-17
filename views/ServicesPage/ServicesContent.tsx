@@ -176,7 +176,7 @@ export default function ServicesContent() {
 
                 {/* Schedule consult should be orange + open in new tab */}
                 <Schedule
-                  href={`/schedule-consult?service=${service.id}`}
+                  href="/schedule-consult"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

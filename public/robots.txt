@@ -3,10 +3,11 @@
 
 User-agent: *
 Allow: /
+Allow: /_next/static/
 
-# Block server-side internals — not indexable content
-Disallow: /api/
+# Block server-side internals
 Disallow: /_next/
+Disallow: /api/
 
 # Sitemap
 Sitemap: https://preciseanalytics.io/sitemap.xml

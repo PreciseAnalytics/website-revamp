@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -254,6 +255,7 @@ export default function ScheduleConsult() {
             <PageSubtitle>
               Discover How Data Can Drive Your Mission Forward
             </PageSubtitle>
+            <PageH2>Book a Free Strategy Session with Our Analytics Experts</PageH2>
           </HeaderSection>
 
           <ContentGrid>
@@ -365,6 +367,21 @@ export default function ScheduleConsult() {
           </ContentGrid>
         </Container>
       </PageWrapper>
+
+      {/* Internal navigation links — helps crawlers discover related pages */}
+      <RelatedLinks>
+        <Container>
+          <RelatedLinksTitle>Explore What We Offer</RelatedLinksTitle>
+          <RelatedLinksGrid>
+            <RelatedLink href="/services">Our Services</RelatedLink>
+            <RelatedLink href="/solutions">Solutions</RelatedLink>
+            <RelatedLink href="/sectors">Industries We Serve</RelatedLink>
+            <RelatedLink href="/about-us">About Precise Analytics</RelatedLink>
+            <RelatedLink href="/careers">Careers</RelatedLink>
+            <RelatedLink href="/capabilities-statement">Capabilities Statement</RelatedLink>
+          </RelatedLinksGrid>
+        </Container>
+      </RelatedLinks>
 
       {/* SCROLL ASSIST BUTTON */}
       <ScrollAssist />
@@ -889,4 +906,49 @@ const ScrollButton = styled.button`
     height: 4.5rem;
     font-size: 2rem;
   `)}
+`;
+
+const PageH2 = styled.h2`
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: rgba(var(--text), 0.7);
+  margin-top: 1rem;
+  text-align: center;
+`;
+
+const RelatedLinks = styled.div`
+  padding: 4rem 0;
+  border-top: 1px solid rgba(var(--text), 0.08);
+`;
+
+const RelatedLinksTitle = styled.h3`
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(var(--text), 0.45);
+  margin-bottom: 1.6rem;
+  text-align: center;
+`;
+
+const RelatedLinksGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+`;
+
+const RelatedLink = styled(Link)`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  padding: 0.5rem 1.4rem;
+  border: 1px solid rgba(255, 125, 0, 0.3);
+  border-radius: 2rem;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+  &:hover {
+    background: rgba(255, 125, 0, 0.08);
+    border-color: rgb(255, 125, 0);
+  }
 `;

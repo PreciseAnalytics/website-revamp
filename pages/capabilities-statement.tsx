@@ -158,6 +158,7 @@ export default function CapabilitiesStatementPage() {
                       <CertificationLogo
                         src="/sba-logo.png"
                         alt="SBA Veteran-Owned Small Business Certified"
+                        width={120} height={80}
                       />
                     </CertificationLogoLink>
                     <LogoLabel>VETERAN-OWNED CERTIFIED</LogoLabel>
@@ -171,6 +172,7 @@ export default function CapabilitiesStatementPage() {
                       <EnlargedSwamLogo
                         src="/SWAM_LOGO.jpg"
                         alt="SWaM Certified - Small, Women-owned, and Minority-owned Business"
+                        width={120} height={80}
                       />
                     </CertificationLogoLink>
                     <LogoLabel>SWaM CERTIFIED</LogoLabel>

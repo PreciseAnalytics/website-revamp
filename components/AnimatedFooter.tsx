@@ -114,7 +114,7 @@ export default function AnimatedFooter() {
           <CompanySection>
             <LogoSection>
               <LogoContainer onClick={() => handleNavigation('/')}>
-                <FooterLogo src="/PA-logo.png" alt="Precise Analytics" />
+                <FooterLogo src="/PA-logo.png" alt="Precise Analytics" width={150} height={50} />
               </LogoContainer>
             </LogoSection>
             
@@ -234,7 +234,7 @@ export default function AnimatedFooter() {
                 onClick={() => handleCertificationClick(cert.href)}
                 title={cert.name}
               >
-                <CertificationImage src={cert.image} alt={cert.name} />
+                <CertificationImage src={cert.image} alt={cert.name} width={110} height={70} />
                 <CertName>{cert.name}</CertName>
               </CertLogo>
             ))}

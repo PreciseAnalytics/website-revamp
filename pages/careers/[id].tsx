@@ -202,19 +202,19 @@ export default function JobDetailPage({ job }: Props) {
               </JobHeader>
 
               <Section>
-                <SectionTitle>About This Role</SectionTitle>
+                <SectionTitle>About the {job.title} Role</SectionTitle>
                 <SectionParagraph>{job.description}</SectionParagraph>
               </Section>
 
               <Section>
-                <SectionTitle>Key Responsibilities</SectionTitle>
+                <SectionTitle>Key Responsibilities for {job.title}</SectionTitle>
                 <BulletList>
                   {job.responsibilities.map((item, i) => <BulletItem key={i}>{item}</BulletItem>)}
                 </BulletList>
               </Section>
 
               <Section>
-                <SectionTitle>Required Qualifications</SectionTitle>
+                <SectionTitle>Required Qualifications for {job.title}</SectionTitle>
                 <BulletList>
                   {job.requirements.map((item, i) => <BulletItem key={i}>{item}</BulletItem>)}
                 </BulletList>
@@ -222,7 +222,7 @@ export default function JobDetailPage({ job }: Props) {
 
               {job.preferredQualifications.length > 0 && (
                 <Section>
-                  <SectionTitle>Preferred Qualifications</SectionTitle>
+                  <SectionTitle>Preferred Qualifications for {job.title}</SectionTitle>
                   <BulletList>
                     {job.preferredQualifications.map((item, i) => <BulletItem key={i}>{item}</BulletItem>)}
                   </BulletList>
@@ -231,7 +231,7 @@ export default function JobDetailPage({ job }: Props) {
 
               {job.benefits.length > 0 && (
                 <Section>
-                  <SectionTitle>Benefits</SectionTitle>
+                  <SectionTitle>Benefits for {job.title}</SectionTitle>
                   <BulletList>
                     {job.benefits.map((item, i) => <BulletItem key={i}>{item}</BulletItem>)}
                   </BulletList>
@@ -239,7 +239,7 @@ export default function JobDetailPage({ job }: Props) {
               )}
 
               <Section>
-                <SectionTitle>About Precise Analytics</SectionTitle>
+                <SectionTitle>Why {job.title} at Precise Analytics</SectionTitle>
                 <SectionParagraph>
                   Precise Analytics is a veteran-owned data analytics and AI workforce company
                   headquartered in Richmond, VA. We deliver data engineering, business intelligence,

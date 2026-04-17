@@ -16,6 +16,10 @@ export default function Hero() {
           <AnimatedReveal direction="up" delay={0.4}>
             <Heading>Comprehensive Data Analytics Services</Heading>
           </AnimatedReveal>
+
+          <AnimatedReveal direction="up" delay={0.5}>
+            <Subheading>Data Strategy, BI, and AI Delivery Services</Subheading>
+          </AnimatedReveal>
           
           <AnimatedReveal direction="up" delay={0.6}>
             <Description>
@@ -76,6 +80,18 @@ const Heading = styled.h1`
   
   ${media.tablet(`
     font-size: 3.8rem;
+  `)}
+`;
+
+const Subheading = styled.h2`
+  font-size: 2.6rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgba(var(--text), 0.9);
+  margin-bottom: 2.2rem;
+
+  ${media.tablet(`
+    font-size: 2.1rem;
   `)}
 `;
 

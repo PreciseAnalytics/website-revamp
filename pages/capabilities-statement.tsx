@@ -153,28 +153,30 @@ export default function CapabilitiesStatementPage() {
                       href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label="SBA Veteran-Owned Small Business Certified — View verification"
                     >
                       <CertificationLogo
                         src="/sba-logo.png"
                         alt="SBA Veteran-Owned Small Business Certified"
                         width={120} height={80}
                       />
+                      <LogoLabel>VETERAN-OWNED CERTIFIED</LogoLabel>
                     </CertificationLogoLink>
-                    <LogoLabel>VETERAN-OWNED CERTIFIED</LogoLabel>
                   </LogoContainer>
                   <LogoContainer>
                     <CertificationLogoLink
                       href="https://directory.sbsd.virginia.gov/#/executiveExport"
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label="SWaM Certified Small Business — View Virginia directory"
                     >
                       <EnlargedSwamLogo
                         src="/SWAM_LOGO.jpg"
                         alt="SWaM Certified - Small, Women-owned, and Minority-owned Business"
                         width={120} height={80}
                       />
+                      <LogoLabel>SWaM CERTIFIED</LogoLabel>
                     </CertificationLogoLink>
-                    <LogoLabel>SWaM CERTIFIED</LogoLabel>
                   </LogoContainer>
                 </CertificationLogos>
                 <ComplianceBadge>

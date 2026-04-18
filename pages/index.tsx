@@ -261,6 +261,7 @@ export default function HomePage() {
             <HeroSection>
               <HeroContent>
                 <HeroTitle>Faster Decisions.<br />Cleaner Data.<br />AI That Works.</HeroTitle>
+                <HeroSubtitle>Data Engineering, Business Intelligence, and AI Delivery</HeroSubtitle>
                 <HeroDescription>
                   Precise Analytics delivers end-to-end data engineering, analytics, and AI solutions for
                   government and commercial clients — from raw pipeline to production-ready insight.

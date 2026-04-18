@@ -376,7 +376,7 @@ const SidebarCard = styled.div`
   padding: 1.5rem 1.8rem;
 `;
 
-const SidebarTitle = styled.h3`
+const SidebarTitle = styled.p`
   font-size: 1.3rem;
   font-weight: 700;
   text-transform: uppercase;

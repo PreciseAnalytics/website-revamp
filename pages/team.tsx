@@ -57,6 +57,16 @@ export default function OurTeamPage() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <PageTitle>Meet Our Team</PageTitle>
             <PageSubtitle>Passionate. Experienced. Mission-Driven.</PageSubtitle>
+            <TeamIntro>
+              Precise Analytics is built by veterans, data scientists, engineers, and business intelligence
+              professionals who bring deep domain expertise to every engagement. Our team combines federal
+              contracting experience with commercial analytics know-how, delivering solutions that are
+              technically rigorous and mission-focused. As a Service-Disabled Veteran-Owned Small Business
+              (SDVOSB), we hold ourselves to the same standards of discipline and accountability that define
+              military service. We hire people who take data seriously, communicate clearly, and care about
+              outcomes — not just outputs. When you work with Precise Analytics, you work directly with the
+              people building your solution.
+            </TeamIntro>
           </motion.div>
 
           <TeamGrid>
@@ -101,6 +111,15 @@ const TeamNav = styled.nav`
     color: rgb(var(--accent));
     text-decoration: underline;
   }
+`;
+
+const TeamIntro = styled.p`
+  font-size: 1.7rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.8);
+  max-width: 80rem;
+  margin: 2rem auto 5rem;
+  text-align: center;
 `;
 
 const PageWrapper = styled.div`

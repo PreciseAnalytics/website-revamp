@@ -373,7 +373,7 @@ export default function ContactForm() {
             <InfoSection>
               <InfoTitle>Follow Us</InfoTitle>
               <SocialLinks>
-                <SocialLink href="https://www.facebook.com/PreciseAnalytics.io/" target="_blank" rel="noopener noreferrer">
+                <SocialLink href="https://www.facebook.com/PreciseAnalyticsLLC/" target="_blank" rel="noopener noreferrer">
                   <IconWrapper>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5.07 3.66 9.26 8.44 10.04v-7.09h-2.54v-2.95h2.54v-2.24c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.45 2.95h-2.33v7.09c4.78-.78 8.44-4.97 8.44-10.04 0-5.53-4.5-10.02-10-10.02z"/>

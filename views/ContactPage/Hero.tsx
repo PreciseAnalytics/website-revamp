@@ -94,11 +94,11 @@ export default function ContactHero() {
             </InfoList>
 
             <SocialRow>
-              <SocialLink href="https://www.linkedin.com/company/103138904" target="_blank" rel="noopener noreferrer">
+              <SocialLink href="https://www.linkedin.com/company/precise-analytics-llc/" target="_blank" rel="noopener noreferrer">
                 <SocialIcon viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></SocialIcon>
                 LinkedIn
               </SocialLink>
-              <SocialLink href="https://www.facebook.com/PreciseAnalytics.io" target="_blank" rel="noopener noreferrer">
+              <SocialLink href="https://www.facebook.com/PreciseAnalyticsLLC/" target="_blank" rel="noopener noreferrer">
                 <SocialIcon viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></SocialIcon>
                 Facebook
               </SocialLink>

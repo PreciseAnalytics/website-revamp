@@ -14,25 +14,25 @@ const teamMembers = [
     name: 'Norman Tanui',
     title: 'CTO & Founder',
     image: '/PA-logo.png',
-    bio: 'Veteran technologist passionate about data, strategy, and delivering analytics that matter.',
+    bio: 'U.S. Army veteran and technologist with deep expertise in data strategy, federal contracting, and enterprise analytics. Norman founded Precise Analytics to bring mission-focused data solutions to government agencies and commercial clients.',
   },
   {
     name: 'Krishna Bhatt',
     title: 'Chief Data Scientist',
     image: '/PA-logo.png',
-    bio: 'Leading AI and machine learning innovation across federal and commercial sectors.',
+    bio: 'Leading AI and machine learning innovation across federal and commercial sectors. Krishna specializes in predictive modeling, NLP, and building ML pipelines that drive measurable business outcomes.',
   },
   {
     name: 'Vivek Pokhrel',
     title: 'Director of BI Solutions',
     image: '/PA-logo.png',
-    bio: 'Expert in business intelligence systems, dashboards, and data storytelling.',
+    bio: 'Expert in business intelligence systems, dashboards, and data storytelling. Vivek transforms complex datasets into clear, actionable Power BI and Tableau dashboards for agency and enterprise clients.',
   },
   {
     name: 'Prashant Bhatta',
     title: 'Full Stack Engineer',
     image: '/PA-logo.png',
-    bio: 'Crafting scalable analytics platforms and user-friendly frontend experiences.',
+    bio: 'Crafting scalable analytics platforms and user-friendly frontend experiences. Prashant builds the data applications and portals that bring Precise Analytics solutions to end users.',
   },
 ];
 

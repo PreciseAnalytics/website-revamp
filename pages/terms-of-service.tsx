@@ -27,35 +27,49 @@ export default function TermsOfService() {
             <Section>
               <SectionTitle>1. Acceptance of Terms</SectionTitle>
               <SectionContent>
-                By accessing and using Precise Analytics services, you accept and agree to be bound by the terms and provision of this agreement.
+                By accessing and using Precise Analytics services, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these terms, please do not use our services. Your continued use of our website or engagement of our services constitutes acceptance of any updated terms.
               </SectionContent>
             </Section>
 
             <Section>
               <SectionTitle>2. Services</SectionTitle>
               <SectionContent>
-                Precise Analytics provides data analytics consulting services, business intelligence solutions, and related professional services. The specific terms of each engagement will be detailed in separate service agreements.
+                Precise Analytics provides data analytics consulting services, business intelligence solutions, AI and machine learning implementations, data engineering, ETL pipeline development, and related professional services for federal agencies, state and local governments, and commercial enterprises. The specific scope, deliverables, timelines, and pricing for each client engagement will be detailed in separate statements of work or service agreements executed between the parties.
               </SectionContent>
             </Section>
 
             <Section>
-              <SectionTitle>3. Confidentiality</SectionTitle>
+              <SectionTitle>3. Intellectual Property</SectionTitle>
               <SectionContent>
-                We maintain strict confidentiality of all client data and information. All data handling procedures comply with applicable privacy laws and industry best practices.
+                All content, methodologies, frameworks, and proprietary tools developed by Precise Analytics remain the intellectual property of Precise Analytics unless explicitly transferred in a written agreement. Client data and client-specific deliverables are owned by the client as specified in the applicable service agreement. You may not reproduce, distribute, or create derivative works from our proprietary content without prior written consent.
               </SectionContent>
             </Section>
 
             <Section>
-              <SectionTitle>4. Limitation of Liability</SectionTitle>
+              <SectionTitle>4. Confidentiality</SectionTitle>
               <SectionContent>
-                Precise Analytics shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to the use of our services.
+                We maintain strict confidentiality of all client data, business information, and proprietary materials. All data handling procedures comply with applicable privacy laws, federal regulations, HIPAA requirements where applicable, and industry best practices including NIST Cybersecurity Framework standards. Precise Analytics employees and contractors are bound by confidentiality obligations that survive the termination of any engagement.
               </SectionContent>
             </Section>
 
             <Section>
-              <SectionTitle>5. Contact Information</SectionTitle>
+              <SectionTitle>5. Limitation of Liability</SectionTitle>
               <SectionContent>
-                If you have any questions about these Terms of Service, please contact us through our website contact form.
+                Precise Analytics shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to the use of our services, including but not limited to loss of revenue, loss of data, or business interruption, even if we have been advised of the possibility of such damages. Our total liability for any claim arising under these terms shall not exceed the total fees paid by you in the three months preceding the claim.
+              </SectionContent>
+            </Section>
+
+            <Section>
+              <SectionTitle>6. Governing Law</SectionTitle>
+              <SectionContent>
+                These terms shall be governed by and construed in accordance with the laws of the Commonwealth of Virginia, without regard to its conflict of law provisions. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the courts located in Fairfax County, Virginia.
+              </SectionContent>
+            </Section>
+
+            <Section>
+              <SectionTitle>7. Contact Information</SectionTitle>
+              <SectionContent>
+                If you have any questions about these Terms of Service, please contact Precise Analytics through our website contact form at preciseanalytics.io/contact, or by email at contact@preciseanalytics.io. We will respond to all inquiries within one business day.
               </SectionContent>
             </Section>
           </ContentWrapper>

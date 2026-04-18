@@ -147,11 +147,9 @@ export default function FinancePage() {
             <CTADescription>
               Partner with Precise Analytics for transparent, compliant, and intelligent finance analytics solutions.
             </CTADescription>
-            <NextLink href="/schedule-consult" passHref>
-              <CTAButton as={motion.a} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <CTAButton href="/schedule-consult" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 Schedule a Consultation
               </CTAButton>
-            </NextLink>
           </CTASection>
 
           <RelatedSection>
@@ -398,7 +396,7 @@ const CTADescription = styled.p`
   opacity: 0.9;
 `;
 
-const CTAButton = styled.a`
+const CTAButton = styled(motion(NextLink))`
   display: inline-block;
   background: linear-gradient(135deg, rgb(56, 189, 248), rgb(59, 130, 246));
   color: white;

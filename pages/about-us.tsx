@@ -25,6 +25,15 @@ export default function AboutUsPage() {
       <PageWrapper>
         <Hero />
         <WhyChooseUs />
+        <AboutIntro>
+          <p>
+            Founded by a U.S. Army veteran, Precise Analytics has grown from a small consulting practice into a
+            full-service data and AI firm serving federal agencies, healthcare organizations, financial institutions,
+            and commercial enterprises. We are certified as a Service-Disabled Veteran-Owned Small Business (SDVOSB)
+            and a Virginia Small, Women-owned, and Minority-owned Business (SWaM). Our team holds active security
+            clearances and brings hands-on experience across NIST, HIPAA, FedRAMP, and CMMI compliance frameworks.
+          </p>
+        </AboutIntro>
         <RelatedLinks>
           <Link href="/solutions">Our Solutions</Link>
           <Link href="/sectors">Sectors We Serve</Link>
@@ -40,6 +49,16 @@ export default function AboutUsPage() {
 
 const PageWrapper = styled.div`
   position: relative;
+`;
+
+const AboutIntro = styled.section`
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  text-align: center;
 `;
 
 const RelatedLinks = styled.nav`

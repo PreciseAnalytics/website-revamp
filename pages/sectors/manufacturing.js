@@ -170,11 +170,9 @@ export default function ManufacturingPage() {
             <CTADescription>
               Partner with Precise Analytics for secure, compliant, and data-driven manufacturing solutions.
             </CTADescription>
-            <NextLink href="/schedule-consult" passHref>
-              <CTAButton as={motion.a} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <CTAButton href="/schedule-consult" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 Schedule a Consultation
               </CTAButton>
-            </NextLink>
           </CTASection>
 
           <RelatedSection>
@@ -423,7 +421,7 @@ const CTADescription = styled.p`
   opacity: 0.9;
 `;
 
-const CTAButton = styled.a`
+const CTAButton = styled(motion(NextLink))`
   display: inline-block;
   background: linear-gradient(135deg, rgb(255, 165, 0), rgb(239, 68, 68));
   color: white;

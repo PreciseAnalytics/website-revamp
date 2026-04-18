@@ -300,15 +300,13 @@ const RetailPage = () => {
                 Partner with Precise Analytics for data-driven retail solutions that improve customer experience 
                 and operational efficiency in federal retail environments.
               </CTADescription>
-              <NextLink href="/schedule-consult" passHref>
-                <CTAButton
-                  as={motion.a}
-                  whileHover={{ scale: 1.05, y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Schedule a Consultation
-                </CTAButton>
-              </NextLink>
+              <CTAButton
+                href="/schedule-consult"
+                whileHover={{ scale: 1.05, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Schedule a Consultation
+              </CTAButton>
             </CTASection>
 
             {/* Related Sectors Section */}
@@ -821,7 +819,7 @@ const CTADescription = styled.p`
   line-height: 1.6;
 `;
 
-const CTAButton = styled.button`
+const CTAButton = styled(motion(NextLink))`
   background: linear-gradient(135deg, rgb(147, 51, 234), rgb(219, 39, 119));
   color: white;
   border: none;

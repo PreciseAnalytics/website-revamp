@@ -18,6 +18,15 @@ export default function ContactPage() {
       <AnimatedHeader />
       <PageWrapper>
         <Hero />
+        <ContactIntro>
+          <p>
+            Precise Analytics is a veteran-owned data analytics firm headquartered in Virginia, serving federal agencies,
+            state and local governments, and commercial enterprises. Whether you need to modernize your data infrastructure,
+            build custom dashboards, implement AI and machine learning solutions, or explore our AI workforce services,
+            our team is ready to help. Reach out to schedule a free consultation, get a capabilities briefing, or ask
+            about our VOSB and SWaM certified service offerings. We respond to all inquiries within one business day.
+          </p>
+        </ContactIntro>
         <ContactNav>
           <Link href="/solutions">Our Solutions</Link>
           <Link href="/sectors">Sectors We Serve</Link>
@@ -29,6 +38,16 @@ export default function ContactPage() {
     </>
   );
 }
+
+const ContactIntro = styled.section`
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 4rem 2rem 0;
+  font-size: 1.8rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.85);
+  text-align: center;
+`;
 
 const ContactNav = styled.nav`
   display: flex;

@@ -96,16 +96,7 @@ const nextConfig = {
   // Add headers for better SEO
   async headers() {
     return [
-      {
-        source: '/capabilities-statement.pdf',
-        headers: [
-          {
-            key: 'Link',
-            value: '<https://preciseanalytics.io/capabilities-statement>; rel="canonical"',
-          },
-        ],
-      },
-      {
+{
         source: '/sitemap.xml',
         headers: [
           {

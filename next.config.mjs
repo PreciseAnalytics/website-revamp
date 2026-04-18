@@ -97,6 +97,28 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/capabilities-statement.pdf',
+        headers: [
+          {
+            key: 'Link',
+            value: '<https://preciseanalytics.io/capabilities-statement>; rel="canonical"',
+          },
+        ],
+      },
+      {
+        source: '/sitemap.xml',
+        headers: [
+          {
+            key: 'Link',
+            value: '<https://preciseanalytics.io/sitemap.xml>; rel="canonical"',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, follow',
+          },
+        ],
+      },
+      {
         source: '/:path*',
         headers: [
           {

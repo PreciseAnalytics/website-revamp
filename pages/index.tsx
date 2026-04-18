@@ -750,7 +750,7 @@ const ServicesSection = styled.section`
   margin-bottom: 4rem;
 `;
 
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 3.6rem;
   font-weight: 700;
   text-align: center;
@@ -1101,7 +1101,7 @@ const FormWrapper = styled.div`
   `)}
 `;
 
-const FormTitle = styled.h2`
+const FormTitle = styled.h3`
   font-size: 3.2rem;
   font-weight: 700;
   text-align: center;

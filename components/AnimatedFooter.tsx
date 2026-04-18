@@ -96,6 +96,7 @@ export default function AnimatedFooter() {
           <CompanySection>
             <LogoSection>
               <LogoLink href="/" aria-label="Precise Analytics homepage">
+                <span className="sr-only">Home</span>
                 <FooterLogo src="/PA-logo.png" alt="Precise Analytics" width={150} height={50} />
               </LogoLink>
             </LogoSection>

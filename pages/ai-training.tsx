@@ -654,7 +654,7 @@ const SectionLabel = styled.p`
   margin-bottom: 1rem;
 `;
 
-const SectionHeading = styled.h2`
+const SectionHeading = styled.h3`
   font-size: clamp(2.8rem, 4vw, 4.2rem);
   font-weight: 900;
   color: #fff;
@@ -846,7 +846,7 @@ const CtaBox = styled(motion.div)`
   ${media.tablet(`padding: 4rem 2.4rem;`)}
 `;
 
-const CtaHeading = styled.h2`
+const CtaHeading = styled.h3`
   font-size: clamp(3rem, 4.5vw, 4.8rem);
   font-weight: 900;
   color: #fff;

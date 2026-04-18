@@ -66,6 +66,7 @@ export default function Navbar({ items }: NavbarProps) {
       <Content>
         <NextLink href="/" passHref>
           <LogoWrapper>
+            <span className="sr-only">Home</span>
             <Logo />
           </LogoWrapper>
         </NextLink>

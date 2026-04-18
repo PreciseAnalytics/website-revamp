@@ -87,7 +87,13 @@ export default function TeamPage() {
                 <Title>{member.title}</Title>
                 <Bio>{member.bio}</Bio>
                 {member.linkedin && (
-                  <LinkedInLink href={member.linkedin} target="_blank" rel="noopener noreferrer">
+                  <LinkedInLink
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    aria-label={`View ${member.name} on LinkedIn`}
+                  >
+                    <span className="sr-only">View {member.name} on LinkedIn</span>
                     <LinkedInIcon />
                   </LinkedInLink>
                 )}

@@ -582,7 +582,7 @@ const Section = styled.section`
   margin-bottom: 8rem;
 `;
 
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 3.6rem;
   font-weight: 700;
   color: rgb(255, 125, 0);
@@ -836,7 +836,7 @@ const CTASection = styled.section`
   margin-top: 4rem;
 `;
 
-const CTATitle = styled.h2`
+const CTATitle = styled.h3`
   font-size: 3.2rem;
   font-weight: 700;
   color: white;

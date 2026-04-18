@@ -201,6 +201,8 @@ export default function JobDetailPage({ job }: Props) {
                 </JobTagRow>
               </JobHeader>
 
+              <RoleDetailsHeading>Role Details</RoleDetailsHeading>
+
               <Section>
                 <SectionTitle>About the {job.title} Role</SectionTitle>
                 <SectionParagraph>{job.description}</SectionParagraph>
@@ -488,8 +490,15 @@ const JobTag = styled.span`
   border: 1px solid rgba(var(--text),0.1);
 `;
 
+const RoleDetailsHeading = styled.h2`
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+`;
+
 const Section = styled.section`margin-bottom: 3rem;`;
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 1.8rem;
   font-weight: 700;
   color: rgb(var(--text));

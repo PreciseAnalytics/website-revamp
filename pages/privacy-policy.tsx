@@ -45,6 +45,8 @@ export default function PrivacyPolicyPage() {
                 data when you visit our website, interact with us, or use our services.
               </IntroText>
 
+              <PolicySectionsHeading>Privacy Policy Sections</PolicySectionsHeading>
+
               <Section>
                 <SectionTitle>1. Information We Collect</SectionTitle>
                 <SectionContent>
@@ -283,6 +285,13 @@ const IntroText = styled.p`
   border-left: 4px solid rgb(var(--accent));
 `;
 
+const PolicySectionsHeading = styled.h2`
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+`;
+
 const Section = styled.section`
   margin-bottom: 4rem;
   
@@ -291,7 +300,7 @@ const Section = styled.section`
   }
 `;
 
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 2.8rem;
   font-weight: 600;
   color: rgb(var(--text));

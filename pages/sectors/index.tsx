@@ -303,7 +303,7 @@ const CTASection = styled.section`
   color: rgb(var(--text));
 `;
 
-const CTATitle = styled.h2`
+const CTATitle = styled.h3`
   font-size: 3.6rem;
   font-weight: 700;
   margin-bottom: 2rem;

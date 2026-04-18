@@ -22,6 +22,7 @@ export default function TermsOfService() {
           <ContentWrapper>
             <PageTitle>Terms of Service</PageTitle>
             <LastUpdated>Last updated: June 26, 2025</LastUpdated>
+            <TermsSectionsHeading>Terms of Service Sections</TermsSectionsHeading>
             
             <Section>
               <SectionTitle>1. Acceptance of Terms</SectionTitle>
@@ -95,11 +96,18 @@ const LastUpdated = styled.p`
   margin-bottom: 4rem;
 `;
 
+const TermsSectionsHeading = styled.h2`
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+`;
+
 const Section = styled.section`
   margin-bottom: 4rem;
 `;
 
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 2.4rem;
   font-weight: 600;
   color: rgb(var(--text));

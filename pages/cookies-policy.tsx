@@ -23,6 +23,7 @@ export default function CookiesPolicy() {
           <ContentWrapper>
             <PageTitle>Cookies Policy</PageTitle>
             <LastUpdated>Last updated: April 16, 2026</LastUpdated>
+            <PolicySectionsHeading>Cookie Policy Sections</PolicySectionsHeading>
 
             <Section>
               <SectionTitle>1. Introduction</SectionTitle>
@@ -133,11 +134,18 @@ const LastUpdated = styled.p`
   margin-bottom: 4rem;
 `;
 
+const PolicySectionsHeading = styled.h2`
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 2rem;
+`;
+
 const Section = styled.section`
   margin-bottom: 4rem;
 `;
 
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 2.4rem;
   font-weight: 600;
   color: rgb(var(--text));

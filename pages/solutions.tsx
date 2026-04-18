@@ -450,18 +450,19 @@ const PageTitle = styled.h1`
   `)}
 `;
 
-const PageSubtitle = styled.p`
+const PageSubtitle = styled.h2`
   font-size: 2rem;
   text-align: center;
   margin-bottom: 6rem;
   color: rgb(var(--text), 0.8);
+  font-weight: 600;
 `;
 
 const SolutionsSection = styled.section`
   margin-top: 8rem;
 `;
 
-const SectionTitle = styled.h2`
+const SectionTitle = styled.h3`
   font-size: 3.6rem;
   font-weight: 700;
   text-align: center;
@@ -689,7 +690,7 @@ const FormWrapper = styled.div`
   `)}
 `;
 
-const FormTitle = styled.h2`
+const FormTitle = styled.h3`
   font-size: 3.2rem;
   font-weight: 700;
   text-align: center;

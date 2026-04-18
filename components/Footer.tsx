@@ -13,6 +13,7 @@ export default function Footer() {
           <FooterSection>
             <LogoArea>
               <Logo href="/">
+                <span className="sr-only">Home</span>
                 <LogoImage>
                   <Image
                     src="/logo.png"
@@ -99,13 +100,13 @@ export default function Footer() {
         {/* Social Links */}
         <SocialSection>
           <SocialLinks>
-            <SocialLink href="https://twitter.com/preciseanalytics" target="_blank" rel="noopener noreferrer">
+            <SocialLink href="https://github.com/preciseanalytics" target="_blank" rel="noopener noreferrer">
               <SocialIcon>𝕏</SocialIcon>
             </SocialLink>
             <SocialLink href="https://facebook.com/preciseanalytics" target="_blank" rel="noopener noreferrer">
               <SocialIcon>f</SocialIcon>
             </SocialLink>
-            <SocialLink href="https://linkedin.com/company/preciseanalytics" target="_blank" rel="noopener noreferrer">
+            <SocialLink href="https://www.linkedin.com/company/precise-analytics-llc/" target="_blank" rel="noopener noreferrer">
               <SocialIcon>in</SocialIcon>
             </SocialLink>
           </SocialLinks>

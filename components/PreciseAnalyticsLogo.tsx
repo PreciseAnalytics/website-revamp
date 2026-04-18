@@ -33,6 +33,7 @@ export const PreciseAnalyticsLogo = ({
   if (clickable && onClick) {
     return (
       <Link href="/" onClick={onClick} style={{ cursor: 'pointer' }} aria-label="Precise Analytics homepage">
+        <span className="sr-only">Home</span>
         {logoContent}
       </Link>
     );

@@ -201,7 +201,7 @@ export default function JobDetailPage({ job }: Props) {
                 </JobTagRow>
               </JobHeader>
 
-              <RoleDetailsHeading>Role Details</RoleDetailsHeading>
+              <RoleDetailsHeading>Role Details for {job.title}</RoleDetailsHeading>
 
               <Section>
                 <SectionTitle>About the {job.title} Role</SectionTitle>

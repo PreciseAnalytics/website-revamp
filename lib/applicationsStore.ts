@@ -11,16 +11,21 @@ export interface ApplicationRecord {
   phone: string;
   jobTitle: string;
   jobNumber: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
+  location?: string;
+  workAuthorized?: string;
+  visaSponsorship?: string;
   submittedAt: string; // ISO
   status: ApplicationStatus;
   statusUpdatedAt: string; // ISO
   hasResume: boolean;
   hasCoverLetter: boolean;
   hasCerts: boolean;
+  hasPhoto: boolean;
 }
 
 function storePath(): string {
-  if (process.env.NODE_ENV === 'production') return '/tmp/pa_applications.json';
   const dir = path.join(process.cwd(), 'data');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   return path.join(dir, 'applications.json');
@@ -46,6 +51,10 @@ export function saveApplication(data: Omit<ApplicationRecord, 'id' | 'status' | 
   records.push(record);
   writeAll(records);
   return record;
+}
+
+export function getAllApplications(): ApplicationRecord[] {
+  return readAll().sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 }
 
 export function getApplicationsByEmail(email: string): ApplicationRecord[] {

@@ -103,8 +103,8 @@ export default function CareersPage() {
               <Pillar>
                 <PillarLabel>How to Apply</PillarLabel>
                 <PillarText>
-                  Browse open positions, create a free account, and submit your application
-                  directly below.
+                  Browse open positions and click <strong>Apply Now</strong> on any role. No
+                  account required — just your resume and a few details.
                 </PillarText>
               </Pillar>
             </PageHeaderPillars>
@@ -185,9 +185,14 @@ export default function CareersPage() {
                         </Td>
 
                         <Td $align="right">
-                          <ViewLink href={`/careers/${job.id}`}>
-                            View &amp; Apply &rarr;
-                          </ViewLink>
+                          <ActionGroup>
+                            <ViewLink href={`/careers/${job.id}`}>
+                              Details
+                            </ViewLink>
+                            <ApplyBtn href={`/apply/${job.id}`}>
+                              Apply Now
+                            </ApplyBtn>
+                          </ActionGroup>
                         </Td>
                       </JobRow>
                     ))}
@@ -489,13 +494,40 @@ const TypeBadge = styled.span<{ type: string }>`
     type === 'contract' ? 'rgb(99, 102, 241)' : 'rgb(22, 163, 74)'};
 `;
 
+const ActionGroup = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+`;
+
 const ViewLink = styled(Link)`
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  padding: 0.8rem 1.4rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: transparent;
+  color: rgba(var(--text), 0.7);
+  border: 1.5px solid rgba(var(--text), 0.2);
+  border-radius: 0.7rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(var(--text), 0.5);
+    color: rgb(var(--text));
+  }
+`;
+
+const ApplyBtn = styled(Link)`
+  display: inline-flex;
+  align-items: center;
   padding: 0.9rem 1.8rem;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   background: rgb(255, 125, 0);
   color: #fff;
   border-radius: 0.7rem;

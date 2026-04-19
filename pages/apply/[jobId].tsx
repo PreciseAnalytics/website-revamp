@@ -1,4 +1,4 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -7,11 +7,21 @@ import styled from 'styled-components';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { useAuth } from 'contexts/auth.context';
-import { JOBS, getJobById, Job } from 'lib/jobsData';
 import { media } from 'utils/media';
 
+const ATS_API = 'https://precise-analytics-ats.vercel.app/api';
+
 interface Props {
-  job: Job;
+  job: {
+    id: string;
+    jobNumber: string;
+    title: string;
+    departmentLabel: string;
+    locationLabel: string;
+    employmentTypeLabel: string;
+    salaryRange?: string | null;
+    description?: string;
+  };
 }
 
 export default function ApplyPage({ job }: Props) {
@@ -65,6 +75,17 @@ export default function ApplyPage({ job }: Props) {
     }
   }, [user]);
 
+  async function uploadToATS(file: File, type: string): Promise<string> {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('type', type);
+    const res = await fetch(`${ATS_API}/upload`, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error(`File upload failed: ${res.statusText}`);
+    const data = await res.json();
+    if (!data.success || !data.url) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -80,31 +101,66 @@ export default function ApplyPage({ job }: Props) {
 
     setLoading(true);
     try {
-      const fd = new FormData();
-      fd.append('firstName', firstName.trim());
-      fd.append('lastName', lastName.trim());
-      fd.append('name', `${firstName.trim()} ${lastName.trim()}`);
-      fd.append('email', email.trim());
-      fd.append('phone', phone.trim());
-      fd.append('linkedinUrl', linkedinUrl.trim());
-      fd.append('portfolioUrl', portfolioUrl.trim());
-      fd.append('city', city.trim());
-      fd.append('state', state.trim());
-      fd.append('zipCode', zipCode.trim());
-      fd.append('country', country.trim());
-      fd.append('workAuthorized', workAuthorized);
-      fd.append('visaSponsorship', visaSponsorship);
-      fd.append('jobTitle', job.title);
-      fd.append('jobNumber', job.jobNumber);
-      fd.append('coverNote', coverNote.trim());
-      fd.append('resume', resumeFile);
-      if (coverLetterFile) fd.append('coverLetter', coverLetterFile);
-      if (certsFile) fd.append('certifications', certsFile);
-      if (photoFile) fd.append('photo', photoFile);
+      // 1. Upload files to ATS Blob storage
+      let resumeUrl = '';
+      let coverLetterUrl = '';
+      try {
+        resumeUrl = await uploadToATS(resumeFile, 'resume');
+        if (coverLetterFile) coverLetterUrl = await uploadToATS(coverLetterFile, 'cover_letter');
+      } catch (uploadErr: any) {
+        throw new Error(`File upload failed: ${uploadErr.message}. Please try a smaller file or email apply@preciseanalytics.io.`);
+      }
 
-      const res = await fetch('/api/submit-application', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed');
+      // 2. Submit application to ATS database
+      const atsRes = await fetch(`${ATS_API}/applications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_id: job.id,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          linkedin_url: linkedinUrl.trim() || null,
+          portfolio_url: portfolioUrl.trim() || null,
+          address: `${city.trim()}, ${state.trim()} ${zipCode.trim()}`.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          zip_code: zipCode.trim(),
+          country: country.trim(),
+          work_authorized: workAuthorized,
+          visa_sponsorship: visaSponsorship,
+          why_interested: coverNote.trim(),
+          position_applying_for: job.title,
+          application_source: 'preciseanalytics.io',
+          resume_url: resumeUrl,
+          cover_letter_url: coverLetterUrl || null,
+          submission_date: new Date().toISOString(),
+        }),
+      });
+      const atsData = await atsRes.json();
+      if (!atsRes.ok) throw new Error(atsData.error || 'Application submission failed');
+
+      // 3. Send acknowledgment email via local API (non-blocking)
+      try {
+        const fd = new FormData();
+        fd.append('firstName', firstName.trim());
+        fd.append('lastName', lastName.trim());
+        fd.append('name', `${firstName.trim()} ${lastName.trim()}`);
+        fd.append('email', email.trim());
+        fd.append('phone', phone.trim());
+        fd.append('jobTitle', job.title);
+        fd.append('jobNumber', job.jobNumber);
+        fd.append('coverNote', coverNote.trim());
+        fd.append('city', city.trim());
+        fd.append('state', state.trim());
+        fd.append('country', country.trim());
+        fd.append('workAuthorized', workAuthorized);
+        fd.append('visaSponsorship', visaSponsorship);
+        fd.append('linkedinUrl', linkedinUrl.trim());
+        fd.append('portfolioUrl', portfolioUrl.trim());
+        await fetch('/api/submit-application', { method: 'POST', body: fd });
+      } catch {}
 
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -169,6 +225,7 @@ export default function ApplyPage({ job }: Props) {
                       <MetaIcon>&#127970;</MetaIcon>
                       {job.departmentLabel}
                     </JobMetaRow>
+
                     <JobMetaRow>
                       <MetaIcon>#</MetaIcon>
                       {job.jobNumber}
@@ -523,15 +580,36 @@ export default function ApplyPage({ job }: Props) {
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: JOBS.map((j) => ({ params: { jobId: j.id } })),
-  fallback: false,
-});
-
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-  const job = getJobById(params?.jobId as string);
-  if (!job) return { notFound: true };
-  return { props: { job } };
+export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) => {
+  const jobId = params?.jobId as string;
+  try {
+    const res = await fetch(`${ATS_API}/jobs/${jobId}`);
+    if (res.ok) {
+      const data = await res.json();
+      const j = data.job || data;
+      if (j && j.id) {
+        return {
+          props: {
+            job: {
+              id: j.id,
+              jobNumber: j.job_number || `PA-${String(j.id).slice(0, 6).toUpperCase()}`,
+              title: j.title,
+              departmentLabel: j.department || 'General',
+              locationLabel: j.location || 'Richmond, VA',
+              employmentTypeLabel: (j.employment_type || j.type || 'Full Time')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, (c: string) => c.toUpperCase()),
+              salaryRange: j.salary_range || null,
+              description: j.description || '',
+            },
+          },
+        };
+      }
+    }
+  } catch (e) {
+    console.error('Failed to fetch job from ATS:', e);
+  }
+  return { notFound: true };
 };
 
 // ─── Styled Components ────────────────────────────────────────────────────────

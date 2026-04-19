@@ -1,29 +1,68 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { AnimatePresence } from 'framer-motion';
+import { GetServerSideProps } from 'next';
 
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import AuthModal from 'components/AuthModals';
 import { useAuth } from 'contexts/auth.context';
-import { JOBS } from 'lib/jobsData';
 import { media } from 'utils/media';
+
+const ATS_API = 'https://precise-analytics-ats.vercel.app/api';
 
 type AuthModalMode = 'login' | 'register' | 'reset' | null;
 
-export default function CareersPage() {
+interface DisplayJob {
+  id: string;
+  jobNumber: string;
+  title: string;
+  departmentLabel: string;
+  locationLabel: string;
+  employmentType: string;
+  employmentTypeLabel: string;
+  salaryRange?: string | null;
+}
+
+interface Props {
+  jobs: DisplayJob[];
+}
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  try {
+    const res = await fetch(`${ATS_API}/jobs?status=published`, { next: { revalidate: 0 } } as any);
+    if (!res.ok) throw new Error(`ATS API ${res.status}`);
+    const data = await res.json();
+    if (data.success && Array.isArray(data.jobs)) {
+      const jobs: DisplayJob[] = data.jobs
+        .filter((j: any) => j.status === 'published')
+        .map((j: any) => ({
+          id: j.id,
+          jobNumber: j.job_number || `PA-${String(j.id).slice(0, 6).toUpperCase()}`,
+          title: j.title,
+          departmentLabel: j.department || 'General',
+          locationLabel: j.location || 'Richmond, VA',
+          employmentType: (j.employment_type || j.type || 'full_time').toLowerCase().replace(/\s+/g, '_'),
+          employmentTypeLabel: (j.employment_type || j.type || 'Full Time')
+            .replace(/_/g, ' ')
+            .replace(/\b\w/g, (c: string) => c.toUpperCase()),
+          salaryRange: j.salary_range || null,
+        }));
+      return { props: { jobs } };
+    }
+  } catch (e) {
+    console.error('Failed to fetch jobs from ATS:', e);
+  }
+  return { props: { jobs: [] } };
+};
+
+export default function CareersPage({ jobs }: Props) {
   const { user, logout } = useAuth();
   const [authModal, setAuthModal] = useState<AuthModalMode>(null);
 
-  const openJobs = useMemo(() => {
-    return JOBS.filter((job: any) => {
-      if (typeof job.isOpen === 'boolean') return job.isOpen;
-      if (typeof job.status === 'string') return job.status.toLowerCase() !== 'closed';
-      return true;
-    });
-  }, []);
+  const openJobs = jobs;
 
   return (
     <>

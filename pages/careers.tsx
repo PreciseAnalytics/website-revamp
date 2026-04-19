@@ -32,12 +32,13 @@ interface Props {
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
-    const res = await fetch(`${ATS_API}/jobs?status=published`, { next: { revalidate: 0 } } as any);
+    const res = await fetch(`${ATS_API}/jobs`, { next: { revalidate: 0 } } as any);
     if (!res.ok) throw new Error(`ATS API ${res.status}`);
     const data = await res.json();
     if (data.success && Array.isArray(data.jobs)) {
+      const ACTIVE_STATUSES = new Set(['published', 'active']);
       const jobs: DisplayJob[] = data.jobs
-        .filter((j: any) => j.status === 'published')
+        .filter((j: any) => ACTIVE_STATUSES.has(j.status) || j.posted === true)
         .map((j: any) => ({
           id: j.id,
           jobNumber: j.job_number || `PA-${String(j.id).slice(0, 6).toUpperCase()}`,

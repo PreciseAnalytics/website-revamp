@@ -182,7 +182,7 @@ export default function AITrainingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                <PrimaryBtn href="#pilot-form">Deploy a Contributor Team →</PrimaryBtn>
+                <PrimaryBtn href="/schedule-consult">Deploy a Contributor Team →</PrimaryBtn>
                 <SecondaryBtn href="#how-it-works">See How It Works</SecondaryBtn>
               </HeroActions>
 

@@ -11,7 +11,7 @@ import AuthModal from 'components/AuthModals';
 import { useAuth } from 'contexts/auth.context';
 import { media } from 'utils/media';
 
-const ATS_API = 'https://precise-analytics-ats.vercel.app/api';
+const ATS_API = 'https://ats.preciseanalytics.io/api';
 
 type AuthModalMode = 'login' | 'register' | 'reset' | null;
 

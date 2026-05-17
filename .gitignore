@@ -3,6 +3,10 @@
 .env.local
 .env.production
 
+# Local runtime/config data
+data/
+.claude/
+
 # Dependency directories
 node_modules/
 dist/

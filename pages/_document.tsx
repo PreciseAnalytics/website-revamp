@@ -34,8 +34,9 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          {/* Theme */}
           <meta name="theme-color" content="#0F172A" />
+          <link rel="icon" href="/favicon.png" type="image/png" />
+          <link rel="shortcut icon" href="/favicon.ico" />
         </Head>
         <body className="next-dark-theme">
           <Main />

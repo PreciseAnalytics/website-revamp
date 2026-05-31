@@ -35,6 +35,18 @@ function formatPhone(raw: string): string {
 const CURRENT_YEAR = new Date().getFullYear();
 const GRAD_YEARS = Array.from({ length: CURRENT_YEAR - 1969 + 6 }, (_, i) => CURRENT_YEAR + 5 - i);
 
+const DEGREE_OPTIONS = [
+  "High School / GED",
+  "Associate's",
+  "Bachelor's",
+  "Master's",
+  "MBA",
+  "PhD / Doctorate",
+  "Professional Degree (JD/MD)",
+  "Bootcamp / Certificate",
+  "Other",
+];
+
 export default function ApplyPage({ job }: Props) {
   const { user } = useAuth();
   const router = useRouter();
@@ -67,6 +79,11 @@ export default function ApplyPage({ job }: Props) {
   const [certsFile, setCertsFile] = useState<File | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
+  // Resume autofill
+  const [parsing, setParsing] = useState(false);
+  const [parseError, setParseError] = useState('');
+  const [autofilled, setAutofilled] = useState(false);
+
   // Cover note
   const [coverNote, setCoverNote] = useState('');
 
@@ -91,6 +108,44 @@ export default function ApplyPage({ job }: Props) {
       setPhone(user.phone || '');
     }
   }, [user]);
+
+  async function handleResumeUpload(file: File) {
+    setResumeFile(file);
+    setParseError('');
+    setAutofilled(false);
+
+    const ext = file.name.toLowerCase().split('.').pop() ?? '';
+    if (!['pdf', 'doc', 'docx'].includes(ext)) return;
+
+    setParsing(true);
+    try {
+      const fd = new FormData();
+      fd.append('resume', file);
+      const res = await fetch('/api/parse-resume', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        setParseError(json.error || 'Could not parse resume. Fill in fields manually.');
+        return;
+      }
+      const d = json.data;
+      if (d.firstName) setFirstName(d.firstName);
+      if (d.lastName) setLastName(d.lastName);
+      if (d.email && !user?.email) setEmail(d.email);
+      if (d.phone) setPhone(formatPhone(d.phone));
+      if (d.linkedinUrl) setLinkedinUrl(d.linkedinUrl);
+      if (d.city) setCity(d.city);
+      if (d.state) setState(d.state);
+      if (d.school) setSchool(d.school);
+      if (d.degree && DEGREE_OPTIONS.includes(d.degree)) setDegree(d.degree);
+      if (d.fieldOfStudy) setFieldOfStudy(d.fieldOfStudy);
+      if (d.graduationYear) setGraduationYear(d.graduationYear);
+      setAutofilled(true);
+    } catch {
+      setParseError('Could not parse resume. Please fill in fields manually.');
+    } finally {
+      setParsing(false);
+    }
+  }
 
   async function uploadToATS(file: File, type: string): Promise<string> {
     const fd = new FormData();
@@ -296,16 +351,60 @@ export default function ApplyPage({ job }: Props) {
               {/* ── Application Form ── */}
               <FormPanel>
                 <FormHeading>Your Application</FormHeading>
-                {user ? (
+                {user && (
                   <AuthNotice>
                     Signed in as <strong>{user.firstName} {user.lastName}</strong> — your details have been pre-filled.
                   </AuthNotice>
-                ) : (
-                  <GuestNotice>
-                    No account needed. Fill in your details below to apply.{' '}
-                    <GuestSignInLink href="/careers">Already have an account? Sign in first to pre-fill.</GuestSignInLink>
-                  </GuestNotice>
                 )}
+
+                {/* ── Resume Quick-Start ── */}
+                <ResumeStartBox>
+                  <ResumeStartTitle>
+                    <span>⚡</span> Start with your resume
+                  </ResumeStartTitle>
+                  <ResumeStartDesc>
+                    Upload a PDF and we&apos;ll autofill the form — no account needed. Review and edit anything before submitting.
+                  </ResumeStartDesc>
+                  <HiddenInput
+                    ref={resumeRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleResumeUpload(file);
+                    }}
+                  />
+                  <ResumeStartRow>
+                    <ResumePickBtn
+                      type="button"
+                      $selected={!!resumeFile}
+                      onClick={() => resumeRef.current?.click()}
+                      disabled={parsing}
+                    >
+                      {parsing
+                        ? '⏳ Parsing resume…'
+                        : resumeFile
+                        ? `✓  ${resumeFile.name}`
+                        : 'Upload Resume (PDF, DOC, DOCX)'}
+                    </ResumePickBtn>
+                    {resumeFile && !parsing && (
+                      <ClearBtn type="button" onClick={() => {
+                        setResumeFile(null);
+                        setAutofilled(false);
+                        if (resumeRef.current) resumeRef.current.value = '';
+                      }}>Remove</ClearBtn>
+                    )}
+                  </ResumeStartRow>
+                  {autofilled && (
+                    <AutofillBanner>
+                      ✓ Fields autofilled from your resume — review everything below before submitting.
+                    </AutofillBanner>
+                  )}
+                  {parseError && (
+                    <ParseErrorMsg>{parseError}</ParseErrorMsg>
+                  )}
+                  <ResumeHint>PDF works best for autofill. Max 10 MB. Required to apply.</ResumeHint>
+                </ResumeStartBox>
 
                 <AppForm onSubmit={handleSubmit} noValidate>
 
@@ -547,28 +646,7 @@ export default function ApplyPage({ job }: Props) {
 
                   {/* ── Section 5: Documents ── */}
                   <FormSection>
-                    <SectionLabel>Documents &amp; Files</SectionLabel>
-
-                    <FileUploadGroup>
-                      <Label>Resume / CV <Req>*</Req></Label>
-                      <FileRow>
-                        <HiddenInput
-                          ref={resumeRef}
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
-                        />
-                        <FilePickBtn type="button" $selected={!!resumeFile} onClick={() => resumeRef.current?.click()}>
-                          {resumeFile ? `✓  ${resumeFile.name}` : 'Choose file…'}
-                        </FilePickBtn>
-                        {resumeFile && (
-                          <ClearBtn type="button" onClick={() => { setResumeFile(null); if (resumeRef.current) resumeRef.current.value = ''; }}>
-                            Remove
-                          </ClearBtn>
-                        )}
-                      </FileRow>
-                      <FileHint>PDF, DOC, or DOCX — max 10 MB</FileHint>
-                    </FileUploadGroup>
+                    <SectionLabel>Additional Documents</SectionLabel>
 
                     <FileUploadGroup>
                       <Label>Cover Letter <Opt>(optional)</Opt></Label>
@@ -738,8 +816,8 @@ const BreadcrumbLink = styled(Link)`
   text-decoration: none;
   &:hover { text-decoration: underline; }
 `;
-const Sep = styled.span`color: rgba(var(--text), 0.35);`;
-const BreadcrumbCurrent = styled.span`color: rgba(var(--text), 0.6);`;
+const Sep = styled.span`color: #94a3b8;`;
+const BreadcrumbCurrent = styled.span`color: #64748b;`;
 
 const TwoCol = styled.div`
   display: flex;
@@ -775,7 +853,7 @@ const JobCardLabel = styled.p`
 const JobCardTitle = styled.h2`
   font-size: 1.9rem;
   font-weight: 700;
-  color: rgb(var(--text));
+  color: #0f172a;
   margin-bottom: 1.6rem;
   line-height: 1.3;
 `;
@@ -787,14 +865,14 @@ const JobMeta = styled.dl`
 `;
 const JobMetaRow = styled.dt`
   font-size: 1.4rem;
-  color: rgba(var(--text), 0.75);
+  color: #475569;
   display: flex;
   align-items: center;
   gap: 0.7rem;
 `;
 const MetaIcon = styled.span`
   font-size: 1.2rem;
-  color: rgba(var(--text), 0.4);
+  color: #94a3b8;
   flex-shrink: 0;
   width: 1.6rem;
 `;
@@ -821,7 +899,7 @@ const HelpTitle = styled.p`
 const HelpText = styled.p`
   font-size: 1.4rem;
   line-height: 1.6;
-  color: rgba(var(--text), 0.75);
+  color: #475569;
 `;
 const HelpEmail = styled.a`
   color: rgb(255, 125, 0);
@@ -831,7 +909,7 @@ const HelpEmail = styled.a`
 
 const BackLink = styled(Link)`
   font-size: 1.4rem;
-  color: rgba(var(--text), 0.5);
+  color: #64748b;
   text-decoration: none;
   &:hover { color: rgb(255, 125, 0); }
 `;
@@ -856,28 +934,12 @@ const FormHeading = styled.h1`
 
 const AuthNotice = styled.div`
   font-size: 1.4rem;
-  color: rgba(var(--text), 0.8);
-  background: rgba(34, 197, 94, 0.07);
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
   border-radius: 0.7rem;
   padding: 1rem 1.4rem;
-  margin-bottom: 2.4rem;
-`;
-const GuestNotice = styled.div`
-  font-size: 1.4rem;
-  color: rgba(var(--text), 0.75);
-  background: rgba(255, 125, 0, 0.05);
-  border: 1px solid rgba(255, 125, 0, 0.15);
-  border-radius: 0.7rem;
-  padding: 1rem 1.4rem;
-  margin-bottom: 2.4rem;
-  line-height: 1.6;
-`;
-const GuestSignInLink = styled(Link)`
-  color: rgb(255, 125, 0);
-  text-decoration: none;
-  font-weight: 600;
-  &:hover { text-decoration: underline; }
+  margin-bottom: 1.6rem;
 `;
 
 const AppForm = styled.form`
@@ -937,7 +999,7 @@ const Req = styled.span`color: rgb(255, 125, 0); margin-left: 0.2rem;`;
 const Opt = styled.span`
   font-size: 1.2rem;
   font-weight: 400;
-  color: rgba(var(--text), 0.4);
+  color: #94a3b8;
   margin-left: 0.4rem;
 `;
 
@@ -998,9 +1060,9 @@ const FilePickBtn = styled.button<{ $selected?: boolean }>`
   padding: 0.9rem 1.6rem;
   font-size: 1.4rem;
   font-weight: 600;
-  background: ${({ $selected }) => ($selected ? 'rgba(34,197,94,0.12)' : 'rgb(var(--cardBackground))')};
-  color: ${({ $selected }) => ($selected ? 'rgb(22,163,74)' : 'rgb(var(--text))')};
-  border: 1.5px dashed ${({ $selected }) => ($selected ? 'rgb(34,197,94)' : 'rgba(var(--text),0.35)')};
+  background: ${({ $selected }) => ($selected ? '#f0fdf4' : '#f8fafc')};
+  color: ${({ $selected }) => ($selected ? '#166534' : '#334155')};
+  border: 1.5px dashed ${({ $selected }) => ($selected ? '#86efac' : '#cbd5e1')};
   border-radius: 0.7rem;
   cursor: pointer;
   max-width: 40rem;
@@ -1012,7 +1074,7 @@ const FilePickBtn = styled.button<{ $selected?: boolean }>`
 `;
 const ClearBtn = styled.button`
   font-size: 1.3rem;
-  color: rgba(var(--text), 0.4);
+  color: #94a3b8;
   background: none;
   border: none;
   cursor: pointer;
@@ -1021,7 +1083,7 @@ const ClearBtn = styled.button`
 `;
 const FileHint = styled.p`
   font-size: 1.2rem;
-  color: rgba(var(--text), 0.4);
+  color: #94a3b8;
 `;
 
 // Consent
@@ -1041,7 +1103,7 @@ const ConsentCheck = styled.input`
 const ConsentLabel = styled.label`
   font-size: 1.4rem;
   line-height: 1.65;
-  color: rgba(var(--text), 0.8);
+  color: #334155;
   cursor: pointer;
 `;
 
@@ -1069,7 +1131,7 @@ const SubmitRow = styled.div`
 
 const CancelLink = styled(Link)`
   font-size: 1.4rem;
-  color: rgba(var(--text), 0.55);
+  color: #64748b;
   text-decoration: none;
   &:hover { color: rgb(255, 125, 0); }
 `;
@@ -1089,6 +1151,75 @@ const SubmitBtn = styled.button`
     transform: translateY(-1px);
   }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
+`;
+
+// Resume quick-start
+const ResumeStartBox = styled.div`
+  background: #f0f9ff;
+  border: 1.5px solid #bae6fd;
+  border-radius: 1rem;
+  padding: 2rem 2.4rem;
+  margin-bottom: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+const ResumeStartTitle = styled.p`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+`;
+const ResumeStartDesc = styled.p`
+  font-size: 1.4rem;
+  color: #0c4a6e;
+  line-height: 1.6;
+  margin: 0;
+`;
+const ResumeStartRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+const ResumePickBtn = styled.button<{ $selected?: boolean }>`
+  padding: 1rem 2rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  background: ${({ $selected }) => ($selected ? '#f0fdf4' : '#0369a1')};
+  color: ${({ $selected }) => ($selected ? '#166534' : '#ffffff')};
+  border: 1.5px solid ${({ $selected }) => ($selected ? '#86efac' : '#0369a1')};
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  &:hover:not(:disabled) { background: ${({ $selected }) => ($selected ? '#dcfce7' : '#0284c7')}; }
+  &:disabled { opacity: 0.7; cursor: not-allowed; }
+`;
+const AutofillBanner = styled.div`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.6rem;
+  padding: 0.9rem 1.2rem;
+`;
+const ParseErrorMsg = styled.p`
+  font-size: 1.3rem;
+  color: #9a3412;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 0.6rem;
+  padding: 0.8rem 1.2rem;
+  margin: 0;
+`;
+const ResumeHint = styled.p`
+  font-size: 1.2rem;
+  color: #64748b;
+  margin: 0;
 `;
 
 // Success state
@@ -1117,12 +1248,12 @@ const SuccessIconWrap = styled.div`
 const SuccessTitle = styled.h1`
   font-size: 3rem;
   font-weight: 700;
-  color: rgb(var(--text));
+  color: #0f172a;
 `;
 const SuccessBody = styled.p`
   font-size: 1.6rem;
   line-height: 1.75;
-  color: rgba(var(--text), 0.75);
+  color: #475569;
   max-width: 50rem;
 `;
 const SuccessActions = styled.div`
@@ -1147,10 +1278,10 @@ const SuccessLinkSecondary = styled(Link)`
   padding: 1rem 2.4rem;
   font-size: 1.5rem;
   font-weight: 600;
-  color: rgba(var(--text), 0.7);
-  border: 1.5px solid rgba(var(--text), 0.2);
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
   border-radius: 0.8rem;
   text-decoration: none;
   transition: border-color 0.2s;
-  &:hover { border-color: rgba(var(--text), 0.5); }
+  &:hover { border-color: #94a3b8; }
 `;

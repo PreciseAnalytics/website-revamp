@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@accessible/drawer": "^3.0.2",
+    "@anthropic-ai/sdk": "^0.100.1",
     "@fontsource/inter": "^5.0.18",
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@next/third-parties": "^16.1.1",

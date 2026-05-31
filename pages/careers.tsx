@@ -251,10 +251,12 @@ const AuthBar = styled.div`
   gap: 1.2rem;
   flex-wrap: wrap;
   padding: 1.2rem 1.8rem;
-  background: rgba(255, 125, 0, 0.05);
-  border: 1px solid rgba(255, 125, 0, 0.15);
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-left: 4px solid rgb(255, 125, 0);
   border-radius: 0.8rem;
   margin-bottom: 3rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 `;
 
 const PageHeader = styled.header`
@@ -330,22 +332,22 @@ const AuthBarLeft = styled.div`
 
 const AuthBarText = styled.p`
   font-size: 1.4rem;
-  color: rgba(var(--text), 0.85);
+  color: #334155;
 `;
 
 const AuthBarBtn = styled.button`
   padding: 0.65rem 1.6rem;
   font-size: 1.4rem;
   font-weight: 700;
-  background: #ffffff;
-  color: #111827;
-  border: none;
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1.5px solid #cbd5e1;
   border-radius: 0.6rem;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.2s, transform 0.15s;
   &:hover {
-    background: #f3f4f6;
+    background: #e2e8f0;
     transform: translateY(-1px);
   }
 `;
@@ -370,30 +372,34 @@ const AuthBarLink = styled.button`
   padding: 0.55rem 1.3rem;
   font-size: 1.35rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
   border-radius: 0.6rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.6);
-    color: #fff;
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
   }
 `;
 
 const AuthBarProfileLink = styled(Link)`
-  font-size: 1.3rem;
-  color: rgb(255, 125, 0);
-  background: none;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgb(255, 125, 0);
   border: none;
+  border-radius: 0.6rem;
+  padding: 0.55rem 1.3rem;
   cursor: pointer;
   text-decoration: none;
-  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s;
   &:hover {
-    text-decoration: underline;
+    background: rgb(230, 100, 0);
   }
 `;
 

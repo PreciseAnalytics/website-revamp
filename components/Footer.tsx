@@ -3,6 +3,7 @@ import { media } from 'utils/media';
 import Link from 'next/link';
 import Container from 'components/Container';
 import Image from 'next/image';
+import AnimatedLogo from 'components/AnimatedLogo';
 
 export default function Footer() {
   return (
@@ -14,21 +15,32 @@ export default function Footer() {
             <LogoArea>
               <Logo href="/">
                 <span className="sr-only">Home</span>
-                <LogoImage>
-                  <Image
-                    src="/logo.png"
-                    alt="Precise Analytics"
-                    width={180}
-                    height={60}
-                    style={{ objectFit: 'contain' }}
-                    priority
-                  />
-                </LogoImage>
+                <AnimatedLogo size="8rem" />
               </Logo>
               <Tagline>
-                Transforming complex data into actionable insights through cutting-edge analytics,
-                advanced analytics, custom dashboards, and AI/ML technologies.
+                End-to-end data engineering, BI, and AI delivery for government and commercial clients — from raw pipeline to production.
               </Tagline>
+              <CertBadges>
+                <CertBadge>
+                  <Image
+                    src="/Veteran-Owned-Certified.png"
+                    alt="VOSB Certified"
+                    width={70}
+                    height={46}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </CertBadge>
+                <CertBadge>
+                  <Image
+                    src="/SWAM_LOGO.jpg"
+                    alt="SWaM Certified"
+                    width={70}
+                    height={46}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </CertBadge>
+              </CertBadges>
+              <CertText>GSA Schedule Holder &nbsp;·&nbsp; NAICS Compliance</CertText>
             </LogoArea>
             <ContactInfo>
               <ContactItem>
@@ -53,14 +65,14 @@ export default function Footer() {
             </FooterLinks>
           </FooterSection>
 
-          {/* Industries */}
+          {/* Work & Insights */}
           <FooterSection>
-            <SectionTitle>Industries</SectionTitle>
+            <SectionTitle>Work</SectionTitle>
             <FooterLinks>
-              <FooterLink href="/services">View Services</FooterLink>
-              <FooterLink href="/contact">Contact Us</FooterLink>
-              <FooterLink href="/about-us">About</FooterLink>
-              <FooterLink href="/careers">Careers</FooterLink>
+              <FooterLink href="/work/federal-healthcare-pipeline">Federal Healthcare Pipeline</FooterLink>
+              <FooterLink href="/work/financial-services-reporting">Financial Services Reporting</FooterLink>
+              <FooterLink href="/work/ai-training-at-scale">AI Training at Scale</FooterLink>
+              <FooterLink href="/insights">Insights Blog</FooterLink>
             </FooterLinks>
           </FooterSection>
 
@@ -73,6 +85,9 @@ export default function Footer() {
               <FooterLink href="/careers">Careers</FooterLink>
               <FooterLink href="/schedule-consult">Schedule a Consult</FooterLink>
               <FooterLink href="/capabilities-statement">Capabilities Statement</FooterLink>
+              <FooterLink href="/faq">FAQ</FooterLink>
+              <FooterLink href="/assessment">Data Maturity Assessment</FooterLink>
+              <FooterLink href="/compare">How We Compare →</FooterLink>
             </FooterLinks>
           </FooterSection>
 
@@ -114,7 +129,7 @@ export default function Footer() {
 
         <BottomBar>
           <Copyright>
-            © {new Date().getFullYear()} Precise Analytics LLC. All rights reserved.
+            © {new Date().getFullYear()} Precise Analytics. Veteran-Owned Small Business. &nbsp;·&nbsp; GSA Schedule Holder &nbsp;·&nbsp; NAICS Compliant &nbsp;·&nbsp; Security Clearance Ready
           </Copyright>
         </BottomBar>
       </Container>
@@ -273,4 +288,28 @@ const BottomBar = styled.div`
 const Copyright = styled.p`
   font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.6);
+`;
+
+const CertBadges = styled.div`
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  margin-top: 1.8rem;
+  flex-wrap: wrap;
+`;
+
+const CertBadge = styled.div`
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.6rem;
+  padding: 0.4rem 0.8rem;
+  display: flex;
+  align-items: center;
+`;
+
+const CertText = styled.p`
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.8rem;
+  letter-spacing: 0.03em;
 `;

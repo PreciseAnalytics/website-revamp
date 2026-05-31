@@ -30,7 +30,7 @@ function CalendlyWidgetComponent() {
   return (
     <div
       className="calendly-inline-widget"
-      data-url="https://calendly.com/contact-preciseanalytics/initial-consultation?back=1&month=2025-06"
+      data-url="https://calendly.com/contact-preciseanalytics/initial-consultation?back=1"
       style={{ minWidth: '320px', height: '900px' }}
     />
   );
@@ -197,8 +197,20 @@ function ScrollAssist() {
   );
 }
 
+const SERVICE_MAP: Record<string, string> = {
+  'data-engineering': 'data-engineering',
+  'business-intelligence': 'business-intelligence',
+  'ai-ml': 'ai-ml',
+  'ai-training': 'ai-training-labor',
+  'ai-training-labor': 'ai-training-labor',
+};
+
 export default function ScheduleConsult() {
   const router = useRouter();
+  const { lead, case: caseParam, service } = router.query as Record<string, string>;
+
+  const isChecklistLead = lead === 'checklist';
+  const preSelectedService = service ? (SERVICE_MAP[service] ?? '') : '';
 
   const goBackToServices = () => {
     router.push('/services');
@@ -211,14 +223,10 @@ export default function ScheduleConsult() {
   return (
     <>
       <Head>
-        <title>{`Schedule a Consultation - ${EnvVars.SITE_NAME}`}</title>
+        <title>Schedule a Consultation | Precise Analytics | VOSB Data Engineering & AI</title>
         <meta
           name="description"
-          content="Schedule a free consultation with Precise Analytics to discover how data can drive your mission forward."
-        />
-        <meta
-          name="keywords"
-          content="consultation, data analytics consultation, business meeting, Precise Analytics, free consultation"
+          content="Schedule a free consultation with Precise Analytics. Veteran-owned data engineering, BI, and AI delivery firm serving government and commercial clients."
         />
       </Head>
       <AnimatedHeader />
@@ -322,6 +330,45 @@ export default function ScheduleConsult() {
                   </ContactItem>
                 </ContactList>
               </ContactCard>
+
+              <QualificationCard>
+                <CardTitle>Tell Us About Your Needs</CardTitle>
+                {isChecklistLead && (
+                  <ChecklistNotice>
+                    ✓ Checklist request received — we&apos;ll send it to you after scheduling.
+                  </ChecklistNotice>
+                )}
+                <QualificationForm>
+                  <QualField>
+                    <QualLabel htmlFor="service-interest">I&apos;m interested in...</QualLabel>
+                    <QualSelect id="service-interest" name="service-interest" defaultValue={preSelectedService}>
+                      <option value="" disabled>Select a service area</option>
+                      <option value="data-engineering">Data Engineering</option>
+                      <option value="business-intelligence">Business Intelligence</option>
+                      <option value="ai-ml">AI &amp; Machine Learning</option>
+                      <option value="ai-training-labor">AI Training Labor</option>
+                      <option value="multiple">Multiple Services</option>
+                      <option value="not-sure">Not Sure Yet</option>
+                    </QualSelect>
+                  </QualField>
+                  <QualField>
+                    <QualLabel htmlFor="timeline">My timeline is...</QualLabel>
+                    <QualSelect id="timeline" name="timeline" defaultValue="">
+                      <option value="" disabled>Select your timeline</option>
+                      <option value="immediate">Immediate</option>
+                      <option value="3-6-months">3–6 months</option>
+                      <option value="6-12-months">6–12 months</option>
+                      <option value="exploring">Just exploring</option>
+                    </QualSelect>
+                  </QualField>
+                  <QualCheckboxRow>
+                    <QualCheckbox type="checkbox" id="gov-rep" name="gov-rep" />
+                    <QualCheckboxLabel htmlFor="gov-rep">
+                      I represent a government agency or government contractor
+                    </QualCheckboxLabel>
+                  </QualCheckboxRow>
+                </QualificationForm>
+              </QualificationCard>
 
               <DSBDCard>
                 <CardTitle>Data Strategy & Business Development (DSBD)</CardTitle>
@@ -951,4 +998,75 @@ const RelatedLink = styled(Link)`
     background: rgba(255, 125, 0, 0.08);
     border-color: rgb(255, 125, 0);
   }
+`;
+
+const QualificationCard = styled(InfoCard)`
+  border: 1px solid rgba(255, 125, 0, 0.25);
+`;
+
+const ChecklistNotice = styled.div`
+  background: rgba(255, 125, 0, 0.08);
+  border: 1px solid rgba(255, 125, 0, 0.3);
+  border-radius: 0.8rem;
+  padding: 1.2rem 1.6rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  margin-bottom: 1.6rem;
+`;
+
+const QualificationForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+`;
+
+const QualField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+`;
+
+const QualLabel = styled.label`
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgba(var(--text), 0.75);
+`;
+
+const QualSelect = styled.select`
+  padding: 1.1rem 1.4rem;
+  font-size: 1.5rem;
+  border: 1.5px solid rgba(var(--text), 0.2);
+  border-radius: 0.8rem;
+  background: rgba(var(--background), 0.9);
+  color: rgb(var(--text));
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: rgb(255, 125, 0);
+  }
+`;
+
+const QualCheckboxRow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+`;
+
+const QualCheckbox = styled.input`
+  width: 1.8rem;
+  height: 1.8rem;
+  margin-top: 0.2rem;
+  accent-color: rgb(255, 125, 0);
+  cursor: pointer;
+  flex-shrink: 0;
+`;
+
+const QualCheckboxLabel = styled.label`
+  font-size: 1.5rem;
+  color: rgb(var(--text));
+  line-height: 1.5;
+  cursor: pointer;
 `;

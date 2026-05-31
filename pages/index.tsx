@@ -16,50 +16,67 @@ const services = [
   {
     title: 'Data Analytics',
     icon: '📊',
-    description: 'Transform raw data into actionable insights that drive informed decision-making for mission-critical operations.',
+    description: 'We build it. Transform raw data into actionable insights that drive informed decision-making for mission-critical operations.',
     features: [
       'Advanced statistical analysis',
       'Predictive modeling and forecasting',
       'Real-time data processing',
       'Custom analytics solutions',
     ],
-    buttonText: 'Unlock Your Data Insights',
+    buttonText: 'Unlock Your Data Insights →',
+    href: null,
   },
   {
     title: 'Business Intelligence',
     icon: '📈',
-    description: 'Custom dashboards and reporting solutions that provide real-time visibility into your business performance.',
+    description: 'We surface it. Custom dashboards and reporting solutions that provide real-time visibility into your business performance.',
     features: [
       'Interactive dashboards',
       'Automated reporting systems',
       'KPI tracking and monitoring',
       'Executive decision support',
     ],
-    buttonText: 'Build Smart Dashboards',
+    buttonText: 'Build Smart Dashboards →',
+    href: null,
   },
   {
     title: 'AI/ML Solutions',
     icon: '🤖',
-    description: 'Advanced machine learning models and artificial intelligence solutions for predictive analytics and automation.',
+    description: 'We automate it. Advanced machine learning models and AI solutions for predictive analytics and intelligent automation.',
     features: [
       'Machine learning algorithms',
       'Natural language processing',
       'Computer vision applications',
       'Automated decision systems',
     ],
-    buttonText: 'Explore AI Solutions',
+    buttonText: 'Explore AI Solutions →',
+    href: null,
   },
   {
     title: 'Data Engineering',
     icon: '⚙️',
-    description: 'Robust data pipeline architecture and infrastructure solutions that ensure reliable, scalable data flow.',
+    description: 'We build it. Robust data pipeline architecture and infrastructure solutions that ensure reliable, scalable data flow.',
     features: [
       'ETL/ELT pipeline development',
       'Cloud data architecture',
       'Data warehouse design',
       'Real-time streaming solutions',
     ],
-    buttonText: 'Engineer Your Data Pipeline',
+    buttonText: 'Engineer Your Pipeline →',
+    href: null,
+  },
+  {
+    title: 'AI Training & Annotation',
+    icon: '🧠',
+    description: 'Domain-expert annotation teams for RLHF, preference comparison, and model training — with industry-leading 98% inter-annotator agreement.',
+    features: [
+      'RLHF preference comparisons',
+      'Domain expertise: STEM, legal, coding',
+      '98% inter-annotator agreement',
+      'Scalable annotation teams',
+    ],
+    buttonText: 'Scale Your AI Team →',
+    href: '/services/ai-training-annotation',
   },
 ];
 
@@ -68,21 +85,25 @@ const industries = [
     name: 'Government & Federal',
     description: 'Specialized analytics solutions for government agencies with security clearance and compliance expertise.',
     icon: '🏛️',
+    slug: 'government',
   },
   {
     name: 'Healthcare & Life Sciences',
     description: 'HIPAA-compliant analytics for medical data, patient outcomes, and operational efficiency.',
     icon: '🏥',
+    slug: 'healthcare',
   },
   {
     name: 'Financial Services',
     description: 'Risk analysis, fraud detection, and regulatory compliance solutions for financial institutions.',
     icon: '🏦',
+    slug: 'financial-services',
   },
   {
     name: 'Manufacturing',
     description: 'Operational efficiency optimization and supply chain analytics for manufacturing companies.',
     icon: '🏭',
+    slug: 'manufacturing',
   },
 ];
 
@@ -245,10 +266,49 @@ export default function HomePage() {
     <>
       <Head>
         <StructuredData />
-        <title>{`${EnvVars.SITE_NAME} - Data Analytics Solutions`}</title>
+        <title>VOSB Data Engineering &amp; AI Firm | Precise Analytics | Federal &amp; Commercial</title>
         <meta
           name="description"
-          content="Veteran-owned data analytics company providing comprehensive solutions for government and commercial clients. VOSB and SWaM certified."
+          content="Veteran-owned data engineering, BI, and AI delivery firm. We don't just recommend — we deploy. Serving government and commercial clients with production-ready analytics and AI training labor."
+        />
+        <meta property="og:title" content="VOSB Data Engineering & AI Firm | Precise Analytics | Federal & Commercial" />
+        <meta property="og:description" content="Veteran-owned data engineering, BI, and AI delivery firm. We don't just recommend — we deploy. Production-ready analytics and AI training labor." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://preciseanalytics.io/" />
+        <meta property="og:image" content="https://preciseanalytics.io/og-images/homepage.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="VOSB Data Engineering & AI Firm | Precise Analytics" />
+        <meta name="twitter:description" content="We don't just recommend — we deploy. End-to-end data engineering, BI, and AI delivery." />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Precise Analytics',
+              url: 'https://preciseanalytics.io',
+              logo: 'https://preciseanalytics.io/Favicon/apple-touch-icon.png',
+              description: 'Veteran-owned data engineering, BI, and AI delivery firm serving government and commercial clients.',
+              foundingDate: '2020',
+              sameAs: ['https://www.linkedin.com/company/precise-analytics-llc/'],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                telephone: '+1-804-396-4148',
+                contactType: 'customer service',
+                email: 'contact@preciseanalytics.io',
+              },
+              hasOfferCatalog: {
+                '@type': 'OfferCatalog',
+                name: 'Data Engineering & AI Services',
+                itemListElement: [
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Data Engineering' } },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Business Intelligence' } },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'AI/ML Solutions' } },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'AI Training & Annotation' } },
+                ],
+              },
+            }),
+          }}
         />
       </Head>
 
@@ -260,19 +320,14 @@ export default function HomePage() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <HeroSection>
               <HeroContent>
-                <HeroTitle>Faster Decisions.<br />Cleaner Data.<br />AI That Works.</HeroTitle>
-                <HeroSubtitle>Data Engineering, Business Intelligence, and AI Delivery</HeroSubtitle>
-                <HeroDescription>
-                  Precise Analytics delivers end-to-end data engineering, analytics, and AI solutions for
-                  government and commercial clients — from raw pipeline to production-ready insight.
-                  We also supply skilled AI training labor to the platforms building tomorrow&apos;s models.
-                </HeroDescription>
+                <HeroTitle>We Don&apos;t Just Recommend.<br />We Deploy.</HeroTitle>
+                <HeroSubtitle>End-to-end data engineering, BI, and AI delivery for government and commercial clients — from raw pipeline to production, backed by veteran leadership and a 40% average latency reduction across deployed projects.</HeroSubtitle>
                 <HeroButtons>
-                  <PrimaryButton onClick={() => handleGetStartedClick('Consultation')}>
-                    Schedule a Free Consultation
+                  <PrimaryButton as="a" href="#case-studies">
+                    See Our Results
                   </PrimaryButton>
-                  <SecondaryButtonLink onClick={handleLearnMoreClick}>
-                    See Our Work
+                  <SecondaryButtonLink as="a" href="/schedule-consult">
+                    Schedule a Consultation
                   </SecondaryButtonLink>
                 </HeroButtons>
               </HeroContent>
@@ -302,10 +357,44 @@ export default function HomePage() {
             </MetricsBar>
           </motion.div>
 
+          {/* Trust Bar */}
+          <TrustBar>
+            <TrustBarText>Trusted by Federal Agencies, Financial Institutions, and AI Platform Companies</TrustBarText>
+            <TrustBadges>
+              <TrustBadge>
+                <Image src="/Veteran-Owned-Certified.png" alt="VOSB Certified" width={60} height={40} style={{ objectFit: 'contain' }} />
+                <TrustBadgeLabel>VOSB Certified</TrustBadgeLabel>
+              </TrustBadge>
+              <TrustBadgeDivider />
+              <TrustBadge>
+                <Image src="/SWAM_LOGO.jpg" alt="SWaM Certified" width={60} height={40} style={{ objectFit: 'contain' }} />
+                <TrustBadgeLabel>SWaM Certified</TrustBadgeLabel>
+              </TrustBadge>
+              <TrustBadgeDivider />
+              <TrustBadge>
+                <TrustBadgeIcon>🏛️</TrustBadgeIcon>
+                <TrustBadgeLabel>GSA Schedule Holder</TrustBadgeLabel>
+              </TrustBadge>
+            </TrustBadges>
+          </TrustBar>
+
+          {/* Lead Magnet Section */}
+          <LeadMagnetSection>
+            <LeadMagnetContent>
+              <LeadMagnetHeadline>Is Your Data Infrastructure Ready for Production?</LeadMagnetHeadline>
+              <LeadMagnetSubhead>
+                Download our free checklist: <strong>5 Signs Your ETL Pipeline Is Costing You $100K+</strong> — and learn where your data stack is leaking value.
+              </LeadMagnetSubhead>
+              <LeadMagnetCTA href="/schedule-consult?lead=checklist">
+                Download the Checklist
+              </LeadMagnetCTA>
+            </LeadMagnetContent>
+          </LeadMagnetSection>
+
           {/* Services Section */}
           <ServicesSection>
             <SectionTitle>Our Services</SectionTitle>
-            <SectionSubtitle>Comprehensive data analytics solutions tailored to your mission</SectionSubtitle>
+            <SectionSubtitle>From Raw Pipeline to Production. We Handle Every Layer.</SectionSubtitle>
             
             <ServiceCardsGrid>
               {services.map((service) => (
@@ -313,7 +402,7 @@ export default function HomePage() {
                   <ServiceIcon>{service.icon}</ServiceIcon>
                   <ServiceTitle>{service.title}</ServiceTitle>
                   <ServiceDescription>{service.description}</ServiceDescription>
-                  
+
                   <FeaturesSection>
                     <FeaturesTitle>Key Capabilities:</FeaturesTitle>
                     <FeaturesList>
@@ -323,18 +412,22 @@ export default function HomePage() {
                     </FeaturesList>
                   </FeaturesSection>
 
-                  <LearnMoreButton onClick={() => handleGetStartedClick(service.title)}>
-                    {service.buttonText}
-                  </LearnMoreButton>
+                  {service.href ? (
+                    <LearnMoreLink href={service.href}>{service.buttonText}</LearnMoreLink>
+                  ) : (
+                    <LearnMoreButton onClick={() => handleGetStartedClick(service.title)}>
+                      {service.buttonText}
+                    </LearnMoreButton>
+                  )}
                 </ServiceCard>
               ))}
             </ServiceCardsGrid>
           </ServicesSection>
 
           {/* Case Studies Section */}
-          <CaseStudiesSection>
-            <SectionTitle>Results We&apos;ve Delivered</SectionTitle>
-            <SectionSubtitle>Measurable outcomes across government and commercial engagements</SectionSubtitle>
+          <CaseStudiesSection id="case-studies">
+            <SectionTitle>Deployed. Not Deckware.</SectionTitle>
+            <SectionSubtitle>Production results we&apos;ve shipped for government and commercial clients.</SectionSubtitle>
             <CaseStudyGrid>
               <CaseStudyCard>
                 <CaseStudyTag>Federal Healthcare</CaseStudyTag>
@@ -350,6 +443,7 @@ export default function HomePage() {
                   <CaseTag>AWS</CaseTag>
                   <CaseTag>HIPAA</CaseTag>
                 </CaseStudyTags>
+                <CaseStudyReadMore href="/work/federal-healthcare-pipeline">Read the full case study →</CaseStudyReadMore>
               </CaseStudyCard>
 
               <CaseStudyCard>
@@ -366,6 +460,7 @@ export default function HomePage() {
                   <CaseTag>Power BI</CaseTag>
                   <CaseTag>Automation</CaseTag>
                 </CaseStudyTags>
+                <CaseStudyReadMore href="/work/financial-services-reporting">Read the full case study →</CaseStudyReadMore>
               </CaseStudyCard>
 
               <CaseStudyCard>
@@ -382,13 +477,14 @@ export default function HomePage() {
                   <CaseTag>AI Training</CaseTag>
                   <CaseTag>Quality Assurance</CaseTag>
                 </CaseStudyTags>
+                <CaseStudyReadMore href="/work/ai-training-at-scale">Read the full case study →</CaseStudyReadMore>
               </CaseStudyCard>
             </CaseStudyGrid>
           </CaseStudiesSection>
 
           {/* Certifications Section */}
           <CertificationsSection>
-            <SectionTitle>Certifications & Qualifications</SectionTitle>
+            <SectionTitle>Contract-Ready. Veteran-Led.</SectionTitle>
             <SectionSubtitle>Trusted partner for government and commercial projects</SectionSubtitle>
             
             <CertGrid>
@@ -471,6 +567,7 @@ export default function HomePage() {
                   <IndustryIcon>{industry.icon}</IndustryIcon>
                   <IndustryName>{industry.name}</IndustryName>
                   <IndustryDescription>{industry.description}</IndustryDescription>
+                  <IndustryCTA href={`/industries/${industry.slug}`}>See {industry.name} Solutions →</IndustryCTA>
                 </IndustryCard>
               ))}
             </IndustriesGrid>
@@ -776,11 +873,14 @@ const SectionSubtitle = styled.p`
 
 const ServiceCardsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 3rem;
-  max-width: 120rem;
+  max-width: 130rem;
   margin: 0 auto;
+
+  ${media.desktop(`
+    grid-template-columns: repeat(2, 1fr);
+  `)}
 
   ${media.tablet(`
     grid-template-columns: 1fr;
@@ -1296,4 +1396,182 @@ const StatusMessage = styled(motion.div)<{ success: boolean }>`
     font-size: 1.6rem;
     padding: 2rem;
   `)}
+`;
+
+const LeadMagnetSection = styled.section`
+  background: linear-gradient(135deg, rgba(255, 125, 0, 0.08) 0%, rgba(255, 165, 0, 0.04) 100%);
+  border: 1px solid rgba(255, 125, 0, 0.25);
+  border-radius: 1.6rem;
+  padding: 4rem;
+  margin-bottom: 4rem;
+  text-align: center;
+
+  ${media.tablet(`
+    padding: 2.5rem 2rem;
+  `)}
+`;
+
+const LeadMagnetContent = styled.div`
+  max-width: 72rem;
+  margin: 0 auto;
+`;
+
+const LeadMagnetHeadline = styled.h2`
+  font-size: 3rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 1.2rem;
+
+  ${media.tablet(`
+    font-size: 2.4rem;
+  `)}
+`;
+
+const LeadMagnetSubhead = styled.p`
+  font-size: 1.8rem;
+  line-height: 1.6;
+  color: rgba(var(--text), 0.75);
+  margin-bottom: 2.4rem;
+
+  strong {
+    color: rgb(255, 125, 0);
+  }
+
+  ${media.tablet(`
+    font-size: 1.6rem;
+  `)}
+`;
+
+const LeadMagnetCTA = styled.a`
+  display: inline-block;
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  padding: 1.4rem 3.2rem;
+  border-radius: 0.8rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 125, 0, 0.35);
+  }
+`;
+
+const CaseStudyReadMore = styled.a`
+  display: inline-block;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  text-decoration: none;
+  margin-top: 0.5rem;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: rgb(255, 165, 0);
+    text-decoration: underline;
+  }
+`;
+
+const TrustBar = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.4rem 3rem;
+  background: rgba(var(--cardBackground), 0.4);
+  border: 1px solid rgba(var(--text), 0.08);
+  border-radius: 1.2rem;
+  margin-bottom: 2.4rem;
+
+  ${media.tablet(`
+    padding: 2rem;
+  `)}
+`;
+
+const TrustBarText = styled.p`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(var(--text), 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+`;
+
+const TrustBadges = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const TrustBadge = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+`;
+
+const TrustBadgeDivider = styled.div`
+  width: 1px;
+  height: 4rem;
+  background: rgba(var(--text), 0.12);
+  flex-shrink: 0;
+
+  ${media.tablet(`display: none;`)}
+`;
+
+const TrustBadgeIcon = styled.div`
+  font-size: 2.8rem;
+`;
+
+const TrustBadgeLabel = styled.span`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(var(--text), 0.6);
+  text-align: center;
+`;
+
+const LearnMoreLink = styled.a`
+  margin-top: 2rem;
+  padding: 1.2rem 2rem;
+  font-size: 1.6rem;
+  font-weight: 600;
+  border: 2px solid rgb(255, 125, 0);
+  background: transparent;
+  color: rgb(255, 125, 0);
+  border-radius: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+
+  &:hover {
+    background: rgb(255, 125, 0);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  ${media.tablet(`
+    padding: 1rem 1.5rem;
+    font-size: 1.4rem;
+  `)}
+`;
+
+const IndustryCTA = styled.a`
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgb(255, 125, 0);
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: rgb(255, 165, 0);
+    text-decoration: underline;
+  }
 `;

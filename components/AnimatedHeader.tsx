@@ -14,10 +14,10 @@ import CloseIcon from 'components/CloseIcon';
 const LINKS = [
   { label: 'About', href: '/about-us' },
   { label: 'Services', href: '/services' },
-  { label: 'Solutions', href: '/solutions' },
-  { label: 'Capabilities Statement', href: '/capabilities-statement' },
+  { label: 'Work', href: '/work' },
+  { label: 'Insights', href: '/insights' },
   { label: 'Sectors', href: '/sectors' },
-  { label: 'AI Workforce Solutions', href: '/ai-training', badge: 'NEW' },
+  { label: 'AI Training', href: '/ai-training', badge: 'NEW' },
   { label: 'Careers', href: '/careers' },
 ];
 

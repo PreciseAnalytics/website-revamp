@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 import { GlobalStyle } from '@/components/GlobalStyles';
 import AnimatedFooter from 'components/AnimatedFooter';
 import CanonicalTag from '@/components/CanonicalTag';
+import ExitIntentPopup from 'components/ExitIntentPopup';
 
 // Cookie consent
 import CookieConsent from '@/components/CookieConsent';
@@ -60,7 +61,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           }}
         />
 
-        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/Favicon/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/Favicon/favicon-16x16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/Favicon/apple-touch-icon.png" />
+        <link rel="manifest" href="/Favicon/site.webmanifest" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="theme-color" content="#0F172A" />
       </Head>
@@ -73,6 +78,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
           <AnimatedFooter />
           <CookieConsent />
+          <ExitIntentPopup />
         </Providers>
       </LazyMotion>
     </>

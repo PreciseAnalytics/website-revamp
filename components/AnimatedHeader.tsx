@@ -26,12 +26,16 @@ const HeaderWrapper = styled.header<{ $isScrolled: boolean }>`
   top: 0;
   width: 100%;
   z-index: var(--z-navbar);
-  background: ${(p) => p.$isScrolled ? 'rgba(var(--navbarBackground), 0.8)' : 'rgba(var(--navbarBackground), 0)'};
-  backdrop-filter: ${(p) => (p.$isScrolled ? 'blur(10px)' : 'none')};
-  box-shadow: ${(p) => (p.$isScrolled ? 'var(--shadow-md)' : 'none')};
-  transition: all 0.3s ease-in-out;
+  background: ${(p) =>
+    p.$isScrolled
+      ? 'rgba(10, 18, 35, 0.95)'
+      : 'rgba(10, 18, 35, 0.72)'};
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: ${(p) => (p.$isScrolled ? '0 2px 20px rgba(0,0,0,0.4)' : '0 1px 0 rgba(255,255,255,0.06)')};
+  transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out, padding 0.3s ease-in-out;
   padding: ${(p) => (p.$isScrolled ? '0.4rem 0' : '0.65rem 0')};
-  border-bottom: ${(p) => (p.$isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none')};
+  border-bottom: 1px solid ${(p) => (p.$isScrolled ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.06)')};
 `;
 
 const HeaderPane = styled(Container)`
@@ -136,7 +140,7 @@ const NavItem = styled.li`
 `;
 
 const NavLinkText = styled(Link)<{ $active: boolean }>`
-  color: ${(p) => (p.$active ? 'rgb(var(--accent))' : 'rgb(var(--text))')};
+  color: ${(p) => (p.$active ? 'rgb(255, 140, 43)' : 'rgba(255, 255, 255, 0.92)')};
   font-weight: 600;
   font-size: 1.6rem;
   padding: 0.5rem 0;
@@ -145,9 +149,10 @@ const NavLinkText = styled(Link)<{ $active: boolean }>`
   white-space: nowrap;
   text-decoration: none;
   display: inline-block;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 
   &:hover {
-    color: rgb(var(--accent));
+    color: rgb(255, 140, 43);
   }
 
   ${media.desktop(`

@@ -6,35 +6,119 @@ import { media } from 'utils/media';
 import NextLink from 'next/link';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
+import AnimatedBackground from 'components/AnimatedBackground';
 
 const sectors = [
   {
+    id: 'federal-government',
+    name: 'Federal Government',
+    color: '#4a9eff',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/>
+      </svg>
+    ),
+    headline: 'GSA Schedule · Clearance-Ready',
+    stats: [
+      { value: '12+', label: 'Federal Clients' },
+      { value: 'GSA', label: 'Contract Vehicle' },
+      { value: 'FISMA', label: 'Compliant' },
+    ],
+    capabilities: ['Data modernization', 'FISMA / FedRAMP compliance', 'Agency reporting & dashboards', 'AI/ML for mission ops'],
+    href: '/sectors/federal-government',
+  },
+  {
     id: 'healthcare',
     name: 'Healthcare',
-    title: 'Healthcare Analytics Solutions',
-    description:
-      'Transform patient care with data-driven insights, compliance reporting, and operational efficiency solutions.',
+    color: '#39ff14',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+    ),
+    headline: 'HIPAA · HL7 · FHIR',
+    stats: [
+      { value: 'HIPAA', label: 'Compliant' },
+      { value: '40%', label: 'Avg Latency Cut' },
+      { value: 'FHIR', label: 'Integration' },
+    ],
+    capabilities: ['Patient outcome analytics', 'Claims & billing intelligence', 'Operational efficiency', 'Compliance reporting'],
+    href: '/sectors/healthcare',
+  },
+  {
+    id: 'financial-services',
+    name: 'Financial Services',
+    color: '#ff8c2b',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+    ),
+    headline: 'SOC 2 · Risk · Regulatory',
+    stats: [
+      { value: 'SOC 2', label: 'Type II Ready' },
+      { value: 'Real-time', label: 'Risk Models' },
+      { value: 'AML', label: 'Fraud Detection' },
+    ],
+    capabilities: ['Risk management & modeling', 'Regulatory reporting', 'Fraud & AML analytics', 'Customer intelligence'],
+    href: '/sectors/finance',
+  },
+  {
+    id: 'defense-intel',
+    name: 'Defense & Intel',
+    color: '#a855f7',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+    headline: 'ITAR · EAR · Clearance',
+    stats: [
+      { value: 'ITAR', label: 'Compliant' },
+      { value: 'CUI', label: 'Data Handling' },
+      { value: 'SC', label: 'Cleared Staff' },
+    ],
+    capabilities: ['Classified data pipelines', 'OSINT & signal analytics', 'Mission-system integration', 'Geospatial intelligence'],
+    href: '/sectors/federal-government',
   },
   {
     id: 'manufacturing',
     name: 'Manufacturing',
-    title: 'Manufacturing Analytics',
-    description:
-      'Optimize production, reduce costs, and improve quality with advanced manufacturing analytics and IoT integration.',
+    color: '#39ff14',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M12 12v4M10 14h4"/>
+      </svg>
+    ),
+    headline: 'IoT · OEE · Supply Chain',
+    stats: [
+      { value: 'OEE', label: 'Optimization' },
+      { value: 'IoT', label: 'Integration' },
+      { value: 'SPC', label: 'Quality Control' },
+    ],
+    capabilities: ['Production analytics & OEE', 'Supply chain visibility', 'Predictive maintenance', 'Quality control SPC'],
+    href: '/sectors/manufacturing',
   },
   {
-    id: 'finance',
-    name: 'Finance',
-    title: 'Financial Technology Solutions',
-    description:
-      'Risk management, fraud detection, regulatory compliance, and customer insights for financial institutions.',
-  },
-  {
-    id: 'retail',
-    name: 'Retail',
-    title: 'Retail Analytics Solutions',
-    description:
-      'Customer behavior analysis, inventory optimization, and sales forecasting for retail excellence.',
+    id: 'ai-platforms',
+    name: 'AI Platforms',
+    color: '#ff4da6',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/>
+        <circle cx="12" cy="12" r="2.5"/>
+        <line x1="12" y1="7" x2="12" y2="9.5"/><line x1="10" y1="13.5" x2="6.5" y2="17.2"/>
+        <line x1="14" y1="13.5" x2="17.5" y2="17.2"/>
+      </svg>
+    ),
+    headline: 'RLHF · Annotation · STEM',
+    stats: [
+      { value: '98%', label: 'IAA Score' },
+      { value: 'RLHF', label: 'Specialists' },
+      { value: 'Multi', label: 'Domain Teams' },
+    ],
+    capabilities: ['Expert AI training labor', 'RLHF & preference data', 'Domain annotation (STEM, legal)', 'QA & inter-annotator QC'],
+    href: '/ai-training',
   },
 ];
 
@@ -42,304 +126,434 @@ export default function SectorsPage() {
   return (
     <>
       <Head>
-      <meta name="robots" content="index, follow" />
+        <meta name="robots" content="index, follow" />
         <title>Sectors We Serve | Precise Analytics</title>
         <meta
           name="description"
-          content="Specialized analytics for healthcare, manufacturing, finance, and retail — purpose-built for government and enterprise clients by Precise Analytics."
+          content="Specialized analytics for federal government, healthcare, finance, defense, manufacturing, and AI platforms — production-ready solutions by Precise Analytics."
         />
-        <meta
-          name="keywords"
-          content="sector analytics, healthcare analytics, retail analytics, manufacturing analytics, financial data solutions"
-        />
+        <meta name="keywords" content="sector analytics, federal analytics, healthcare data, defense intelligence, financial risk, manufacturing IoT, AI training" />
       </Head>
 
       <AnimatedHeader />
 
       <PageWrapper>
+        {/* Hero */}
         <HeroSection>
+          <BgLayer><AnimatedBackground variant="particles" /></BgLayer>
           <Container>
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <HeroTitle>Sectors We Serve</HeroTitle>
-              <HeroDescription>
-                Our tailored analytics solutions help government and enterprise clients solve critical challenges in the
-                healthcare, finance, retail, and manufacturing sectors.
-              </HeroDescription>
-            </motion.div>
+            <HeroLayout>
+              <HeroLeft>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
+                  <Overline>Where We Operate</Overline>
+                  <HeroTitle>6 Sectors.<br /><AccentSpan>One Delivery Standard.</AccentSpan></HeroTitle>
+                  <HeroSub>
+                    Federal agencies, healthcare systems, financial institutions, defense contractors,
+                    manufacturers, and AI platforms — each with unique constraints, all demanding production-grade results.
+                  </HeroSub>
+                  <HeroActions>
+                    <PrimaryBtn href="/schedule-consult">Talk to Our Team →</PrimaryBtn>
+                    <OutlineBtn href="/work">See Case Studies</OutlineBtn>
+                  </HeroActions>
+                </motion.div>
+              </HeroLeft>
+              <HeroRight>
+                {[
+                  { icon: '🏛️', label: 'Federal Government' },
+                  { icon: '🏥', label: 'Healthcare' },
+                  { icon: '💰', label: 'Financial Services' },
+                  { icon: '🛡️', label: 'Defense & Intel' },
+                  { icon: '🏭', label: 'Manufacturing' },
+                  { icon: '🤖', label: 'AI Platforms' },
+                ].map((s, i) => (
+                  <motion.div key={s.label} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.07 }}>
+                    <SectorPill>{s.icon} {s.label}</SectorPill>
+                  </motion.div>
+                ))}
+              </HeroRight>
+            </HeroLayout>
           </Container>
         </HeroSection>
 
-        {/* ✅ NEW: Sector Overview Content (Indexing Signal Boost) */}
-        <IntroSection>
+        {/* Sector cards */}
+        <CardsSection>
           <Container>
-            <IntroText>
-              Precise Analytics partners with organizations operating in highly regulated, data-intensive environments
-              where accuracy, compliance, and actionable insight are critical to success. Each sector we serve presents
-              unique operational challenges, regulatory requirements, and decision-making pressures. Our approach
-              combines advanced analytics, domain expertise, and scalable data platforms to deliver solutions that are
-              purpose-built for each industry.
-              <br />
-              <br />
-              In healthcare, we support payers, providers, and public agencies with analytics that improve outcomes,
-              enhance compliance, and optimize resource utilization. Manufacturing clients leverage our solutions to
-              gain visibility into production performance, supply chains, and quality metrics. Financial institutions
-              rely on our analytics to strengthen risk management, regulatory reporting, and customer intelligence,
-              while retail organizations use our data-driven insights to forecast demand, optimize inventory, and better
-              understand consumer behavior.
-              <br />
-              <br />
-              By aligning analytics strategy with industry-specific needs, Precise Analytics enables organizations to
-              make confident, data-informed decisions that drive measurable results.
-            </IntroText>
-          </Container>
-        </IntroSection>
-
-        <IndustriesSection>
-          <Container>
-            <SectionTitle>Explore Our Sector Expertise</SectionTitle>
-            <IndustryGrid>
-              {sectors.map((sector, index) => (
+            <SectorGrid>
+              {sectors.map((sector, i) => (
                 <motion.div
                   key={sector.id}
-                  style={{ display: 'flex', justifyContent: 'center' }}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.4, delay: i * 0.07 }}
                 >
-                  <CardWrapper
-                    whileHover={{ y: -8, scale: 1.03 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  >
-                    <IndustryCard href={`/sectors/${sector.id}`}>
-                      <IndustryHeader>
-                        <IndustryName>{sector.name}</IndustryName>
-                        <ArrowIcon>→</ArrowIcon>
-                      </IndustryHeader>
-                      <IndustryTitle>{sector.title}</IndustryTitle>
-                      <IndustryDescription>{sector.description}</IndustryDescription>
-                    </IndustryCard>
-                  </CardWrapper>
+                  <SectorCard href={sector.href} $color={sector.color}>
+                    <CardTop>
+                      <SectorIcon $color={sector.color}>{sector.icon}</SectorIcon>
+                      <SectorMeta>
+                        <SectorName>{sector.name}</SectorName>
+                        <SectorHeadline $color={sector.color}>{sector.headline}</SectorHeadline>
+                      </SectorMeta>
+                    </CardTop>
+
+                    <StatsRow>
+                      {sector.stats.map((s) => (
+                        <StatCell key={s.label}>
+                          <StatVal $color={sector.color}>{s.value}</StatVal>
+                          <StatLabel>{s.label}</StatLabel>
+                        </StatCell>
+                      ))}
+                    </StatsRow>
+
+                    <CapList>
+                      {sector.capabilities.map((c) => (
+                        <CapItem key={c} $color={sector.color}>
+                          <CapDot $color={sector.color} />
+                          {c}
+                        </CapItem>
+                      ))}
+                    </CapList>
+
+                    <CardArrow $color={sector.color}>Explore →</CardArrow>
+                  </SectorCard>
                 </motion.div>
               ))}
-            </IndustryGrid>
+            </SectorGrid>
           </Container>
-        </IndustriesSection>
+        </CardsSection>
 
-        <CTASection>
+        {/* Compact CTA */}
+        <CtaBanner>
           <Container>
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              <CTATitle>Ready to Accelerate Your Sector&apos;s Success?</CTATitle>
-              <CTADescription>
-                Discover how Precise Analytics can help transform your data into measurable outcomes.
-              </CTADescription>
-              <CTAButton href="/schedule-consult">Get Started Today</CTAButton>
-            </motion.div>
+            <CtaInner>
+              <CtaText>
+                <CtaTitle>Ready to see results in your sector?</CtaTitle>
+                <CtaSub>Free 30-minute consultation — we diagnose your data stack on the first call.</CtaSub>
+              </CtaText>
+              <CtaActions>
+                <CtaBtn href="/schedule-consult">Schedule a Consultation →</CtaBtn>
+                <CtaSecondary href="/capabilities-statement">View Capabilities</CtaSecondary>
+              </CtaActions>
+            </CtaInner>
           </Container>
-        </CTASection>
+        </CtaBanner>
       </PageWrapper>
     </>
   );
 }
 
-/* =======================
-   Styled Components
-======================= */
+/* ── Styles ── */
 
-const PageWrapper = styled.div`
-  min-height: 100vh;
-`;
+const PageWrapper = styled.div`min-height: 100vh;`;
 
 const HeroSection = styled.section`
-  padding: 12rem 0 8rem;
-  background: linear-gradient(
-    135deg,
-    rgba(var(--primary), 0.05) 0%,
-    rgba(var(--accent), 0.05) 100%
-  );
-  text-align: center;
+  position: relative;
+  overflow: hidden;
+  padding: 13rem 0 7rem;
+  border-bottom: 1px solid rgba(var(--text), 0.07);
+`;
+
+const BgLayer = styled.div`
+  position: absolute; inset: 0; z-index: 0; opacity: 0.18;
+`;
+
+const HeroLayout = styled.div`
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 28rem;
+  gap: 6rem;
+  align-items: center;
+
+  ${media.desktop(`grid-template-columns: 1fr 22rem; gap: 4rem;`)}
+  ${media.tablet(`grid-template-columns: 1fr; gap: 3rem;`)}
+`;
+
+const HeroLeft = styled.div``;
+
+const HeroRight = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  ${media.tablet(`flex-direction: row; flex-wrap: wrap;`)}
+`;
+
+const SectorPill = styled.div`
+  background: rgba(var(--cardBackground), 0.6);
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 0.8rem;
+  padding: 1rem 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: rgba(var(--text), 0.85);
+`;
+
+const Overline = styled.p`
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #ff8c2b;
+  margin-bottom: 1.4rem;
 `;
 
 const HeroTitle = styled.h1`
-  font-size: 5.6rem;
+  font-size: 5rem;
   font-weight: 800;
-  margin-bottom: 2rem;
+  line-height: 1.1;
   color: rgb(var(--text));
+  margin-bottom: 1.8rem;
+  letter-spacing: -0.02em;
 
-  ${media.desktop(`
-    font-size: 4.8rem;
-  `)}
-
-  ${media.tablet(`
-    font-size: 3.6rem;
-  `)}
+  ${media.tablet(`font-size: 3.8rem;`)}
 `;
 
-const HeroDescription = styled.p`
-  font-size: 2.2rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.8);
-  max-width: 80rem;
-  margin: 0 auto;
+const AccentSpan = styled.span`color: rgb(var(--accent));`;
 
-  ${media.tablet(`
-    font-size: 1.8rem;
-  `)}
-`;
-
-/* NEW */
-const IntroSection = styled.section`
-  padding: 6rem 0;
-`;
-
-const IntroText = styled.p`
-  font-size: 1.8rem;
+const HeroSub = styled.p`
+  font-size: 1.75rem;
   line-height: 1.7;
-  color: rgba(var(--text), 0.85);
-  max-width: 90rem;
-  margin: 0 auto;
-`;
-
-const IndustriesSection = styled.section`
-  padding: 10rem 0;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 3.6rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 6rem;
-  color: rgb(var(--text));
-
-  ${media.tablet(`
-    font-size: 2.8rem;
-    margin-bottom: 4rem;
-  `)}
-`;
-
-const IndustryGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4rem;
-  justify-items: center;
-  align-items: stretch;
-
-  ${media.tablet(`
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  `)}
-`;
-
-const CardWrapper = styled(motion.div)`
-  width: 100%;
-  max-width: 50rem;
-`;
-
-const IndustryCard = styled(NextLink)`
-  display: block;
-  padding: 4rem 3rem;
-  background: rgba(var(--cardBackground), 0.9);
-  border-radius: 1.2rem;
-  border: 1px solid rgba(var(--primary), 0.1);
-  transition: all 0.3s ease;
-  text-decoration: none;
-  backdrop-filter: blur(10px);
-
-  &:hover {
-    border-color: rgba(var(--accent), 0.3);
-    box-shadow: 0 20px 40px -10px rgba(var(--primary), 0.3);
-  }
-`;
-
-const IndustryHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-`;
-
-const IndustryName = styled.h3`
-  font-size: 2.4rem;
-  font-weight: 600;
-  color: rgb(var(--text));
-`;
-
-const ArrowIcon = styled.span`
-  font-size: 2rem;
-  color: rgb(var(--accent));
-  transition: transform 0.3s ease;
-
-  ${IndustryCard}:hover & {
-    transform: translateX(5px);
-  }
-`;
-
-const IndustryTitle = styled.h4`
-  font-size: 1.8rem;
-  font-weight: 500;
-  color: rgb(var(--accent));
-  margin-bottom: 1.5rem;
-`;
-
-const IndustryDescription = styled.p`
-  font-size: 1.6rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.8);
-`;
-
-const CTASection = styled.section`
-  padding: 8rem 0;
-  background: linear-gradient(135deg, rgba(var(--primary), 0.08), rgba(var(--accent), 0.08));
-  text-align: center;
-  color: rgb(var(--text));
-`;
-
-const CTATitle = styled.h3`
-  font-size: 3.6rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-
-  ${media.tablet(`
-    font-size: 2.8rem;
-  `)}
-`;
-
-const CTADescription = styled.p`
-  font-size: 2rem;
-  line-height: 1.6;
-  margin-bottom: 4rem;
-  opacity: 0.9;
+  color: rgba(var(--text), 0.72);
+  margin-bottom: 2.8rem;
   max-width: 60rem;
-  margin-left: auto;
-  margin-right: auto;
-
-  ${media.tablet(`
-    font-size: 1.8rem;
-  `)}
 `;
 
-const CTAButton = styled(NextLink)`
+const HeroActions = styled.div`
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+`;
+
+const PrimaryBtn = styled(NextLink)`
   display: inline-block;
-  padding: 1.8rem 4rem;
-  background: rgb(var(--accent));
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
-  border-radius: 5rem;
-  font-size: 1.8rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 1.2rem 2.6rem;
+  border-radius: 0.8rem;
   text-decoration: none;
   transition: all 0.3s ease;
 
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 125, 0, 0.35); }
+`;
+
+const OutlineBtn = styled(NextLink)`
+  display: inline-block;
+  color: rgb(var(--text));
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 1.2rem 2.6rem;
+  border-radius: 0.8rem;
+  text-decoration: none;
+  border: 1.5px solid rgba(var(--text), 0.18);
+  transition: all 0.2s;
+
+  &:hover { border-color: #ff8c2b; color: #ff8c2b; }
+`;
+
+const CardsSection = styled.section`
+  padding: 8rem 0 10rem;
+`;
+
+const SectorGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.4rem;
+
+  ${media.desktop(`grid-template-columns: repeat(2, 1fr);`)}
+  ${media.tablet(`grid-template-columns: 1fr; gap: 1.8rem;`)}
+`;
+
+const SectorCard = styled(NextLink)<{ $color: string }>`
+  display: block;
+  background: rgba(var(--cardBackground), 0.7);
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 1.4rem;
+  padding: 2.8rem;
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-color: ${(p) => p.$color}55;
+    box-shadow: 0 8px 28px ${(p) => p.$color}18;
+    transform: translateY(-4px);
   }
+`;
+
+const CardTop = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  margin-bottom: 2rem;
+`;
+
+const SectorIcon = styled.div<{ $color: string }>`
+  width: 5rem;
+  height: 5rem;
+  border-radius: 1rem;
+  background: ${(p) => p.$color}18;
+  border: 1px solid ${(p) => p.$color}33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 2.2rem;
+    height: 2.2rem;
+    color: ${(p) => p.$color};
+  }
+`;
+
+const SectorMeta = styled.div``;
+
+const SectorName = styled.h3`
+  font-size: 2rem;
+  font-weight: 800;
+  color: rgb(var(--text));
+  margin-bottom: 0.3rem;
+  line-height: 1.2;
+`;
+
+const SectorHeadline = styled.p<{ $color: string }>`
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: ${(p) => p.$color};
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+`;
+
+const StatsRow = styled.div`
+  display: flex;
+  gap: 0;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(var(--text), 0.07);
+  border-radius: 0.8rem;
+  overflow: hidden;
+`;
+
+const StatCell = styled.div`
+  flex: 1;
+  text-align: center;
+  padding: 1.2rem 0.8rem;
+  border-right: 1px solid rgba(var(--text), 0.07);
+
+  &:last-child { border-right: none; }
+`;
+
+const StatVal = styled.div<{ $color: string }>`
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: ${(p) => p.$color};
+  line-height: 1;
+  margin-bottom: 0.3rem;
+`;
+
+const StatLabel = styled.div`
+  font-size: 1.1rem;
+  color: rgba(var(--text), 0.5);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+const CapList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+`;
+
+const CapItem = styled.li<{ $color: string }>`
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 1.4rem;
+  color: rgba(var(--text), 0.8);
+  font-weight: 500;
+`;
+
+const CapDot = styled.span<{ $color: string }>`
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: ${(p) => p.$color};
+  flex-shrink: 0;
+`;
+
+const CardArrow = styled.span<{ $color: string }>`
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: ${(p) => p.$color};
+`;
+
+/* CTA Banner */
+const CtaBanner = styled.section`
+  padding: 5rem 0;
+  background: linear-gradient(135deg, rgba(var(--background), 1) 0%, rgba(15, 25, 50, 0.98) 100%);
+  border-top: 1px solid rgba(var(--text), 0.07);
+`;
+
+const CtaInner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  flex-wrap: wrap;
+`;
+
+const CtaText = styled.div``;
+
+const CtaTitle = styled.h2`
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: rgb(var(--text));
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+
+  ${media.tablet(`font-size: 2.2rem;`)}
+`;
+
+const CtaSub = styled.p`
+  font-size: 1.6rem;
+  color: rgba(var(--text), 0.65);
+`;
+
+const CtaActions = styled.div`
+  display: flex;
+  gap: 1.2rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+`;
+
+const CtaBtn = styled(NextLink)`
+  display: inline-block;
+  background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 1.2rem 2.6rem;
+  border-radius: 0.8rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 125, 0, 0.35); }
+`;
+
+const CtaSecondary = styled(NextLink)`
+  display: inline-block;
+  color: rgb(var(--text));
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 1.2rem 2.6rem;
+  border-radius: 0.8rem;
+  text-decoration: none;
+  border: 1.5px solid rgba(var(--text), 0.18);
+  transition: all 0.2s;
+
+  &:hover { border-color: #ff8c2b; color: #ff8c2b; }
 `;

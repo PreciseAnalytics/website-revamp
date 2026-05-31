@@ -52,21 +52,6 @@ function passwordStrength(p: string): StrengthResult {
   return { score: capped, ...map[capped] };
 }
 
-// ── Eye icon ──────────────────────────────────────────────────────────────────
-function EyeIcon({ open }: { open: boolean }) {
-  return open ? (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-      <circle cx="12" cy="12" r="3"/>
-    </svg>
-  ) : (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
-      <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
-      <line x1="1" y1="1" x2="23" y2="23"/>
-    </svg>
-  );
-}
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function AuthModal({ mode, onClose, onSwitch }: Props) {
@@ -226,7 +211,6 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
 
   return (
     <Overlay
-      onClick={onClose}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -281,11 +265,11 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
                   onChange={e => setLoginPassword(e.target.value)}
                   placeholder="Your password"
                   required
-                  style={{ paddingRight: '4rem' }}
+                  style={{ paddingRight: '5.5rem' }}
                 />
-                <EyeBtn type="button" onClick={() => setShowLoginPw(p => !p)} tabIndex={-1}>
-                  <EyeIcon open={showLoginPw} />
-                </EyeBtn>
+                <ShowBtn type="button" onClick={() => setShowLoginPw(p => !p)} tabIndex={-1}>
+                  {showLoginPw ? 'Hide' : 'Show'}
+                </ShowBtn>
               </PasswordWrap>
             </Field>
             <Actions>
@@ -472,11 +456,11 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
                   onBlur={() => touch('password')}
                   placeholder="Min. 8 characters"
                   required
-                  style={{ paddingRight: '4rem' }}
+                  style={{ paddingRight: '5.5rem' }}
                 />
-                <EyeBtn type="button" onClick={() => setShowRegPw(p => !p)} tabIndex={-1}>
-                  <EyeIcon open={showRegPw} />
-                </EyeBtn>
+                <ShowBtn type="button" onClick={() => setShowRegPw(p => !p)} tabIndex={-1}>
+                  {showRegPw ? 'Hide' : 'Show'}
+                </ShowBtn>
               </PasswordWrap>
               {regPassword && (
                 <>
@@ -509,11 +493,11 @@ export default function AuthModal({ mode, onClose, onSwitch }: Props) {
                   placeholder="Repeat password"
                   required
                   $invalid={touched.confirm && !passwordsMatch}
-                  style={{ paddingRight: '4rem' }}
+                  style={{ paddingRight: '5.5rem' }}
                 />
-                <EyeBtn type="button" onClick={() => setShowConfirm(p => !p)} tabIndex={-1}>
-                  <EyeIcon open={showConfirm} />
-                </EyeBtn>
+                <ShowBtn type="button" onClick={() => setShowConfirm(p => !p)} tabIndex={-1}>
+                  {showConfirm ? 'Hide' : 'Show'}
+                </ShowBtn>
               </PasswordWrap>
               {touched.confirm && regConfirm && !passwordsMatch && (
                 <ValidationMsg $error>Passwords do not match.</ValidationMsg>
@@ -653,12 +637,23 @@ const Input = styled.input<{ $invalid?: boolean }>`
 `;
 
 const PasswordWrap = styled.div`position: relative; display: flex; align-items: center;`;
-const EyeBtn = styled.button`
-  position: absolute; right: 0.8rem;
-  background: rgba(0,0,0,0.06); border: none; cursor: pointer;
-  color: #444; display: flex; align-items: center;
-  padding: 0.4rem; border-radius: 0.4rem;
-  &:hover { color: #111; background: rgba(0,0,0,0.1); }
+const ShowBtn = styled.button`
+  position: absolute; right: 0.7rem;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: rgb(21, 128, 61);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.35rem 0.8rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  &:hover {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(34, 197, 94, 0.5);
+  }
 `;
 
 const ValidationMsg = styled.p<{ $error?: boolean; $success?: boolean }>`

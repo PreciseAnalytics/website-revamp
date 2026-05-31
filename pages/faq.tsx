@@ -79,44 +79,67 @@ export default function FaqPage() {
             </PageHeader>
           </motion.div>
 
-          <FaqList>
-            {faqs.map((faq, i) => (
-              <FaqItem key={i}>
-                <FaqQuestion
-                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  aria-expanded={openIndex === i}
-                >
-                  <FaqQuestionText>{faq.q}</FaqQuestionText>
-                  <FaqChevron $open={openIndex === i}>{openIndex === i ? '−' : '+'}</FaqChevron>
-                </FaqQuestion>
-                <AnimatePresence initial={false}>
-                  {openIndex === i && (
-                    <motion.div
-                      key="answer"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      style={{ overflow: 'hidden' }}
+          <FaqLayout>
+            {/* Left — accordion */}
+            <FaqCol>
+              <FaqList>
+                {faqs.map((faq, i) => (
+                  <FaqItem key={i}>
+                    <FaqQuestion
+                      onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                      aria-expanded={openIndex === i}
                     >
-                      <FaqAnswer>{faq.a}</FaqAnswer>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </FaqItem>
-            ))}
-          </FaqList>
+                      <FaqQuestionText>{faq.q}</FaqQuestionText>
+                      <FaqChevron $open={openIndex === i}>{openIndex === i ? '−' : '+'}</FaqChevron>
+                    </FaqQuestion>
+                    <AnimatePresence initial={false}>
+                      {openIndex === i && (
+                        <motion.div
+                          key="answer"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          style={{ overflow: 'hidden' }}
+                        >
+                          <FaqAnswer>{faq.a}</FaqAnswer>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </FaqItem>
+                ))}
+              </FaqList>
+            </FaqCol>
 
-          <CtaSection>
-            <CtaTitle>Still have questions?</CtaTitle>
-            <CtaSubtitle>Schedule a free 30-minute consultation — we&apos;ll answer anything specific to your project.</CtaSubtitle>
-            <CtaButton href="/schedule-consult">Schedule a Consultation →</CtaButton>
-            <AltLinks>
-              <AltLink href="/compare">See how we compare →</AltLink>
-              <span> · </span>
-              <AltLink href="/work">View our case studies →</AltLink>
-            </AltLinks>
-          </CtaSection>
+            {/* Right — sticky sidebar */}
+            <Sidebar>
+              <CtaSection>
+                <CtaTitle>Still have questions?</CtaTitle>
+                <CtaSubtitle>Schedule a free 30-minute consultation — we&apos;ll answer anything specific to your project.</CtaSubtitle>
+                <CtaButton href="/schedule-consult">Schedule a Consultation →</CtaButton>
+                <AltLinks>
+                  <AltLink href="/compare">See how we compare →</AltLink>
+                  <AltLink href="/work">View our case studies →</AltLink>
+                </AltLinks>
+              </CtaSection>
+
+              <QuickFacts>
+                <QuickFactsTitle>Quick Facts</QuickFactsTitle>
+                {[
+                  { label: 'Response time', value: '< 4 business hours' },
+                  { label: 'Contract vehicle', value: 'GSA Schedule' },
+                  { label: 'Clearance', value: 'Clearance-ready staff' },
+                  { label: 'Avg. deployment', value: 'Weeks, not months' },
+                  { label: 'Satisfaction', value: '98% client retention' },
+                ].map((f) => (
+                  <FactRow key={f.label}>
+                    <FactLabel>{f.label}</FactLabel>
+                    <FactValue>{f.value}</FactValue>
+                  </FactRow>
+                ))}
+              </QuickFacts>
+            </Sidebar>
+          </FaqLayout>
         </Container>
       </PageWrapper>
     </>
@@ -127,8 +150,28 @@ const PageWrapper = styled.div`padding: 4rem 0 8rem;`;
 
 const PageHeader = styled.div`
   text-align: center;
-  max-width: 80rem;
+  max-width: 100rem;
   margin: 0 auto 5rem;
+`;
+
+const FaqLayout = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 36rem;
+  gap: 4rem;
+  align-items: start;
+
+  ${media.desktop(`grid-template-columns: 1fr 32rem;`)}
+  ${media.tablet(`grid-template-columns: 1fr; gap: 3rem;`)}
+`;
+
+const FaqCol = styled.div``;
+
+const Sidebar = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  position: sticky;
+  top: 10rem;
 `;
 
 const OverTitle = styled.p`
@@ -161,8 +204,6 @@ const PageSubtitle = styled.p`
 `;
 
 const FaqList = styled.div`
-  max-width: 85rem;
-  margin: 0 auto 6rem;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -217,60 +258,97 @@ const FaqAnswer = styled.div`
 `;
 
 const CtaSection = styled.div`
-  max-width: 85rem;
-  margin: 0 auto;
   text-align: center;
-  padding: 4.5rem;
+  padding: 3rem 2.4rem;
   background: linear-gradient(135deg, rgba(255, 125, 0, 0.08), rgba(255, 165, 0, 0.04));
   border: 1px solid rgba(255, 125, 0, 0.2);
-  border-radius: 1.6rem;
+  border-radius: 1.4rem;
 `;
 
 const CtaTitle = styled.h2`
-  font-size: 3.2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: rgb(var(--text));
-  margin-bottom: 1rem;
-
-  ${media.tablet(`font-size: 2.4rem;`)}
+  margin-bottom: 0.8rem;
 `;
 
 const CtaSubtitle = styled.p`
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   color: rgba(var(--text), 0.7);
-  margin-bottom: 2.4rem;
+  margin-bottom: 1.8rem;
+  line-height: 1.55;
 `;
 
 const CtaButton = styled(Link)`
-  display: inline-block;
+  display: block;
   background: linear-gradient(135deg, rgb(255, 125, 0), rgb(255, 165, 0));
   color: white;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  padding: 1.4rem 3.2rem;
+  padding: 1.2rem 2rem;
   border-radius: 0.9rem;
   text-decoration: none;
+  text-align: center;
   transition: all 0.3s ease;
-  margin-bottom: 2rem;
+  margin-bottom: 1.4rem;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 125, 0, 0.35);
+    box-shadow: 0 6px 16px rgba(255, 125, 0, 0.35);
   }
 `;
 
 const AltLinks = styled.div`
-  font-size: 1.5rem;
-  color: rgba(var(--text), 0.5);
-  margin-top: 1rem;
-
-  span { margin: 0 0.4rem; }
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 `;
 
 const AltLink = styled(Link)`
+  font-size: 1.4rem;
   color: rgb(255, 125, 0);
   text-decoration: none;
   font-weight: 600;
 
   &:hover { text-decoration: underline; }
+`;
+
+const QuickFacts = styled.div`
+  background: rgba(var(--cardBackground), 0.6);
+  border: 1px solid rgba(var(--text), 0.1);
+  border-radius: 1.4rem;
+  padding: 2.4rem;
+`;
+
+const QuickFactsTitle = styled.h3`
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: rgb(var(--text));
+  margin-bottom: 1.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+`;
+
+const FactRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(var(--text), 0.06);
+
+  &:last-child { border-bottom: none; }
+`;
+
+const FactLabel = styled.span`
+  font-size: 1.35rem;
+  color: rgba(var(--text), 0.5);
+  font-weight: 500;
+`;
+
+const FactValue = styled.span`
+  font-size: 1.35rem;
+  color: rgb(var(--text));
+  font-weight: 700;
+  text-align: right;
 `;

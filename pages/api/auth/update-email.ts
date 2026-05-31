@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import * as nodemailer from 'nodemailer';
 import { updateEmail, hashPassword, findByEmail } from 'lib/userStore';
+import { emailHtml, FROM_ADDRESS, smtpTransport } from 'lib/email-html';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -25,27 +25,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://preciseanalytics.io'}/api/auth/verify?token=${result.verifyToken}`;
 
-  const html = `
-    <div style="font-family:sans-serif;max-width:560px;margin:0 auto">
-      <h2 style="color:#111">Verify your new email address</h2>
-      <p>Hi ${result.user.firstName},</p>
-      <p>You updated your email address on Precise Analytics. Click the button below to verify this new address.</p>
-      <a href="${verifyUrl}" style="display:inline-block;margin:1.5rem 0;padding:1rem 2rem;background:rgb(255,125,0);color:#fff;border-radius:0.6rem;text-decoration:none;font-weight:700">
-        Verify New Email
-      </a>
-      <p style="color:#666;font-size:0.9rem">This link expires in 24 hours. If you did not request this change, please contact us immediately at <a href="mailto:support@preciseanalytics.io">support@preciseanalytics.io</a>.</p>
-    </div>`;
+  const html = emailHtml({
+    title: 'Verify New Email Address',
+    preview: `Hi ${result.user.firstName}, verify your new email address for Precise Analytics.`,
+    body: `
+      <p style="margin:0 0 16px;color:#111827;font-size:16px;line-height:1.6;">
+        Hi <strong>${result.user.firstName}</strong>,
+      </p>
+      <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.7;">
+        You updated your email address on Precise Analytics. Click the button below to
+        verify your new address and complete the change.
+      </p>
+      <div style="text-align:center;margin:30px 0;">
+        <a href="${verifyUrl}"
+           style="display:inline-block;background:#ff8c2b;color:#ffffff;font-size:16px;font-weight:700;
+                  padding:14px 36px;border-radius:8px;text-decoration:none;">
+          Verify New Email
+        </a>
+      </div>
+      <p style="margin:0 0 8px;color:#64748b;font-size:13px;">Or paste this link into your browser:</p>
+      <p style="word-break:break-all;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;
+                padding:10px 14px;font-size:12px;color:#475569;margin:0 0 22px;">
+        ${verifyUrl}
+      </p>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:13px 16px;">
+        <p style="margin:0;font-size:13px;color:#9a3412;line-height:1.6;">
+          <strong>This link expires in 24 hours.</strong>
+          If you did not request this change, contact us immediately at
+          <a href="mailto:careers@preciseanalytics.io" style="color:#ff8c2b;">careers@preciseanalytics.io</a>.
+        </p>
+      </div>
+    `,
+  });
 
   try {
-    const t = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.zoho.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      tls: { rejectUnauthorized: false },
-    });
-    await t.sendMail({
-      from: process.env.SMTP_USER,
+    await smtpTransport().sendMail({
+      from: FROM_ADDRESS,
       to: newEmail.trim(),
       subject: 'Verify your new email — Precise Analytics',
       html,

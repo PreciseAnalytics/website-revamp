@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import * as nodemailer from 'nodemailer';
 import { findByEmail, createUser, hashPassword } from 'lib/userStore';
+import { emailHtml, FROM_ADDRESS, smtpTransport } from 'lib/email-html';
 
 const s = (v: string) => (v || '').trim().replace(/<[^>]*>/g, '');
 
@@ -25,34 +25,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`;
   const verifyUrl = `${baseUrl}/careers/verify-email?token=${user.verifyToken}`;
 
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden">
-      <div style="background:linear-gradient(135deg,#FF7D00,#FFA500);padding:28px 32px;text-align:center">
-        <h1 style="color:#fff;margin:0;font-size:24px">Verify Your Email</h1>
-        <p style="color:rgba(255,255,255,.9);margin:8px 0 0;font-size:15px">Precise Analytics Careers</p>
+  const html = emailHtml({
+    title: 'Verify Your Email',
+    preview: `Hi ${s(firstName)}, verify your email to activate your Precise Analytics account.`,
+    body: `
+      <p style="margin:0 0 16px;color:#111827;font-size:16px;line-height:1.6;">
+        Hi <strong>${s(firstName)}</strong>,
+      </p>
+      <p style="margin:0 0 18px;color:#334155;font-size:15px;line-height:1.7;">
+        Thank you for creating an account. Click the button below to verify your email
+        and activate your account so you can apply for open positions.
+      </p>
+      <div style="text-align:center;margin:30px 0;">
+        <a href="${verifyUrl}"
+           style="display:inline-block;background:#ff8c2b;color:#ffffff;font-size:16px;font-weight:700;
+                  padding:14px 36px;border-radius:8px;text-decoration:none;">
+          Verify My Email
+        </a>
       </div>
-      <div style="padding:28px 32px;font-size:15px;color:#333;line-height:1.7">
-        <p>Hi ${s(firstName)},</p>
-        <p>Thank you for creating an account. Click the button below to verify your email and activate your account.</p>
-        <div style="text-align:center;margin:30px 0">
-          <a href="${verifyUrl}" style="background:linear-gradient(135deg,#FF7D00,#FFA500);color:#fff;padding:14px 32px;text-decoration:none;border-radius:6px;font-weight:700;font-size:16px;display:inline-block">Verify My Email</a>
-        </div>
-        <p style="color:#888;font-size:13px">This link expires in 24 hours. If you did not create this account, ignore this email.</p>
+      <p style="margin:0 0 8px;color:#64748b;font-size:13px;line-height:1.6;">
+        Or copy and paste this link into your browser:
+      </p>
+      <p style="word-break:break-all;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;
+                padding:10px 14px;font-size:12px;color:#475569;margin:0 0 22px;">
+        ${verifyUrl}
+      </p>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:13px 16px;">
+        <p style="margin:0;font-size:13px;color:#9a3412;line-height:1.6;">
+          <strong>This link expires in 24 hours.</strong>
+          If you did not create this account, you can safely ignore this email.
+        </p>
       </div>
-      <div style="background:#f8f9fa;padding:14px 32px;border-top:1px solid #e0e0e0;text-align:center;font-size:12px;color:#888">
-        &copy; ${new Date().getFullYear()} Precise Analytics
-      </div>
-    </div>`;
+    `,
+  });
 
   try {
-    const t = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.zoho.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      tls: { rejectUnauthorized: false },
+    await smtpTransport().sendMail({
+      from: FROM_ADDRESS,
+      to: email,
+      subject: 'Verify your email — Precise Analytics',
+      html,
     });
-    await t.sendMail({ from: process.env.SMTP_USER, to: email, subject: 'Verify your email — Precise Analytics', html });
   } catch (err) {
     console.error('Verification email error:', err);
   }

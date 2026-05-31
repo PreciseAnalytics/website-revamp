@@ -49,18 +49,44 @@ export default function OurTeamPage() {
 
       <PageWrapper>
         <Container>
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <PageTitle>Meet Our Team</PageTitle>
-            <PageSubtitle>Passionate. Experienced. Results-Driven.</PageSubtitle>
-            <TeamIntro>
-              Precise Analytics is built by data scientists, engineers, and business intelligence professionals
-              who bring deep domain expertise to every engagement. Our team combines federal contracting
-              experience with commercial analytics know-how, delivering solutions that are technically rigorous
-              and focused on client outcomes. We hold active federal contracts and hire people who take data
-              seriously, communicate clearly, and care about results — not just outputs. When you work with
-              Precise Analytics, you work directly with the people building your solution.
-            </TeamIntro>
-          </motion.div>
+          <HeroRow>
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <PageTitle>Meet Our Team</PageTitle>
+              <PageSubtitle>Passionate. Experienced. Results-Driven.</PageSubtitle>
+              <TeamIntro>
+                Precise Analytics is built by data scientists, engineers, and business intelligence professionals
+                who bring deep domain expertise to every engagement. Our team combines federal contracting
+                experience with commercial analytics know-how, delivering solutions that are technically rigorous
+                and focused on client outcomes. When you work with Precise Analytics, you work directly with
+                the people building your solution.
+              </TeamIntro>
+              <TeamCtaRow>
+                <TeamCtaBtn href="/careers">Join Our Team →</TeamCtaBtn>
+                <TeamCtaLink href="/schedule-consult">Schedule a Consultation</TeamCtaLink>
+              </TeamCtaRow>
+            </motion.div>
+
+            <TeamStats>
+              {[
+                { value: '4+', label: 'Core Team Members' },
+                { value: '50+', label: 'Projects Delivered' },
+                { value: '12+', label: 'Federal Clients' },
+                { value: '98%', label: 'Client Satisfaction' },
+              ].map((s, i) => (
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.08 }}
+                >
+                  <StatBlock>
+                    <StatVal>{s.value}</StatVal>
+                    <StatLbl>{s.label}</StatLbl>
+                  </StatBlock>
+                </motion.div>
+              ))}
+            </TeamStats>
+          </HeroRow>
 
           <TeamGrid>
             {teamMembers.map((member, index) => (
@@ -104,42 +130,122 @@ const TeamNav = styled.nav`
   }
 `;
 
-const TeamIntro = styled.p`
-  font-size: 1.7rem;
-  line-height: 1.7;
-  color: rgba(var(--text), 0.8);
-  max-width: 80rem;
-  margin: 2rem auto 5rem;
-  text-align: center;
-`;
-
 const PageWrapper = styled.div`
   padding: 6rem 0;
 `;
 
+const HeroRow = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 26rem;
+  gap: 6rem;
+  align-items: center;
+  margin-bottom: 6rem;
+
+  ${media.desktop(`grid-template-columns: 1fr 22rem; gap: 4rem;`)}
+  ${media.tablet(`grid-template-columns: 1fr; gap: 3rem;`)}
+`;
+
 const PageTitle = styled.h1`
-  font-size: 4.4rem;
-  font-weight: 700;
+  font-size: 4.8rem;
+  font-weight: 800;
   background: linear-gradient(135deg, rgb(0, 153, 255), rgb(0, 204, 153));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.1;
+
+  ${media.tablet(`font-size: 3.6rem;`)}
 `;
 
 const PageSubtitle = styled.h2`
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 5rem;
-  color: rgb(var(--text), 0.8);
+  font-size: 1.8rem;
+  margin-bottom: 1.6rem;
+  color: rgba(var(--text), 0.6);
   font-weight: 500;
+`;
+
+const TeamIntro = styled.p`
+  font-size: 1.7rem;
+  line-height: 1.7;
+  color: rgba(var(--text), 0.8);
+  margin-bottom: 2.4rem;
+`;
+
+const TeamCtaRow = styled.div`
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+`;
+
+const TeamCtaBtn = styled(Link)`
+  display: inline-block;
+  background: linear-gradient(135deg, rgb(0, 153, 255), rgb(0, 204, 153));
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  padding: 1.1rem 2.4rem;
+  border-radius: 0.8rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 153, 255, 0.35);
+  }
+`;
+
+const TeamCtaLink = styled(Link)`
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgb(var(--text));
+  padding: 1.1rem 2.4rem;
+  border-radius: 0.8rem;
+  text-decoration: none;
+  border: 1.5px solid rgba(var(--text), 0.18);
+  transition: all 0.2s;
+
+  &:hover { border-color: rgb(0, 153, 255); color: rgb(0, 153, 255); }
+`;
+
+const TeamStats = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+`;
+
+const StatBlock = styled.div`
+  background: rgba(var(--cardBackground), 0.55);
+  border: 1px solid rgba(var(--text), 0.09);
+  border-radius: 1.2rem;
+  padding: 2rem 1.6rem;
+  text-align: center;
+`;
+
+const StatVal = styled.div`
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: rgb(0, 153, 255);
+  line-height: 1;
+  margin-bottom: 0.4rem;
+`;
+
+const StatLbl = styled.div`
+  font-size: 1.2rem;
+  color: rgba(var(--text), 0.5);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 `;
 
 const TeamGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
-  gap: 4rem;
-  justify-items: center;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2.8rem;
+
+  ${media.desktop(`grid-template-columns: repeat(3, 1fr);`)}
+  ${media.tablet(`grid-template-columns: repeat(2, 1fr); gap: 2rem;`)}
+  ${media.phone(`grid-template-columns: 1fr;`)}
 `;
 
 const TeamCard = styled.div`

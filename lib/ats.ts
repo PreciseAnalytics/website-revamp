@@ -73,20 +73,18 @@ export function normalizeAtsJob(raw: any): Job {
 }
 
 export async function fetchPublishedAtsJobs(): Promise<Job[]> {
-  const serviceToken = process.env.ATS_SERVICE_TOKEN;
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (serviceToken) headers['Authorization'] = `Bearer ${serviceToken}`;
+  // ?status=published is a public endpoint — no auth needed
+  const response = await fetch(`${getAtsApiBaseUrl()}/jobs?status=published`, {
+    headers: { 'Content-Type': 'application/json' },
+    next: { revalidate: 300 },
+  } as any);
 
-  const response = await fetch(`${getAtsApiBaseUrl()}/jobs`, { headers });
   if (!response.ok) throw new Error(`ATS jobs API returned ${response.status}`);
 
   const data = await response.json();
   const rawJobs = data.success && Array.isArray(data.jobs) ? data.jobs : Array.isArray(data) ? data : [];
-  const activeStatuses = new Set(['published', 'active', 'posted']);
 
-  return rawJobs
-    .filter((job: any) => activeStatuses.has(String(job.status).toLowerCase()) || job.posted === true)
-    .map(normalizeAtsJob);
+  return rawJobs.map(normalizeAtsJob);
 }
 
 export async function fetchAtsJobById(id: string): Promise<Job | null> {

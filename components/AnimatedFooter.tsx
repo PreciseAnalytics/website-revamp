@@ -44,7 +44,7 @@ const footerNavigation = {
       { name: 'Our Team', href: '/team' },
       { name: 'Careers', href: '/careers' },
       { name: 'Schedule a Consult', href: '/schedule-consult' },
-      { name: 'Capabilities Statement', href: '/capabilities-statement' },
+      { name: 'Capabilities Statement', href: '/about-us' },
     ]
   },
   legal: {
@@ -58,16 +58,26 @@ const footerNavigation = {
   }
 };
 
+const partners = [
+  { name: 'TrustLoop', image: '/partners/trustloop-africa.svg', href: 'https://trustloopafrica.com/' },
+  { name: 'Frontline Tea', image: '/partners/frontline-tea.png', href: 'https://frontlinetea.com/' },
+  { name: 'PreciseGovCon', image: '/partners/precisegovcon.png', href: 'https://www.precisegovcon.com/' },
+  { name: 'Savannah Nomad', image: '/partners/savannah-nomad.jpg', href: 'https://www.savannahnomad.com/' },
+  { name: 'Proventus Analytics', image: '/partners/proventus-analytics.svg', href: 'https://www.proventusanalytics.com/' },
+  { name: 'Hercules Platform', image: '/partners/hercules-platform.png', href: 'https://herculesplatform.com/' },
+  { name: 'Lose The Back Pain', image: '/partners/lose-the-back-pain.png', href: 'https://losethebackpain.com/' },
+];
+
 // Updated certification badges
 const certifications = [
-  { name: 'NIST Cybersecurity Framework', image: '/certifications/nist.svg', href: '/capabilities-statement' },
-  { name: 'HIPAA', image: '/certifications/hipaa.svg', href: '/capabilities-statement' },
-  { name: 'ITAR/EAR', image: '/certifications/itar.svg', href: '/capabilities-statement' },
-  { name: 'ISO/IEC 27001', image: '/certifications/iso-27001.svg', href: '/capabilities-statement' },
-  { name: 'SOC 2 Type II', image: '/certifications/soc2.svg', href: '/capabilities-statement' },
-  { name: 'CMMI', image: '/CMMI_LOGO.png', href: '/capabilities-statement' },
-  { name: 'FedRAMP', image: '/fedramp-logo-vert.svg', href: '/capabilities-statement' },
-  { name: 'SBA', image: '/sba-logo.png', href: '/capabilities-statement' },
+  { name: 'NIST Cybersecurity Framework', image: '/certifications/nist.svg', href: '/about-us' },
+  { name: 'HIPAA', image: '/certifications/hipaa.svg', href: '/about-us' },
+  { name: 'ITAR/EAR', image: '/certifications/itar.svg', href: '/about-us' },
+  { name: 'ISO/IEC 27001', image: '/certifications/iso-27001.svg', href: '/about-us' },
+  { name: 'SOC 2 Type II', image: '/certifications/soc2.svg', href: '/about-us' },
+  { name: 'CMMI', image: '/CMMI_LOGO.png', href: '/about-us' },
+  { name: 'FedRAMP', image: '/fedramp-logo-vert.svg', href: '/about-us' },
+  { name: 'SBA', image: '/sba-logo.png', href: '/about-us' },
 ];
 
 export default function AnimatedFooter() {
@@ -96,7 +106,7 @@ export default function AnimatedFooter() {
             <LogoSection>
               <LogoLink href="/" aria-label="Precise Analytics homepage">
                 <span className="sr-only">Home</span>
-                <FooterLogo src="/PA-logo.png" alt="Precise Analytics" width={150} height={50} />
+                <FooterLogo src="/Favicon/android-chrome-512x512.png" alt="Precise Analytics" width={150} height={150} />
               </LogoLink>
             </LogoSection>
             
@@ -202,34 +212,41 @@ export default function AnimatedFooter() {
           </NavSection>
         </FooterContent>
 
-        {/* Certifications — same pane, compact strip */}
-        <CertStrip>
-          <CertStripLabel>Certifications &amp; Partnerships</CertStripLabel>
-          <CertLogoRow>
-            {certifications.map((cert, index) => (
-              <CertLogo
-                key={cert.name}
+        {/* Partners strip */}
+        <PartnersStrip>
+          <CertStripLabel>Our Partners</CertStripLabel>
+          <PartnerLogoRow>
+            {partners.map((partner, index) => (
+              <PartnerLogo
+                key={partner.name}
                 initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                whileHover={{ y: -3, scale: 1.08 }}
-                title={cert.name}
+                transition={{ duration: 0.3, delay: index * 0.07 }}
+                whileHover={{ y: -3, scale: 1.05 }}
+                title={partner.name}
               >
-                <CertLogoLink href={cert.href} aria-label={cert.name}>
-                  <CertificationImage
-                    src={cert.image}
-                    alt={cert.name}
-                    width={110}
-                    height={70}
-                    style={{ width: 'auto', height: '7rem', maxWidth: '11rem' }}
-                  />
-                  <CertName>{cert.name}</CertName>
-                </CertLogoLink>
-              </CertLogo>
+                <PartnerLogoLink
+                  href={partner.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={partner.name}
+                >
+                  <PartnerImageBox>
+                    <PartnerImage
+                      src={partner.image}
+                      alt={partner.name}
+                      width={160}
+                      height={60}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  </PartnerImageBox>
+                  <PartnerName>{partner.name}</PartnerName>
+                </PartnerLogoLink>
+              </PartnerLogo>
             ))}
-          </CertLogoRow>
-        </CertStrip>
+          </PartnerLogoRow>
+        </PartnersStrip>
 
       </FooterPane>
 
@@ -347,9 +364,10 @@ const LogoSection = styled.div`
 `;
 
 const FooterLogo = styled.img`
-  height: auto;
-  width: 15rem;
+  height: 5rem;
+  width: 5rem;
   object-fit: contain;
+  border-radius: 0.6rem;
 `;
 
 const LogoLink = styled(Link)`
@@ -594,6 +612,68 @@ const CertName = styled.span`
 
   ${CertLogo}:hover & {
     color: rgb(var(--accent));
+  }
+`;
+
+const PartnersStrip = styled.div`
+  border-top: 1px solid rgba(var(--text), 0.1);
+  padding: 2.8rem 0 1.6rem;
+`;
+
+const PartnerLogoRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  align-items: center;
+  justify-content: center;
+`;
+
+const PartnerLogo = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+`;
+
+const PartnerLogoLink = styled.a`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  text-decoration: none;
+`;
+
+const PartnerImageBox = styled.div`
+  width: 14rem;
+  height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+`;
+
+const PartnerImage = styled(Image)`
+  object-fit: contain;
+  border-radius: 0.6rem;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+  opacity: 0.85;
+  filter: brightness(1) saturate(0.9);
+
+  ${PartnerLogo}:hover & {
+    opacity: 1;
+    filter: brightness(1.05) saturate(1);
+  }
+`;
+
+const PartnerName = styled.span`
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: rgba(var(--text), 0.5);
+  text-align: center;
+  transition: color 0.2s ease;
+
+  ${PartnerLogo}:hover & {
+    color: rgba(var(--text), 0.85);
   }
 `;
 

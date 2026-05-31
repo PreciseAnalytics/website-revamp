@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { AnimatePresence } from 'framer-motion';
-import { GetServerSideProps } from 'next';
+import { GetStaticProps } from 'next';
 
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
@@ -29,7 +29,7 @@ interface Props {
   jobs: DisplayJob[];
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getStaticProps: GetStaticProps<Props> = async () => {
   const jobs = await fetchWebsiteJobs();
 
   return {
@@ -45,6 +45,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
         salaryRange: job.salaryRange || null,
       })),
     },
+    revalidate: 300,
   };
 };
 
@@ -333,19 +334,19 @@ const AuthBarText = styled.p`
 `;
 
 const AuthBarBtn = styled.button`
-  padding: 0.6rem 1.4rem;
+  padding: 0.65rem 1.6rem;
   font-size: 1.4rem;
   font-weight: 700;
-  background: rgb(var(--cardBackground));
-  color: rgb(var(--text));
-  border: 1.5px solid rgba(var(--text), 0.5);
+  background: #ffffff;
+  color: #111827;
+  border: none;
   border-radius: 0.6rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.2s, background 0.2s;
+  transition: background 0.2s, transform 0.15s;
   &:hover {
-    border-color: rgba(var(--text), 0.9);
-    background: rgba(var(--text), 0.06);
+    background: #f3f4f6;
+    transform: translateY(-1px);
   }
 `;
 
@@ -366,14 +367,20 @@ const AuthBarBtnPrimary = styled.button`
 `;
 
 const AuthBarLink = styled.button`
-  font-size: 1.3rem;
-  color: rgba(var(--text), 0.5);
-  background: none;
-  border: none;
+  padding: 0.55rem 1.3rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.6rem;
   cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
   &:hover {
-    color: rgb(var(--text));
-    text-decoration: underline;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #fff;
   }
 `;
 

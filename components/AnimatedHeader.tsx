@@ -15,7 +15,7 @@ const LINKS = [
   { label: 'About', href: '/about-us' },
   { label: 'Services', href: '/services' },
   { label: 'Work', href: '/work' },
-  { label: 'Insights', href: '/insights' },
+  { label: 'Capabilities', href: '/capabilities-statement' },
   { label: 'Sectors', href: '/sectors' },
   { label: 'AI Training', href: '/ai-training', badge: 'NEW' },
   { label: 'Careers', href: '/careers' },
@@ -140,19 +140,22 @@ const NavItem = styled.li`
 `;
 
 const NavLinkText = styled(Link)<{ $active: boolean }>`
-  color: ${(p) => (p.$active ? 'rgb(255, 140, 43)' : 'rgba(255, 255, 255, 0.92)')};
-  font-weight: 600;
+  color: ${(p) => (p.$active ? '#000' : 'rgba(255, 255, 255, 0.92)')};
+  font-weight: ${(p) => (p.$active ? '800' : '600')};
   font-size: 1.6rem;
-  padding: 0.5rem 0;
-  transition: all 0.3s ease;
+  padding: ${(p) => (p.$active ? '0.4rem 1.1rem' : '0.5rem 0')};
+  transition: all 0.2s ease;
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
   display: inline-block;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  background: ${(p) => (p.$active ? '#ff8c2b' : 'transparent')};
+  border-radius: ${(p) => (p.$active ? '0.55rem' : '0')};
+  box-shadow: ${(p) => (p.$active ? '0 2px 10px rgba(255,140,43,0.45)' : 'none')};
+  text-shadow: none;
 
   &:hover {
-    color: rgb(255, 140, 43);
+    color: ${(p) => (p.$active ? '#000' : 'rgb(255, 140, 43)')};
   }
 
   ${media.desktop(`
@@ -331,15 +334,18 @@ const MobileNavItem = styled(motion.li)`
 
 const MobileNavLinkText = styled(Link)<{ $active: boolean }>`
   font-size: 2rem;
-  color: ${(p) => (p.$active ? 'rgb(var(--accent))' : 'rgb(var(--text))')};
-  font-weight: 500;
-  display: block;
-  padding: 0.8rem 0;
+  color: ${(p) => (p.$active ? '#000' : 'rgb(var(--text))')};
+  font-weight: ${(p) => (p.$active ? '800' : '500')};
+  display: inline-block;
+  padding: ${(p) => (p.$active ? '0.5rem 1.4rem' : '0.8rem 0')};
   cursor: pointer;
   text-decoration: none;
+  background: ${(p) => (p.$active ? '#ff8c2b' : 'transparent')};
+  border-radius: ${(p) => (p.$active ? '0.6rem' : '0')};
+  box-shadow: ${(p) => (p.$active ? '0 2px 8px rgba(255,140,43,0.4)' : 'none')};
 
   &:hover {
-    color: rgb(var(--accent));
+    color: ${(p) => (p.$active ? '#000' : 'rgb(var(--accent))')};
   }
 `;
 

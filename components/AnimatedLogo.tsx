@@ -17,12 +17,12 @@ export default function AnimatedLogo({ size = '7rem' }: LogoProps) {
           ease: "easeOut"
         }}
       >
-        <Image 
-          src="/logo.png" 
-          alt="Precise Analytics Logo" 
-          width={280} 
-          height={80}
-          style={{ height: 'auto', maxWidth: '100%' }} 
+        <Image
+          src="/Favicon/android-chrome-512x512.png"
+          alt="Precise Analytics Logo"
+          width={280}
+          height={280}
+          style={{ height: 'auto', maxWidth: '100%' }}
         />
       </motion.div>
     </LogoContainer>

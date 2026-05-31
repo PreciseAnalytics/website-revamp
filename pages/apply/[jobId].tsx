@@ -175,12 +175,6 @@ export default function ApplyPage({ job }: Props) {
     if (!fieldOfStudy.trim()) { setError('Please enter your field of study or major.'); return; }
     if (!graduationYear) { setError('Please select your graduation year.'); return; }
 
-    // Cover note required
-    if (coverNote.trim().length < 50) {
-      setError('Please write at least 50 characters explaining your interest in this role.');
-      return;
-    }
-
     if (!resumeFile) {
       setError('Please attach your resume — it is required to submit your application.');
       return;
@@ -232,7 +226,7 @@ export default function ApplyPage({ job }: Props) {
         }),
       });
       const atsData = await atsRes.json();
-      if (!atsRes.ok) throw new Error(atsData.error || 'Application submission failed');
+      if (!atsRes.ok) throw new Error(atsData.details ? `${atsData.error}: ${atsData.details}` : atsData.error || 'Application submission failed');
 
       // 3. Send team notification email via local API (non-blocking)
       try {
@@ -717,10 +711,10 @@ export default function ApplyPage({ job }: Props) {
                     <SectionLabel>Why This Role?</SectionLabel>
                     <FieldGroup>
                       <Label htmlFor="af-cover">
-                        Tell us why you&apos;re interested, relevant experience, and what makes you a strong fit <Req>*</Req>
+                        Tell us why you&apos;re interested, relevant experience, and what makes you a strong fit <Opt>(optional — but strongly recommended)</Opt>
                       </Label>
                       <CoverHint>
-                        Include your school, degree, and any certifications if not already listed above. Our team uses this response to evaluate fit — the more detail, the better.
+                        The more detail here, the better we can evaluate your application. Mention anything not captured above — certifications, past projects, why this role fits your goals.
                       </CoverHint>
                       <Textarea
                         id="af-cover"
@@ -730,8 +724,8 @@ export default function ApplyPage({ job }: Props) {
                         maxLength={3000}
                         placeholder="Example: I graduated with a Bachelor's in Computer Science from Virginia Tech in 2021. I have 3 years of experience building data pipelines in Python and SQL…"
                       />
-                      <CharCount $warn={coverNote.length < 50 && coverNote.length > 0}>
-                        {coverNote.length} / 3,000 {coverNote.length < 50 && coverNote.length > 0 ? `— ${50 - coverNote.length} more characters needed` : ''}
+                      <CharCount>
+                        {coverNote.length} / 3,000
                       </CharCount>
                     </FieldGroup>
                   </FormSection>
@@ -934,9 +928,10 @@ const FormHeading = styled.h1`
 
 const AuthNotice = styled.div`
   font-size: 1.4rem;
-  color: #166534;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  color: #1e293b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #22c55e;
   border-radius: 0.7rem;
   padding: 1rem 1.4rem;
   margin-bottom: 1.6rem;
@@ -1020,15 +1015,22 @@ const sharedInput = `
     box-shadow: 0 0 0 3px rgba(255, 125, 0, 0.12);
   }
   &::placeholder { color: #94a3b8; }
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+    -webkit-text-fill-color: #1e293b;
+    caret-color: #1e293b;
+  }
 `;
 
 const Input = styled.input`${sharedInput}`;
 const Select = styled.select`${sharedInput} cursor: pointer; appearance: auto;`;
 const Textarea = styled.textarea`${sharedInput} resize: vertical; line-height: 1.65;`;
 
-const CharCount = styled.p<{ $warn?: boolean }>`
+const CharCount = styled.p`
   font-size: 1.2rem;
-  color: ${(p) => (p.$warn ? '#ef4444' : '#94a3b8')};
+  color: #94a3b8;
   text-align: right;
 `;
 
@@ -1201,9 +1203,10 @@ const ResumePickBtn = styled.button<{ $selected?: boolean }>`
 const AutofillBanner = styled.div`
   font-size: 1.4rem;
   font-weight: 600;
-  color: #166534;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  color: #1e293b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #22c55e;
   border-radius: 0.6rem;
   padding: 0.9rem 1.2rem;
 `;

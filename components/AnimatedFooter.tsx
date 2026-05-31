@@ -67,6 +67,7 @@ const certifications = [
   { name: 'SOC 2 Type II', image: '/certifications/soc2.svg', href: '/capabilities-statement' },
   { name: 'CMMI', image: '/CMMI_LOGO.png', href: '/capabilities-statement' },
   { name: 'FedRAMP', image: '/fedramp-logo-vert.svg', href: '/capabilities-statement' },
+  { name: 'SBA', image: '/sba-logo.png', href: '/capabilities-statement' },
 ];
 
 export default function AnimatedFooter() {

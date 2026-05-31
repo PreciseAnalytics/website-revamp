@@ -113,6 +113,7 @@ export default function ContactHero() {
             </MessageBtn>
 
             <CertRow>
+              <CertImg src="/sba-logo.png" alt="SBA Registered" width={120} height={80} />
               <CertImg src="/fedramp-logo-vert.svg" alt="FedRAMP Aligned" width={80} height={80} />
               <CertImg src="/CMMI_LOGO.png" alt="CMMI" width={120} height={80} />
             </CertRow>

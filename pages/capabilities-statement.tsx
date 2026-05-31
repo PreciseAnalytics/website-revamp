@@ -150,6 +150,14 @@ export default function CapabilitiesStatementPage() {
                 <CertificationLogos>
                   <LogoContainer>
                     <CertificationLogo
+                      src="/sba-logo.png"
+                      alt="SBA Registered"
+                      width={120} height={80}
+                    />
+                    <LogoLabel>SBA REGISTERED</LogoLabel>
+                  </LogoContainer>
+                  <LogoContainer>
+                    <CertificationLogo
                       src="/fedramp-logo-vert.svg"
                       alt="FedRAMP Aligned"
                       width={80} height={80}

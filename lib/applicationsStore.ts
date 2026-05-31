@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-export type ApplicationStatus = 'received' | 'under_review' | 'interview' | 'offer' | 'closed';
+export type ApplicationStatus = 'received' | 'under_review' | 'interview' | 'offer' | 'closed' | 'withdrawn';
 
 export interface ApplicationRecord {
   id: string;
@@ -11,6 +11,7 @@ export interface ApplicationRecord {
   phone: string;
   jobTitle: string;
   jobNumber: string;
+  jobId?: string;
   linkedinUrl?: string;
   portfolioUrl?: string;
   location?: string;
@@ -71,4 +72,14 @@ export function updateStatus(id: string, status: ApplicationStatus): void {
     r.statusUpdatedAt = new Date().toISOString();
     writeAll(records);
   }
+}
+
+export function withdrawApplication(id: string, email: string): boolean {
+  const records = readAll();
+  const r = records.find(r => r.id === id && r.applicantEmail === email.toLowerCase());
+  if (!r || r.status === 'withdrawn' || r.status === 'closed') return false;
+  r.status = 'withdrawn';
+  r.statusUpdatedAt = new Date().toISOString();
+  writeAll(records);
+  return true;
 }

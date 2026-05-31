@@ -62,6 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const visaSponsor = get('visaSponsorship');
   const jobTitle    = get('jobTitle');
   const jobNumber   = get('jobNumber');
+  const jobId       = get('jobId');
   const coverNote   = get('coverNote');
 
   if (!name || !email || !jobTitle) {
@@ -376,6 +377,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     phone,
     jobTitle,
     jobNumber,
+    jobId: jobId || undefined,
     linkedinUrl: linkedinUrl || undefined,
     portfolioUrl: portfolioUrl || undefined,
     location: [city, state, country].filter(Boolean).join(', ') || undefined,

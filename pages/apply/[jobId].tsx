@@ -152,6 +152,7 @@ export default function ApplyPage({ job }: Props) {
         fd.append('phone', phone.trim());
         fd.append('jobTitle', job.title);
         fd.append('jobNumber', job.jobNumber);
+        fd.append('jobId', job.id);
         fd.append('coverNote', coverNote.trim());
         fd.append('city', city.trim());
         fd.append('state', state.trim());

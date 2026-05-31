@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { useAuth } from 'contexts/auth.context';
@@ -11,11 +11,12 @@ import { media } from 'utils/media';
 import type { ApplicationRecord, ApplicationStatus } from 'lib/applicationsStore';
 
 const STATUS_CONFIG: Record<ApplicationStatus, { label: string; color: string; bg: string }> = {
-  received:      { label: 'Received',      color: '#2563eb', bg: 'rgba(37,99,235,0.1)'  },
-  under_review:  { label: 'Under Review',  color: '#d97706', bg: 'rgba(217,119,6,0.1)'  },
-  interview:     { label: 'Interview',     color: '#7c3aed', bg: 'rgba(124,58,237,0.1)' },
-  offer:         { label: 'Offer',         color: '#16a34a', bg: 'rgba(22,163,74,0.1)'  },
-  closed:        { label: 'Closed',        color: '#6b7280', bg: 'rgba(107,114,128,0.1)'},
+  received:      { label: 'Received',      color: '#2563eb', bg: 'rgba(37,99,235,0.1)'   },
+  under_review:  { label: 'Under Review',  color: '#d97706', bg: 'rgba(217,119,6,0.1)'   },
+  interview:     { label: 'Interview',     color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
+  offer:         { label: 'Offer',         color: '#16a34a', bg: 'rgba(22,163,74,0.1)'   },
+  closed:        { label: 'Closed',        color: '#6b7280', bg: 'rgba(107,114,128,0.1)' },
+  withdrawn:     { label: 'Withdrawn',     color: '#9ca3af', bg: 'rgba(156,163,175,0.1)' },
 };
 
 function formatDate(iso: string) {
@@ -29,10 +30,16 @@ export default function ProfilePage() {
   const { user, logout } = useAuth();
   const [applications, setApplications] = useState<ApplicationRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+  const [confirmWithdraw, setConfirmWithdraw] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) { router.replace('/careers'); return; }
+    fetchApplications();
+  }, [user, router]);
 
+  function fetchApplications() {
+    if (!user) return;
     fetch('/api/applications', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -42,9 +49,35 @@ export default function ProfilePage() {
       .then(d => setApplications(d.applications || []))
       .catch(() => setApplications([]))
       .finally(() => setLoading(false));
-  }, [user, router]);
+  }
+
+  async function handleWithdraw(appId: string) {
+    if (!user) return;
+    setWithdrawingId(appId);
+    try {
+      const res = await fetch('/api/applications/withdraw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicationId: appId, email: user.email }),
+      });
+      if (res.ok) {
+        setApplications(prev =>
+          prev.map(a => a.id === appId
+            ? { ...a, status: 'withdrawn' as ApplicationStatus, statusUpdatedAt: new Date().toISOString() }
+            : a
+          )
+        );
+      }
+    } finally {
+      setWithdrawingId(null);
+      setConfirmWithdraw(null);
+    }
+  }
 
   if (!user) return null;
+
+  const activeApps = applications.filter(a => a.status !== 'withdrawn' && a.status !== 'closed');
+  const closedApps = applications.filter(a => a.status === 'withdrawn' || a.status === 'closed');
 
   return (
     <>
@@ -68,11 +101,25 @@ export default function ProfilePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <Avatar>{user.firstName[0]}{user.lastName[0]}</Avatar>
-            <ProfileInfo>
-              <ProfileName>{user.firstName} {user.lastName}</ProfileName>
-              <ProfileMeta>{user.email}{user.phone ? ` · ${user.phone}` : ''}</ProfileMeta>
-            </ProfileInfo>
+            <ProfileLeft>
+              <Avatar>{user.firstName[0]}{user.lastName[0]}</Avatar>
+              <ProfileInfo>
+                <ProfileName>{user.firstName} {user.lastName}</ProfileName>
+                <ProfileMeta>{user.email}</ProfileMeta>
+                {user.phone && <ProfileMeta>{user.phone}</ProfileMeta>}
+              </ProfileInfo>
+            </ProfileLeft>
+            <ProfileStats>
+              <StatItem>
+                <StatNum>{activeApps.length}</StatNum>
+                <StatLabel>Active</StatLabel>
+              </StatItem>
+              <StatDivider />
+              <StatItem>
+                <StatNum>{applications.length}</StatNum>
+                <StatLabel>Total Applied</StatLabel>
+              </StatItem>
+            </ProfileStats>
           </ProfileCard>
 
           {/* Applications */}
@@ -84,58 +131,107 @@ export default function ProfilePage() {
             <EmptyCard>
               <EmptyIcon>📋</EmptyIcon>
               <EmptyTitle>No applications yet</EmptyTitle>
-              <EmptyText>
-                Browse open positions and submit your first application.
-              </EmptyText>
+              <EmptyText>Browse open positions and submit your first application.</EmptyText>
               <BrowseLink href="/careers">Browse Open Positions →</BrowseLink>
             </EmptyCard>
           ) : (
-            <ApplicationsTable>
-              <thead>
-                <tr>
-                  <Th>Position</Th>
-                  <Th $hide="mobile">Job #</Th>
-                  <Th>Status</Th>
-                  <Th $hide="mobile">Applied</Th>
-                  <Th $hide="mobile">Last Update</Th>
-                  <Th $hide="mobile">Documents</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {applications.map((app, i) => {
-                  const s = STATUS_CONFIG[app.status];
-                  return (
-                    <ApplicationRow
-                      key={app.id}
-                      as={motion.tr}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: i * 0.05 }}
-                    >
-                      <Td>
-                        <PositionTitle>{app.jobTitle}</PositionTitle>
-                        <PositionMeta>{app.jobNumber}</PositionMeta>
-                      </Td>
-                      <Td $hide="mobile">
-                        <JobNumber>{app.jobNumber}</JobNumber>
-                      </Td>
-                      <Td>
+            <>
+              {applications.map((app, i) => {
+                const s = STATUS_CONFIG[app.status] ?? STATUS_CONFIG.closed;
+                const canWithdraw = app.status !== 'withdrawn' && app.status !== 'closed';
+                const isConfirming = confirmWithdraw === app.id;
+                const isWithdrawing = withdrawingId === app.id;
+
+                return (
+                  <AppCard
+                    key={app.id}
+                    as={motion.div}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.06 }}
+                    $withdrawn={app.status === 'withdrawn'}
+                  >
+                    <AppCardTop>
+                      <AppCardMain>
+                        <AppPosition>
+                          {app.jobId ? (
+                            <PositionLink href={`/careers/${app.jobId}`}>
+                              {app.jobTitle}
+                            </PositionLink>
+                          ) : (
+                            <PositionText>{app.jobTitle}</PositionText>
+                          )}
+                          <JobNumberBadge>{app.jobNumber}</JobNumberBadge>
+                        </AppPosition>
+                        <AppMeta>
+                          Applied {formatDate(app.submittedAt)}
+                          {app.statusUpdatedAt !== app.submittedAt && (
+                            <> · Updated {formatDate(app.statusUpdatedAt)}</>
+                          )}
+                          {app.location && <> · {app.location}</>}
+                        </AppMeta>
+                      </AppCardMain>
+                      <AppCardRight>
                         <StatusBadge $color={s.color} $bg={s.bg}>{s.label}</StatusBadge>
-                      </Td>
-                      <Td $hide="mobile">{formatDate(app.submittedAt)}</Td>
-                      <Td $hide="mobile">{formatDate(app.statusUpdatedAt)}</Td>
-                      <Td $hide="mobile">
-                        <DocIcons>
-                          <DocIcon $has={app.hasResume} title={app.hasResume ? 'Resume submitted' : 'No resume'}>📄</DocIcon>
-                          <DocIcon $has={app.hasCoverLetter} title={app.hasCoverLetter ? 'Cover letter submitted' : 'No cover letter'}>✉️</DocIcon>
-                          <DocIcon $has={app.hasCerts} title={app.hasCerts ? 'Certifications submitted' : 'No certifications'}>🏅</DocIcon>
-                        </DocIcons>
-                      </Td>
-                    </ApplicationRow>
-                  );
-                })}
-              </tbody>
-            </ApplicationsTable>
+                        {canWithdraw && (
+                          isConfirming ? (
+                            <ConfirmRow>
+                              <ConfirmText>Withdraw this application?</ConfirmText>
+                              <ConfirmBtn
+                                onClick={() => handleWithdraw(app.id)}
+                                disabled={isWithdrawing}
+                              >
+                                {isWithdrawing ? 'Withdrawing…' : 'Yes, withdraw'}
+                              </ConfirmBtn>
+                              <CancelBtn onClick={() => setConfirmWithdraw(null)}>Cancel</CancelBtn>
+                            </ConfirmRow>
+                          ) : (
+                            <WithdrawBtn onClick={() => setConfirmWithdraw(app.id)}>
+                              Withdraw
+                            </WithdrawBtn>
+                          )
+                        )}
+                      </AppCardRight>
+                    </AppCardTop>
+
+                    <AppCardBottom>
+                      <DocSection>
+                        <DocLabel>Documents submitted:</DocLabel>
+                        <DocBadges>
+                          {app.hasResume && <DocBadge $present>Resume</DocBadge>}
+                          {app.hasCoverLetter && <DocBadge $present>Cover Letter</DocBadge>}
+                          {app.hasCerts && <DocBadge $present>Certifications</DocBadge>}
+                          {!app.hasResume && !app.hasCoverLetter && !app.hasCerts && (
+                            <DocNote>No documents attached</DocNote>
+                          )}
+                        </DocBadges>
+                      </DocSection>
+                      {(app.linkedinUrl || app.portfolioUrl) && (
+                        <LinkSection>
+                          {app.linkedinUrl && (
+                            <ProfileLink href={app.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                              LinkedIn ↗
+                            </ProfileLink>
+                          )}
+                          {app.portfolioUrl && (
+                            <ProfileLink href={app.portfolioUrl} target="_blank" rel="noopener noreferrer">
+                              Portfolio ↗
+                            </ProfileLink>
+                          )}
+                        </LinkSection>
+                      )}
+                    </AppCardBottom>
+                  </AppCard>
+                );
+              })}
+
+              <DocNote style={{ marginTop: '1.5rem', display: 'block', textAlign: 'center' }}>
+                Documents are securely stored in our applicant tracking system. To request copies, contact{' '}
+                <a href="mailto:careers@preciseanalytics.io" style={{ color: 'rgb(255,125,0)' }}>
+                  careers@preciseanalytics.io
+                </a>
+              </DocNote>
+            </>
           )}
 
           {/* Status legend */}
@@ -188,13 +284,47 @@ const SignOutBtn = styled.button`
 const ProfileCard = styled(motion.div)`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 2rem;
   background: rgba(var(--cardBackground), 0.9);
   border: 1px solid rgba(var(--text), 0.1);
   border-radius: 1.2rem;
   padding: 2.5rem 3rem;
   margin-bottom: 4rem;
-  ${media.tablet(`padding: 2rem;`)}
+  ${media.tablet(`flex-direction: column; align-items: flex-start; padding: 2rem;`)}
+`;
+
+const ProfileLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+`;
+
+const ProfileStats = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  ${media.tablet(`padding-left: 8rem;`)}
+`;
+
+const StatItem = styled.div`
+  text-align: center;
+`;
+const StatNum = styled.div`
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: rgb(255,125,0);
+  line-height: 1;
+`;
+const StatLabel = styled.div`
+  font-size: 1.2rem;
+  color: rgba(var(--text), 0.5);
+  margin-top: 0.3rem;
+  white-space: nowrap;
+`;
+const StatDivider = styled.div`
+  width: 1px; height: 4rem;
+  background: rgba(var(--text), 0.1);
 `;
 
 const Avatar = styled.div`
@@ -214,11 +344,12 @@ const ProfileName = styled.h1`
   font-size: 2.4rem;
   font-weight: 700;
   color: rgb(var(--text));
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.3rem;
 `;
 const ProfileMeta = styled.p`
   font-size: 1.5rem;
   color: rgba(var(--text), 0.6);
+  margin: 0;
 `;
 
 const SectionTitle = styled.h2`
@@ -258,60 +389,74 @@ const BrowseLink = styled(Link)`
   &:hover { background: rgb(230,100,0); }
 `;
 
-const ApplicationsTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1.5rem;
+const AppCard = styled(motion.div)<{ $withdrawn?: boolean }>`
+  background: rgba(var(--cardBackground), 0.9);
+  border: 1px solid rgba(var(--text), ${p => p.$withdrawn ? '0.06' : '0.1'});
+  border-radius: 1.2rem;
+  padding: 2rem 2.4rem;
+  margin-bottom: 1.6rem;
+  opacity: ${p => p.$withdrawn ? 0.6 : 1};
 `;
 
-const Th = styled.th<{ $hide?: string }>`
-  text-align: left;
-  padding: 0 1.4rem 1.2rem;
-  font-size: 1.2rem;
+const AppCardTop = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.4rem;
+  ${media.tablet(`flex-direction: column; gap: 1rem;`)}
+`;
+
+const AppCardMain = styled.div`flex: 1;`;
+
+const AppPosition = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+`;
+
+const PositionLink = styled(Link)`
+  font-size: 1.8rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: rgba(var(--text), 0.45);
-  border-bottom: 2px solid rgba(var(--text), 0.1);
-  ${({ $hide }) => $hide === 'mobile' ? media.tablet(`display: none;`) : ''}
+  color: rgb(255,125,0);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
 `;
 
-const ApplicationRow = styled.tr`
-  border-bottom: 1px solid rgba(var(--text), 0.07);
-  transition: background 0.15s;
-  &:hover { background: rgba(255,125,0,0.03); }
-`;
-
-const Td = styled.td<{ $hide?: string }>`
-  padding: 1.8rem 1.4rem;
-  vertical-align: middle;
-  color: rgba(var(--text), 0.85);
-  ${({ $hide }) => $hide === 'mobile' ? media.tablet(`display: none;`) : ''}
-`;
-
-const PositionTitle = styled.span`
-  display: block;
-  font-size: 1.6rem;
+const PositionText = styled.span`
+  font-size: 1.8rem;
   font-weight: 700;
   color: rgb(var(--text));
-  margin-bottom: 0.3rem;
 `;
-const PositionMeta = styled.span`
-  display: block;
-  font-size: 1.2rem;
+
+const JobNumberBadge = styled.span`
+  font-size: 1.1rem;
+  font-family: monospace;
   color: rgba(var(--text), 0.4);
-  font-family: monospace;
-  ${media.tablet(`display: inline;`)}
+  background: rgba(var(--text), 0.06);
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.6rem;
 `;
-const JobNumber = styled.span`
-  font-size: 1.3rem;
-  font-family: monospace;
+
+const AppMeta = styled.div`
+  font-size: 1.35rem;
   color: rgba(var(--text), 0.5);
+`;
+
+const AppCardRight = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.8rem;
+  flex-shrink: 0;
+  ${media.tablet(`align-items: flex-start;`)}
 `;
 
 const StatusBadge = styled.span<{ $color: string; $bg: string }>`
   display: inline-block;
-  padding: 0.35rem 1rem;
+  padding: 0.35rem 1.1rem;
   border-radius: 2rem;
   font-size: 1.2rem;
   font-weight: 700;
@@ -320,14 +465,107 @@ const StatusBadge = styled.span<{ $color: string; $bg: string }>`
   white-space: nowrap;
 `;
 
-const DocIcons = styled.div`
-  display: flex;
-  gap: 0.6rem;
+const WithdrawBtn = styled.button`
+  font-size: 1.2rem;
+  color: rgba(var(--text), 0.4);
+  background: none;
+  border: 1px solid rgba(var(--text), 0.15);
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  &:hover { color: #dc2626; border-color: rgba(220,38,38,0.4); }
 `;
-const DocIcon = styled.span<{ $has: boolean }>`
-  font-size: 1.6rem;
-  opacity: ${p => p.$has ? 1 : 0.2};
-  cursor: default;
+
+const ConfirmRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  ${media.tablet(`align-items: flex-start;`)}
+`;
+
+const ConfirmText = styled.span`
+  font-size: 1.25rem;
+  color: #dc2626;
+  font-weight: 600;
+`;
+
+const ConfirmBtn = styled.button`
+  font-size: 1.2rem;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+`;
+
+const CancelBtn = styled.button`
+  font-size: 1.2rem;
+  color: rgba(var(--text), 0.5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+`;
+
+const AppCardBottom = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(var(--text), 0.06);
+  flex-wrap: wrap;
+`;
+
+const DocSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+`;
+
+const DocLabel = styled.span`
+  font-size: 1.25rem;
+  color: rgba(var(--text), 0.45);
+  white-space: nowrap;
+`;
+
+const DocBadges = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
+const DocBadge = styled.span<{ $present: boolean }>`
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0.25rem 0.8rem;
+  border-radius: 0.4rem;
+  background: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+  border: 1px solid rgba(22, 163, 74, 0.2);
+`;
+
+const DocNote = styled.span`
+  font-size: 1.25rem;
+  color: rgba(var(--text), 0.4);
+`;
+
+const LinkSection = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+const ProfileLink = styled.a`
+  font-size: 1.3rem;
+  color: rgb(255,125,0);
+  text-decoration: none;
+  font-weight: 600;
+  &:hover { text-decoration: underline; }
 `;
 
 const Legend = styled.div`

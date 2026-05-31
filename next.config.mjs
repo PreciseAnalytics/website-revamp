@@ -96,7 +96,15 @@ const nextConfig = {
   // Add headers for better SEO
   async headers() {
     return [
-{
+      {
+        source: '/bimi-logo.svg',
+        headers: [
+          { key: 'Content-Type', value: 'image/svg+xml' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Cache-Control', value: 'public, max-age=86400' },
+        ],
+      },
+      {
         source: '/sitemap.xml',
         headers: [
           {

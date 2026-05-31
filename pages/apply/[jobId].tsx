@@ -20,7 +20,6 @@ interface Props {
     departmentLabel: string;
     locationLabel: string;
     employmentTypeLabel: string;
-    salaryRange?: string | null;
     description?: string;
   };
 }
@@ -48,7 +47,7 @@ const DEGREE_OPTIONS = [
 ];
 
 export default function ApplyPage({ job }: Props) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   // Personal info
@@ -319,12 +318,6 @@ export default function ApplyPage({ job }: Props) {
                       <MetaIcon>#</MetaIcon>
                       {job.jobNumber}
                     </JobMetaRow>
-                    {job.salaryRange && (
-                      <JobMetaRow>
-                        <MetaIcon>&#36;</MetaIcon>
-                        {job.salaryRange}
-                      </JobMetaRow>
-                    )}
                   </JobMeta>
                   <ViewJobLink href={`/careers/${job.id}`}>View Job Details &rarr;</ViewJobLink>
                 </JobCard>
@@ -347,7 +340,13 @@ export default function ApplyPage({ job }: Props) {
                 <FormHeading>Your Application</FormHeading>
                 {user && (
                   <AuthNotice>
-                    Signed in as <strong>{user.firstName} {user.lastName}</strong> — your details have been pre-filled.
+                    <AuthNoticeLeft>
+                      Signed in as <strong>{user.firstName} {user.lastName}</strong> — your details have been pre-filled.
+                    </AuthNoticeLeft>
+                    <AuthNoticeActions>
+                      <AuthNoticeLink href="/careers/profile">My Profile</AuthNoticeLink>
+                      <AuthNoticeSignOut type="button" onClick={logout}>Sign Out</AuthNoticeSignOut>
+                    </AuthNoticeActions>
                   </AuthNotice>
                 )}
 
@@ -779,7 +778,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
           departmentLabel: job.departmentLabel,
           locationLabel: job.locationLabel,
           employmentTypeLabel: job.employmentTypeLabel,
-          salaryRange: job.salaryRange || null,
           description: job.description,
         },
       },
@@ -935,6 +933,38 @@ const AuthNotice = styled.div`
   border-radius: 0.7rem;
   padding: 1rem 1.4rem;
   margin-bottom: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+`;
+
+const AuthNoticeLeft = styled.span`flex: 1;`;
+
+const AuthNoticeActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-shrink: 0;
+`;
+
+const AuthNoticeLink = styled(Link)`
+  font-size: 1.3rem;
+  color: #0ea5e9;
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+`;
+
+const AuthNoticeSignOut = styled.button`
+  font-size: 1.3rem;
+  color: #64748b;
+  background: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  &:hover { color: #ef4444; border-color: #ef4444; }
 `;
 
 const AppForm = styled.form`

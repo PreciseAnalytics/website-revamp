@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function JobDetailPage({ job }: Props) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [authModal, setAuthModal] = useState<'login' | 'register' | 'reset' | null>(null);
 
   const seoTitle = (() => {
@@ -89,6 +89,28 @@ export default function JobDetailPage({ job }: Props) {
             <BreadcrumbSep>/</BreadcrumbSep>
             <BreadcrumbCurrent>{job.title}</BreadcrumbCurrent>
           </Breadcrumb>
+
+          <AuthBar>
+            {user ? (
+              <>
+                <AuthBarText>
+                  Signed in as <strong>{user.firstName} {user.lastName}</strong>
+                </AuthBarText>
+                <AuthBarActions>
+                  <AuthBarProfileLink href="/careers/profile">My Profile</AuthBarProfileLink>
+                  <AuthBarSignOut type="button" onClick={logout}>Sign Out</AuthBarSignOut>
+                </AuthBarActions>
+              </>
+            ) : (
+              <>
+                <AuthBarText>Have an account? Sign in to pre-fill your application.</AuthBarText>
+                <AuthBarActions>
+                  <AuthBarBtn type="button" onClick={() => setAuthModal('login')}>Sign In</AuthBarBtn>
+                  <AuthBarBtnPrimary type="button" onClick={() => setAuthModal('register')}>Create Account</AuthBarBtnPrimary>
+                </AuthBarActions>
+              </>
+            )}
+          </AuthBar>
 
           <TwoColumnLayout>
             {/* ── Sticky sidebar ── */}
@@ -228,6 +250,42 @@ const Breadcrumb = styled.nav`
 const BreadcrumbLink = styled(Link)`color: rgb(255,125,0); text-decoration: none; &:hover{text-decoration:underline;}`;
 const BreadcrumbSep = styled.span`color: rgba(var(--text),0.4);`;
 const BreadcrumbCurrent = styled.span`color: rgba(var(--text),0.7);`;
+
+const AuthBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-left: 4px solid rgb(255,125,0);
+  border-radius: 0.8rem;
+  padding: 1rem 1.6rem;
+  margin-bottom: 2.4rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+`;
+const AuthBarText = styled.p`font-size: 1.4rem; color: #334155; margin: 0;`;
+const AuthBarActions = styled.div`display: flex; align-items: center; gap: 0.8rem; flex-shrink: 0;`;
+const AuthBarProfileLink = styled(Link)`
+  font-size: 1.3rem; color: #0ea5e9; text-decoration: none;
+  &:hover { text-decoration: underline; }
+`;
+const AuthBarSignOut = styled.button`
+  font-size: 1.3rem; color: #64748b; background: none;
+  border: 1px solid #cbd5e1; border-radius: 0.4rem; padding: 0.3rem 0.9rem; cursor: pointer;
+  &:hover { color: #ef4444; border-color: #ef4444; }
+`;
+const AuthBarBtn = styled.button`
+  font-size: 1.3rem; color: #334155; background: none;
+  border: 1px solid #cbd5e1; border-radius: 0.4rem; padding: 0.4rem 1rem; cursor: pointer;
+  &:hover { border-color: #94a3b8; }
+`;
+const AuthBarBtnPrimary = styled.button`
+  font-size: 1.3rem; color: #ffffff; background: rgb(255,125,0);
+  border: none; border-radius: 0.5rem; padding: 0.5rem 1.2rem; cursor: pointer;
+  &:hover { opacity: 0.9; }
+`;
 
 const TwoColumnLayout = styled.div`
   display: flex;

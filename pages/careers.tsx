@@ -22,7 +22,6 @@ interface DisplayJob {
   locationLabel: string;
   employmentType: string;
   employmentTypeLabel: string;
-  salaryRange?: string | null;
 }
 
 interface Props {
@@ -42,7 +41,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         locationLabel: job.locationLabel,
         employmentType: job.employmentType,
         employmentTypeLabel: job.employmentTypeLabel,
-        salaryRange: job.salaryRange || null,
       })),
     },
     revalidate: 300,

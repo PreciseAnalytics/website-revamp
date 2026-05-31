@@ -48,7 +48,9 @@ export function normalizeAtsJob(raw: any): Job {
 
   return {
     id,
-    jobNumber: raw.job_number || `PA-${id.slice(0, 6).toUpperCase()}`,
+    jobNumber: raw.job_number
+      ? `PA-${String(raw.job_number).padStart(4, '0')}`
+      : `PA-${id.slice(0, 6).toUpperCase()}`,
     title: raw.title || 'Open Position',
     department: String(raw.department || 'general').toLowerCase().replace(/\s+/g, '-'),
     departmentLabel: raw.department || 'General',
@@ -57,7 +59,7 @@ export function normalizeAtsJob(raw: any): Job {
     employmentType,
     employmentTypeLabel: labelize(raw.employment_type || raw.type, 'Full Time'),
     postedDate: raw.created_at || raw.posted_at || new Date().toISOString(),
-    salaryRange: raw.salary_range || undefined,
+    salaryRange: undefined,
     clearanceLevel: raw.clearance_level || undefined,
     summary: raw.summary || raw.description || `${raw.title || 'This role'} at Precise Analytics.`,
     description: raw.description || '',

@@ -8,7 +8,7 @@ import mammoth from 'mammoth';
 export const config = { api: { bodyParser: false } };
 
 // Update this to the current non-deprecated Gemini model ID from aistudio.google.com
-const GEMINI_MODEL = 'gemini-2.5-flash-preview-05-20';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 const PROMPT = `Extract the following fields from this resume and return ONLY a valid JSON object — no markdown, no explanation, no code fences.
 
@@ -97,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ success: true, data });
   } catch (err: any) {
-    console.error('Resume parse error:', err);
+    console.error('Resume parse error:', err?.message || String(err));
     return res.status(500).json({ error: 'Could not parse resume. Please fill in the fields manually.' });
   }
 }

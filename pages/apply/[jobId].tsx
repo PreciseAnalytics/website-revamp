@@ -25,6 +25,16 @@ interface Props {
   };
 }
 
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 10);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+}
+
+const CURRENT_YEAR = new Date().getFullYear();
+const GRAD_YEARS = Array.from({ length: CURRENT_YEAR - 1969 + 6 }, (_, i) => CURRENT_YEAR + 5 - i);
+
 export default function ApplyPage({ job }: Props) {
   const { user } = useAuth();
   const router = useRouter();
@@ -36,6 +46,12 @@ export default function ApplyPage({ job }: Props) {
   const [phone, setPhone] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
+
+  // Education
+  const [school, setSchool] = useState('');
+  const [degree, setDegree] = useState('');
+  const [fieldOfStudy, setFieldOfStudy] = useState('');
+  const [graduationYear, setGraduationYear] = useState('');
 
   // Address / work auth
   const [city, setCity] = useState('');
@@ -91,6 +107,25 @@ export default function ApplyPage({ job }: Props) {
     e.preventDefault();
     setError('');
 
+    // Phone: must have at least 10 digits
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      setError('Please enter a valid 10-digit phone number.');
+      return;
+    }
+
+    // Education
+    if (!school.trim()) { setError('Please enter your school or institution name.'); return; }
+    if (!degree) { setError('Please select your degree.'); return; }
+    if (!fieldOfStudy.trim()) { setError('Please enter your field of study or major.'); return; }
+    if (!graduationYear) { setError('Please select your graduation year.'); return; }
+
+    // Cover note required
+    if (coverNote.trim().length < 50) {
+      setError('Please write at least 50 characters explaining your interest in this role.');
+      return;
+    }
+
     if (!resumeFile) {
       setError('Please attach your resume — it is required to submit your application.');
       return;
@@ -113,6 +148,7 @@ export default function ApplyPage({ job }: Props) {
       }
 
       // 2. Submit application to ATS database
+      const educationSummary = `${degree} in ${fieldOfStudy.trim()} — ${school.trim()} (${graduationYear})`;
       const atsRes = await fetch(`${ATS_API}/applications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -131,6 +167,7 @@ export default function ApplyPage({ job }: Props) {
           country: country.trim(),
           work_authorized: workAuthorized,
           visa_sponsorship: visaSponsorship,
+          highest_education: educationSummary,
           why_interested: coverNote.trim(),
           position_applying_for: job.title,
           application_source: 'preciseanalytics.io',
@@ -142,7 +179,7 @@ export default function ApplyPage({ job }: Props) {
       const atsData = await atsRes.json();
       if (!atsRes.ok) throw new Error(atsData.error || 'Application submission failed');
 
-      // 3. Send acknowledgment email via local API (non-blocking)
+      // 3. Send team notification email via local API (non-blocking)
       try {
         const fd = new FormData();
         fd.append('firstName', firstName.trim());
@@ -154,6 +191,7 @@ export default function ApplyPage({ job }: Props) {
         fd.append('jobNumber', job.jobNumber);
         fd.append('jobId', job.id);
         fd.append('coverNote', coverNote.trim());
+        fd.append('education', educationSummary);
         fd.append('city', city.trim());
         fd.append('state', state.trim());
         fd.append('country', country.trim());
@@ -321,10 +359,12 @@ export default function ApplyPage({ job }: Props) {
                           id="af-phone"
                           type="tel"
                           value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
+                          onChange={(e) => setPhone(formatPhone(e.target.value))}
                           required
                           autoComplete="tel"
                           placeholder="(555) 555-5555"
+                          maxLength={14}
+                          inputMode="tel"
                         />
                       </FieldGroup>
                     </FieldRow>
@@ -357,7 +397,74 @@ export default function ApplyPage({ job }: Props) {
                     </FieldGroup>
                   </FormSection>
 
-                  {/* ── Section 3: Location & Work Authorization ── */}
+                  {/* ── Section 3: Education ── */}
+                  <FormSection>
+                    <SectionLabel>Education Background</SectionLabel>
+
+                    <FieldRow>
+                      <FieldGroup>
+                        <Label htmlFor="af-school">School / Institution <Req>*</Req></Label>
+                        <Input
+                          id="af-school"
+                          type="text"
+                          value={school}
+                          onChange={(e) => setSchool(e.target.value)}
+                          required
+                          placeholder="Virginia Tech"
+                        />
+                      </FieldGroup>
+                      <FieldGroup>
+                        <Label htmlFor="af-degree">Highest Degree <Req>*</Req></Label>
+                        <Select
+                          id="af-degree"
+                          value={degree}
+                          onChange={(e) => setDegree(e.target.value)}
+                          required
+                        >
+                          <option value="">Select degree…</option>
+                          <option value="High School / GED">High School / GED</option>
+                          <option value="Associate's">Associate&apos;s</option>
+                          <option value="Bachelor's">Bachelor&apos;s</option>
+                          <option value="Master's">Master&apos;s</option>
+                          <option value="MBA">MBA</option>
+                          <option value="PhD / Doctorate">PhD / Doctorate</option>
+                          <option value="Professional Degree (JD/MD)">Professional Degree (JD/MD)</option>
+                          <option value="Bootcamp / Certificate">Bootcamp / Certificate</option>
+                          <option value="Other">Other</option>
+                        </Select>
+                      </FieldGroup>
+                    </FieldRow>
+
+                    <FieldRow>
+                      <FieldGroup>
+                        <Label htmlFor="af-major">Field of Study / Major <Req>*</Req></Label>
+                        <Input
+                          id="af-major"
+                          type="text"
+                          value={fieldOfStudy}
+                          onChange={(e) => setFieldOfStudy(e.target.value)}
+                          required
+                          placeholder="Computer Science"
+                        />
+                      </FieldGroup>
+                      <FieldGroup>
+                        <Label htmlFor="af-gradyear">Graduation Year <Req>*</Req></Label>
+                        <Select
+                          id="af-gradyear"
+                          value={graduationYear}
+                          onChange={(e) => setGraduationYear(e.target.value)}
+                          required
+                        >
+                          <option value="">Select year…</option>
+                          {GRAD_YEARS.map((y) => (
+                            <option key={y} value={String(y)}>{y}</option>
+                          ))}
+                        </Select>
+                      </FieldGroup>
+                    </FieldRow>
+                  </FormSection>
+
+                  {/* ── Section 4: Location & Work Authorization ── */}
                   <FormSection>
                     <SectionLabel>Location &amp; Work Authorization</SectionLabel>
 
@@ -438,7 +545,7 @@ export default function ApplyPage({ job }: Props) {
                     </FieldRow>
                   </FormSection>
 
-                  {/* ── Section 4: Documents ── */}
+                  {/* ── Section 5: Documents ── */}
                   <FormSection>
                     <SectionLabel>Documents &amp; Files</SectionLabel>
 
@@ -527,26 +634,31 @@ export default function ApplyPage({ job }: Props) {
                     </FileUploadGroup>
                   </FormSection>
 
-                  {/* ── Section 5: Cover Note ── */}
+                  {/* ── Section 6: Cover Note ── */}
                   <FormSection>
                     <SectionLabel>Why This Role?</SectionLabel>
                     <FieldGroup>
                       <Label htmlFor="af-cover">
-                        Tell us why you are interested in this position <Opt>(optional)</Opt>
+                        Tell us why you&apos;re interested, relevant experience, and what makes you a strong fit <Req>*</Req>
                       </Label>
+                      <CoverHint>
+                        Include your school, degree, and any certifications if not already listed above. Our team uses this response to evaluate fit — the more detail, the better.
+                      </CoverHint>
                       <Textarea
                         id="af-cover"
-                        rows={5}
+                        rows={7}
                         value={coverNote}
                         onChange={(e) => setCoverNote(e.target.value)}
                         maxLength={3000}
-                        placeholder="Describe your interest in this role, relevant experience, and anything else you'd like us to know…"
+                        placeholder="Example: I graduated with a Bachelor's in Computer Science from Virginia Tech in 2021. I have 3 years of experience building data pipelines in Python and SQL…"
                       />
-                      <CharCount>{coverNote.length} / 3,000</CharCount>
+                      <CharCount $warn={coverNote.length < 50 && coverNote.length > 0}>
+                        {coverNote.length} / 3,000 {coverNote.length < 50 && coverNote.length > 0 ? `— ${50 - coverNote.length} more characters needed` : ''}
+                      </CharCount>
                     </FieldGroup>
                   </FormSection>
 
-                  {/* ── Section 6: Consent ── */}
+                  {/* ── Section 7: Consent ── */}
                   <FormSection>
                     <ConsentRow>
                       <ConsentCheck
@@ -610,6 +722,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) 
 const PageWrapper = styled.div`
   padding: 3rem 0 7rem;
   min-height: 80vh;
+  background: #f1f5f9;
 `;
 
 const Breadcrumb = styled.nav`
@@ -646,9 +759,10 @@ const Sidebar = styled.aside`
 `;
 
 const JobCard = styled.div`
-  border: 1px solid rgba(var(--text), 0.1);
+  border: 1px solid #e2e8f0;
   border-radius: 1rem;
   padding: 2rem;
+  background: #ffffff;
 `;
 const JobCardLabel = styled.p`
   font-size: 1.1rem;
@@ -725,8 +839,8 @@ const BackLink = styled(Link)`
 const FormPanel = styled.div`
   flex: 1;
   min-width: 0;
-  background: rgb(var(--cardBackground));
-  border: 1px solid rgba(var(--text), 0.1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 1.2rem;
   padding: 3.2rem 3.6rem;
   ${media.tablet(`padding: 2rem 1.6rem;`)}
@@ -735,7 +849,7 @@ const FormPanel = styled.div`
 const FormHeading = styled.h1`
   font-size: 2.8rem;
   font-weight: 700;
-  color: rgb(var(--text));
+  color: #0f172a;
   margin-bottom: 1.2rem;
   ${media.tablet(`font-size: 2.2rem;`)}
 `;
@@ -774,7 +888,7 @@ const AppForm = styled.form`
 
 const FormSection = styled.section`
   padding: 2.8rem 0;
-  border-bottom: 1px solid rgba(var(--text), 0.08);
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
@@ -816,7 +930,7 @@ const FieldGroup = styled.div`
 const Label = styled.label`
   font-size: 1.4rem;
   font-weight: 600;
-  color: rgb(var(--text));
+  color: #1e293b;
 `;
 
 const Req = styled.span`color: rgb(255, 125, 0); margin-left: 0.2rem;`;
@@ -831,9 +945,9 @@ const sharedInput = `
   padding: 1rem 1.4rem;
   font-size: 1.5rem;
   font-family: inherit;
-  color: rgb(var(--text));
-  background: rgb(var(--cardBackground));
-  border: 1.5px solid rgba(var(--text), 0.3);
+  color: #1e293b;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
   border-radius: 0.7rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -843,17 +957,28 @@ const sharedInput = `
     border-color: rgb(255, 125, 0);
     box-shadow: 0 0 0 3px rgba(255, 125, 0, 0.12);
   }
-  &::placeholder { color: rgba(var(--text), 0.35); }
+  &::placeholder { color: #94a3b8; }
 `;
 
 const Input = styled.input`${sharedInput}`;
 const Select = styled.select`${sharedInput} cursor: pointer; appearance: auto;`;
 const Textarea = styled.textarea`${sharedInput} resize: vertical; line-height: 1.65;`;
 
-const CharCount = styled.p`
+const CharCount = styled.p<{ $warn?: boolean }>`
   font-size: 1.2rem;
-  color: rgba(var(--text), 0.35);
+  color: ${(p) => (p.$warn ? '#ef4444' : '#94a3b8')};
   text-align: right;
+`;
+
+const CoverHint = styled.p`
+  font-size: 1.3rem;
+  color: #64748b;
+  line-height: 1.6;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 0.6rem;
+  padding: 0.8rem 1.2rem;
+  margin: 0;
 `;
 
 // File upload

@@ -65,6 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const jobNumber   = get('jobNumber');
   const jobId       = get('jobId');
   const coverNote   = get('coverNote');
+  const education   = get('education');
 
   if (!name || !email || !jobTitle) {
     return res.status(400).json({ error: 'Name, email, and position are required.' });
@@ -123,6 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ${city || state ? detailRow('Location', [city, state, country].filter(Boolean).join(', ')) : ''}
         ${workAuth ? detailRow('Work Auth (US)', workAuth) : ''}
         ${visaSponsor ? detailRow('Visa Sponsorship', visaSponsor) : ''}
+        ${education ? detailRow('Education', education) : ''}
         ${detailRow('Position', jobTitle)}
         ${detailRow('Job Number', jobNumber)}
         ${detailRow('Submitted', submittedAt + ' ET')}

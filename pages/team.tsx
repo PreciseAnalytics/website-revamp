@@ -4,7 +4,6 @@ import Link from 'next/link';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
-import Image from 'next/image';
 import Container from 'components/Container';
 import { EnvVars } from 'env';
 import { media } from 'utils/media';
@@ -13,25 +12,21 @@ const teamMembers = [
   {
     name: 'Norman Tanui',
     title: 'CTO & Founder',
-    image: '/PA-logo.png',
     bio: 'Technologist with deep expertise in data strategy, federal contracting, and enterprise analytics. Norman founded Precise Analytics to bring production-ready data solutions to government agencies and commercial clients.',
   },
   {
     name: 'Krishna Bhatt',
     title: 'Chief Data Scientist',
-    image: '/PA-logo.png',
     bio: 'Leading AI and machine learning innovation across federal and commercial sectors. Krishna specializes in predictive modeling, NLP, and building ML pipelines that drive measurable business outcomes.',
   },
   {
     name: 'Vivek Pokhrel',
     title: 'Director of BI Solutions',
-    image: '/PA-logo.png',
     bio: 'Expert in business intelligence systems, dashboards, and data storytelling. Vivek transforms complex datasets into clear, actionable Power BI and Tableau dashboards for agency and enterprise clients.',
   },
   {
     name: 'Prashant Bhatta',
     title: 'Full Stack Engineer',
-    image: '/PA-logo.png',
     bio: 'Crafting scalable analytics platforms and user-friendly frontend experiences. Prashant builds the data applications and portals that bring Precise Analytics solutions to end users.',
   },
 ];
@@ -70,15 +65,13 @@ export default function OurTeamPage() {
           <TeamGrid>
             {teamMembers.map((member, index) => (
               <TeamCard key={index}>
-                <ImageWrapper>
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    width={400}
-                    height={400}
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
-                </ImageWrapper>
+                <PhotoPlaceholder>
+                  <svg viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="60" cy="48" r="28" fill="rgba(0,153,255,0.18)" stroke="rgba(0,153,255,0.45)" strokeWidth="2"/>
+                    <ellipse cx="60" cy="130" rx="46" ry="32" fill="rgba(0,153,255,0.12)" stroke="rgba(0,153,255,0.3)" strokeWidth="2"/>
+                  </svg>
+                  <PhotoLabel>Photo coming soon</PhotoLabel>
+                </PhotoPlaceholder>
                 <Name>{member.name}</Name>
                 <Title>{member.title}</Title>
                 <Bio>{member.bio}</Bio>
@@ -163,19 +156,33 @@ const TeamCard = styled.div`
   }
 `;
 
-const ImageWrapper = styled.div`
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 1.5rem;
-  border-radius: 50%;
+const PhotoPlaceholder = styled.div`
+  width: 100%;
+  height: 18rem;
+  margin: 0 0 2rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(160deg, rgba(0, 30, 60, 0.85) 0%, rgba(0, 20, 45, 0.95) 100%);
+  border: 1px solid rgba(0, 153, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   overflow: hidden;
-  border: 3px solid rgb(0, 153, 255);
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  svg {
+    width: 9rem;
+    height: auto;
+    opacity: 0.9;
   }
+`;
+
+const PhotoLabel = styled.span`
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(0, 153, 255, 0.5);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 `;
 
 const Name = styled.h3`

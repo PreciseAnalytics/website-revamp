@@ -1,43 +1,42 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import path from 'path';
+import fs from 'fs';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { GetStaticProps } from 'next';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { media } from 'utils/media';
 
-const posts = [
-  {
-    slug: 'legacy-etl-to-cloud-native-federal-migration-playbook',
-    title: 'Legacy ETL to Cloud-Native: A Federal Migration Playbook',
-    date: '2026-05-30',
-    excerpt:
-      "Federal agencies are moving from on-prem ETL to cloud-native streaming — but the pitfalls are real. Here's a 5-step framework for migrating without breaking compliance or continuity.",
-    tags: ['Data Engineering', 'Federal', 'Cloud Migration'],
-  },
-  {
-    slug: '3-signs-your-bi-dashboards-are-gathering-dust',
-    title: '3 Signs Your BI Dashboards Are Gathering Dust (And What to Do About It)',
-    date: '2026-05-30',
-    excerpt:
-      'If your team still reaches for spreadsheets instead of dashboards, your BI investment is silently failing. Here are 3 specific signs — and concrete fixes for each one.',
-    tags: ['Business Intelligence', 'BI Adoption', 'Dashboards'],
-  },
-  {
-    slug: 'what-98-percent-inter-annotator-agreement-means',
-    title: 'What 98% Inter-Annotator Agreement Actually Means for Your Model',
-    date: '2026-05-30',
-    excerpt:
-      "IAA is the hidden metric that determines RLHF quality. Here's why 98% matters, how most annotation teams miss it, and why domain expertise is the only path to getting there.",
-    tags: ['AI Training', 'RLHF', 'Annotation Quality'],
-  },
-];
+interface Post {
+  slug: string;
+  title: string;
+  date: string;
+  excerpt: string;
+  tags: string[];
+}
+
+interface Props {
+  posts: Post[];
+}
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const filePath = path.join(process.cwd(), 'content', 'insights.json');
+  const raw = fs.readFileSync(filePath, 'utf-8');
+  const posts: Post[] = JSON.parse(raw);
+
+  return {
+    props: { posts: posts.sort((a, b) => b.date.localeCompare(a.date)) },
+    revalidate: 43200, // rebuild every 12 hours
+  };
+};
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-export default function InsightsIndex() {
+export default function InsightsIndex({ posts }: Props) {
   return (
     <>
       <Head>

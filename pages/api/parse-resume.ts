@@ -3,6 +3,7 @@ import formidable from 'formidable';
 import fs from 'fs';
 import os from 'os';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import mammoth from 'mammoth';
 
 export const config = { api: { bodyParser: false } };
 
@@ -80,9 +81,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         PROMPT,
       ]);
     } else {
-      // DOC/DOCX: send base64 as plain text best-effort
+      // DOC/DOCX: extract plain text with mammoth, then send to Gemini
+      const { value: docText } = await mammoth.extractRawText({ buffer: fileBytes });
+      if (!docText || docText.trim().length < 20) {
+        return res.status(422).json({ error: 'Could not read Word document. Please upload a PDF instead.' });
+      }
       result = await model.generateContent([
-        PROMPT + `\n\nThe resume is a Word document. Extract text content from this base64 data:\n${fileBytes.toString('base64').slice(0, 8000)}`,
+        PROMPT + `\n\nResume text:\n${docText.slice(0, 12000)}`,
       ]);
     }
 

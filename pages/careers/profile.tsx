@@ -105,6 +105,7 @@ type ProfileData = {
   resumeUrl: string;
   coverLetterUrl: string;
   certifications: CertEntry[];
+  profilePhotoUrl: string;
 };
 
 type Application = {
@@ -183,6 +184,8 @@ export default function ProfilePage() {
 
   const mainUploadRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   // Account / password
   const [currentPw, setCurrentPw] = useState('');
@@ -219,6 +222,7 @@ export default function ProfilePage() {
           resumeUrl: data.profile.resume_url || '',
           coverLetterUrl: data.profile.cover_letter_url || '',
           certifications: Array.isArray(data.profile.certifications) ? data.profile.certifications : [],
+          profilePhotoUrl: data.profile.profile_photo_url || '',
         };
         setProfile(p);
         setPersonalDraft(p);
@@ -409,7 +413,7 @@ export default function ProfilePage() {
     return data.url as string;
   }
 
-  async function saveDocUrls(updates: { resumeUrl?: string; coverLetterUrl?: string; certifications?: CertEntry[] }) {
+  async function saveDocUrls(updates: { resumeUrl?: string; coverLetterUrl?: string; certifications?: CertEntry[]; profilePhotoUrl?: string }) {
     if (!profile) return;
     const merged = { ...profile, ...updates };
     const res = await fetch(`${ATS_API}/applicant/profile`, {
@@ -431,6 +435,7 @@ export default function ProfilePage() {
         resume_url: merged.resumeUrl,
         cover_letter_url: merged.coverLetterUrl,
         certifications: merged.certifications,
+        profile_photo_url: merged.profilePhotoUrl,
       }),
     });
     if (!res.ok) {
@@ -438,6 +443,20 @@ export default function ProfilePage() {
       throw new Error(errData.error || `Save failed (${res.status})`);
     }
     setProfile(merged);
+  }
+
+  async function handlePhotoUpload(file: File) {
+    if (!profile) return;
+    setPhotoUploading(true);
+    try {
+      const url = await uploadToATS(file, 'photo');
+      await saveDocUrls({ profilePhotoUrl: url });
+      await fetchProfile();
+    } catch (err: any) {
+      setDocMsg(err.message || 'Photo upload failed');
+    } finally {
+      setPhotoUploading(false);
+    }
   }
 
   async function downloadFile(url: string, filename: string) {
@@ -580,7 +599,7 @@ export default function ProfilePage() {
 
   function completionPct() {
     if (!profile) return 0;
-    const fields = [profile.headline, profile.phone, profile.city, profile.linkedinUrl, profile.workHistory.length > 0, profile.educationHistory.length > 0, !!profile.resumeUrl];
+    const fields = [profile.headline, profile.phone, profile.city, profile.linkedinUrl, profile.workHistory.length > 0, profile.educationHistory.length > 0, !!profile.resumeUrl, !!profile.profilePhotoUrl];
     return Math.round((fields.filter(Boolean).length / fields.length) * 100);
   }
 
@@ -598,9 +617,31 @@ export default function ProfilePage() {
             {/* ── Sidebar ── */}
             <Sidebar>
               <SidebarProfile>
-                <AvatarRing>
-                  <Avatar>{initials}</Avatar>
+                <AvatarRing
+                  title="Click to upload profile photo"
+                  style={{ cursor: 'pointer', position: 'relative' }}
+                  onClick={() => photoInputRef.current?.click()}
+                >
+                  {profile?.profilePhotoUrl ? (
+                    <img
+                      src={profile.profilePhotoUrl}
+                      alt={displayName}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  ) : (
+                    <Avatar>{initials}</Avatar>
+                  )}
+                  <span style={{ position: 'absolute', bottom: 2, right: 2, background: '#1e40af', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#fff', border: '2px solid #fff' }}>
+                    {photoUploading ? '…' : '✎'}
+                  </span>
                 </AvatarRing>
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ''; }}
+                />
                 <SidebarName>{displayName}</SidebarName>
                 {profile?.headline && <SidebarHeadline>{profile.headline}</SidebarHeadline>}
                 <SidebarEmail>{user.email}</SidebarEmail>

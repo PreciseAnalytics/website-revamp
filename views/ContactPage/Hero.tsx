@@ -113,12 +113,8 @@ export default function ContactHero() {
             </MessageBtn>
 
             <CertRow>
-              <CertLink href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1" target="_blank" rel="noopener noreferrer">
-                <CertImg src="/sba-logo.png" alt="SBA Certified" width={120} height={80} />
-              </CertLink>
-              <CertLink href="https://directory.sbsd.virginia.gov/#/executiveExport" target="_blank" rel="noopener noreferrer">
-                <CertImg src="/SWAM_LOGO.jpg" alt="SWAM Certified" width={120} height={80} />
-              </CertLink>
+              <CertImg src="/fedramp-logo-vert.svg" alt="FedRAMP Aligned" width={80} height={80} />
+              <CertImg src="/CMMI_LOGO.png" alt="CMMI" width={120} height={80} />
             </CertRow>
           </LeftCol>
 

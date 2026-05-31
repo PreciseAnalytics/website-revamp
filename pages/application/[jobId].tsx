@@ -837,7 +837,7 @@ export default function ApplicationPage() {
               <ReadyToApplySection>
                 <ReadyToApplyIcon>🚀</ReadyToApplyIcon>
                 <ReadyToApplyText>
-                  Ready to join our mission-driven team? Complete the application below to get started!
+                  Ready to join our team? Complete the application below to get started!
                 </ReadyToApplyText>
                 {isLoggedIn && (
                   <LoginBenefit>

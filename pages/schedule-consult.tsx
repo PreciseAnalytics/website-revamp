@@ -223,10 +223,10 @@ export default function ScheduleConsult() {
   return (
     <>
       <Head>
-        <title>Schedule a Consultation | Precise Analytics | VOSB Data Engineering & AI</title>
+        <title>Schedule a Consultation | Precise Analytics | Data Engineering & AI</title>
         <meta
           name="description"
-          content="Schedule a free consultation with Precise Analytics. Veteran-owned data engineering, BI, and AI delivery firm serving government and commercial clients."
+          content="Schedule a free consultation with Precise Analytics. Data engineering, BI, and AI delivery firm serving government and commercial clients."
         />
       </Head>
       <AnimatedHeader />
@@ -261,7 +261,7 @@ export default function ScheduleConsult() {
           >
             <PageTitle>Schedule Your Free Consultation</PageTitle>
             <PageSubtitle>
-              Discover How Data Can Drive Your Mission Forward
+              Discover How Data Can Drive Your Business Forward
             </PageSubtitle>
             <PageH2>Book a Free Strategy Session with Our Analytics Experts</PageH2>
           </HeaderSection>
@@ -275,7 +275,7 @@ export default function ScheduleConsult() {
               <InfoCard>
                 <AboutSection>
                   <p>
-                    At Precise Analytics, we specialize in transforming raw data into actionable insights that help government agencies and businesses make smarter, faster decisions. As a Service-Disabled Veteran-Owned Small Business (SDVOSB), we bring both technical precision and mission-driven values to every engagement.
+                    At Precise Analytics, we specialize in transforming raw data into actionable insights that help government agencies and businesses make smarter, faster decisions. We bring technical precision and a results-driven approach to every engagement.
                   </p>
                 </AboutSection>
 

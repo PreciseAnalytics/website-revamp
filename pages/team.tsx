@@ -14,7 +14,7 @@ const teamMembers = [
     name: 'Norman Tanui',
     title: 'CTO & Founder',
     image: '/PA-logo.png',
-    bio: 'U.S. Army veteran and technologist with deep expertise in data strategy, federal contracting, and enterprise analytics. Norman founded Precise Analytics to bring mission-focused data solutions to government agencies and commercial clients.',
+    bio: 'Technologist with deep expertise in data strategy, federal contracting, and enterprise analytics. Norman founded Precise Analytics to bring production-ready data solutions to government agencies and commercial clients.',
   },
   {
     name: 'Krishna Bhatt',
@@ -46,7 +46,7 @@ export default function OurTeamPage() {
         <title>{`Meet Our Team | ${EnvVars.SITE_NAME}`}</title>
         <meta
           name="description"
-          content="Meet the leadership and technical experts behind Precise Analytics, delivering secure, mission-focused data and AI solutions."
+          content="Meet the leadership and technical experts behind Precise Analytics, delivering secure, production-ready data and AI solutions."
         />
       </Head>
 
@@ -56,16 +56,14 @@ export default function OurTeamPage() {
         <Container>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <PageTitle>Meet Our Team</PageTitle>
-            <PageSubtitle>Passionate. Experienced. Mission-Driven.</PageSubtitle>
+            <PageSubtitle>Passionate. Experienced. Results-Driven.</PageSubtitle>
             <TeamIntro>
-              Precise Analytics is built by veterans, data scientists, engineers, and business intelligence
-              professionals who bring deep domain expertise to every engagement. Our team combines federal
-              contracting experience with commercial analytics know-how, delivering solutions that are
-              technically rigorous and mission-focused. As a Service-Disabled Veteran-Owned Small Business
-              (SDVOSB), we hold ourselves to the same standards of discipline and accountability that define
-              military service. We hire people who take data seriously, communicate clearly, and care about
-              outcomes — not just outputs. When you work with Precise Analytics, you work directly with the
-              people building your solution.
+              Precise Analytics is built by data scientists, engineers, and business intelligence professionals
+              who bring deep domain expertise to every engagement. Our team combines federal contracting
+              experience with commercial analytics know-how, delivering solutions that are technically rigorous
+              and focused on client outcomes. We hold active federal contracts and hire people who take data
+              seriously, communicate clearly, and care about results — not just outputs. When you work with
+              Precise Analytics, you work directly with the people building your solution.
             </TeamIntro>
           </motion.div>
 

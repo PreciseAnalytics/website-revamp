@@ -66,7 +66,7 @@ export default function LegacyEtlPost() {
 
               <P><Strong>3. Underestimating data gravity.</Strong> Terabytes of on-premise data don't move quickly. Agencies routinely underestimate the time and cost of initial data migration, particularly for historical records with complex formats or undocumented schemas. Budget for a discovery phase that maps every data source, format, and dependency before scoping the migration.</P>
 
-              <P><Strong>4. Migrating everything at once.</Strong> A "big bang" migration — moving all pipelines simultaneously — maximizes risk and minimizes your ability to course-correct. Successful migrations phase the work: start with lower-stakes, high-volume pipelines to validate the architecture, then move mission-critical systems once the pattern is proven.</P>
+              <P><Strong>4. Migrating everything at once.</Strong> A "big bang" migration — moving all pipelines simultaneously — maximizes risk and minimizes your ability to course-correct. Successful migrations phase the work: start with lower-stakes, high-volume pipelines to validate the architecture, then move business-critical systems once the pattern is proven.</P>
 
               <P><Strong>5. No rollback plan.</Strong> Every federal migration needs a documented, tested rollback procedure for each phase. This isn't pessimism — it's operational discipline. If phase two introduces unexpected latency in a compliance-critical pipeline, you need to revert in hours, not days.</P>
 
@@ -76,7 +76,7 @@ export default function LegacyEtlPost() {
 
               <P><Strong>Step 2: Compliance architecture review.</Strong> Work with your ISSO (Information System Security Officer) early. Identify which pipelines touch PHI, PII, or other sensitive data. Map HIPAA/FISMA controls to architectural components. Get FedRAMP-authorized service selections approved before you start building.</P>
 
-              <P><Strong>Step 3: Proof of concept on a low-risk pipeline.</Strong> Choose a high-volume, low-sensitivity pipeline as your first migration target. Build the full cloud-native architecture — streaming ingestion, transformation, storage, and reporting — and operate it in parallel with the legacy system for 30 days. This proves the architecture before you stake mission-critical operations on it.</P>
+              <P><Strong>Step 3: Proof of concept on a low-risk pipeline.</Strong> Choose a high-volume, low-sensitivity pipeline as your first migration target. Build the full cloud-native architecture — streaming ingestion, transformation, storage, and reporting — and operate it in parallel with the legacy system for 30 days. This proves the architecture before you stake production operations on it.</P>
 
               <P><Strong>Step 4: Phased migration with parallel operation.</Strong> Migrate pipeline families in phases, maintaining parallel operation of legacy and cloud systems for each phase until the new system has proven reliability. The overlap period typically runs 4–8 weeks per phase and should be defined in your project plan.</P>
 

@@ -15,8 +15,8 @@ const INDUSTRIES = [
 ];
 
 const TRUST_POINTS = [
-  { icon: '✓', text: 'VOSB Certified' },
-  { icon: '✓', text: 'DSBSD Certified' },
+  { icon: '✓', text: 'GSA Schedule Holder' },
+  { icon: '✓', text: 'Security Clearance Ready' },
   { icon: '✓', text: 'Industry Expertise' },
   { icon: '✓', text: 'Proven Outcomes' },
 ];

@@ -266,18 +266,18 @@ export default function HomePage() {
     <>
       <Head>
         <StructuredData />
-        <title>VOSB Data Engineering &amp; AI Firm | Precise Analytics | Federal &amp; Commercial</title>
+        <title>Precise Analytics | Data Engineering, BI &amp; AI Delivery | Federal &amp; Commercial</title>
         <meta
           name="description"
-          content="Veteran-owned data engineering, BI, and AI delivery firm. We don't just recommend — we deploy. Serving government and commercial clients with production-ready analytics and AI training labor."
+          content="End-to-end data engineering, BI, and AI delivery firm. We don't just recommend — we deploy. Serving government and commercial clients with production-ready analytics and AI training labor."
         />
-        <meta property="og:title" content="VOSB Data Engineering & AI Firm | Precise Analytics | Federal & Commercial" />
-        <meta property="og:description" content="Veteran-owned data engineering, BI, and AI delivery firm. We don't just recommend — we deploy. Production-ready analytics and AI training labor." />
+        <meta property="og:title" content="Precise Analytics | Data Engineering, BI & AI Delivery | Federal & Commercial" />
+        <meta property="og:description" content="End-to-end data engineering, BI, and AI delivery firm. We don't just recommend — we deploy. Production-ready analytics and AI training labor." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://preciseanalytics.io/" />
         <meta property="og:image" content="https://preciseanalytics.io/og-images/homepage.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="VOSB Data Engineering & AI Firm | Precise Analytics" />
+        <meta name="twitter:title" content="Precise Analytics | Data Engineering, BI & AI Delivery" />
         <meta name="twitter:description" content="We don't just recommend — we deploy. End-to-end data engineering, BI, and AI delivery." />
         <script
           type="application/ld+json"
@@ -288,7 +288,7 @@ export default function HomePage() {
               name: 'Precise Analytics',
               url: 'https://preciseanalytics.io',
               logo: 'https://preciseanalytics.io/Favicon/apple-touch-icon.png',
-              description: 'Veteran-owned data engineering, BI, and AI delivery firm serving government and commercial clients.',
+              description: 'End-to-end data engineering, BI, and AI delivery firm serving government and commercial clients.',
               foundingDate: '2020',
               sameAs: ['https://www.linkedin.com/company/precise-analytics-llc/'],
               contactPoint: {
@@ -321,7 +321,7 @@ export default function HomePage() {
             <HeroSection>
               <HeroContent>
                 <HeroTitle>We Don&apos;t Just Recommend.<br />We Deploy.</HeroTitle>
-                <HeroSubtitle>End-to-end data engineering, BI, and AI delivery for government and commercial clients — from raw pipeline to production, backed by veteran leadership and a 40% average latency reduction across deployed projects.</HeroSubtitle>
+                <HeroSubtitle>End-to-end data engineering, BI, and AI delivery for government and commercial clients — from raw pipeline to production, with a 40% average latency reduction across deployed projects.</HeroSubtitle>
                 <HeroButtons>
                   <PrimaryButton as="a" href="#case-studies">
                     See Our Results
@@ -337,7 +337,7 @@ export default function HomePage() {
             <MetricsBar>
               <MetricItem>
                 <MetricNumber>50+</MetricNumber>
-                <MetricLabel>Clients Served</MetricLabel>
+                <MetricLabel>Engagements Delivered</MetricLabel>
               </MetricItem>
               <MetricDivider />
               <MetricItem>
@@ -346,13 +346,13 @@ export default function HomePage() {
               </MetricItem>
               <MetricDivider />
               <MetricItem>
-                <MetricNumber>10+</MetricNumber>
-                <MetricLabel>Years Combined Experience</MetricLabel>
+                <MetricNumber>40%</MetricNumber>
+                <MetricLabel>Avg. Latency Reduction</MetricLabel>
               </MetricItem>
               <MetricDivider />
               <MetricItem>
-                <MetricNumber>3</MetricNumber>
-                <MetricLabel>Active Certifications</MetricLabel>
+                <MetricNumber>GSA</MetricNumber>
+                <MetricLabel>Federal Contract Vehicle</MetricLabel>
               </MetricItem>
             </MetricsBar>
           </motion.div>
@@ -362,18 +362,18 @@ export default function HomePage() {
             <TrustBarText>Trusted by Federal Agencies, Financial Institutions, and AI Platform Companies</TrustBarText>
             <TrustBadges>
               <TrustBadge>
-                <Image src="/Veteran-Owned-Certified.png" alt="VOSB Certified" width={60} height={40} style={{ objectFit: 'contain' }} />
-                <TrustBadgeLabel>VOSB Certified</TrustBadgeLabel>
-              </TrustBadge>
-              <TrustBadgeDivider />
-              <TrustBadge>
-                <Image src="/SWAM_LOGO.jpg" alt="SWaM Certified" width={60} height={40} style={{ objectFit: 'contain' }} />
-                <TrustBadgeLabel>SWaM Certified</TrustBadgeLabel>
-              </TrustBadge>
-              <TrustBadgeDivider />
-              <TrustBadge>
                 <TrustBadgeIcon>🏛️</TrustBadgeIcon>
                 <TrustBadgeLabel>GSA Schedule Holder</TrustBadgeLabel>
+              </TrustBadge>
+              <TrustBadgeDivider />
+              <TrustBadge>
+                <TrustBadgeIcon>🔐</TrustBadgeIcon>
+                <TrustBadgeLabel>Security Clearance Ready</TrustBadgeLabel>
+              </TrustBadge>
+              <TrustBadgeDivider />
+              <TrustBadge>
+                <TrustBadgeIcon>✅</TrustBadgeIcon>
+                <TrustBadgeLabel>NAICS Compliant</TrustBadgeLabel>
               </TrustBadge>
             </TrustBadges>
           </TrustBar>
@@ -484,73 +484,49 @@ export default function HomePage() {
 
           {/* Certifications Section */}
           <CertificationsSection>
-            <SectionTitle>Contract-Ready. Veteran-Led.</SectionTitle>
+            <SectionTitle>Contract-Ready. Cleared. Compliant.</SectionTitle>
             <SectionSubtitle>Trusted partner for government and commercial projects</SectionSubtitle>
-            
+
             <CertGrid>
               <CertCard>
                 <CertLogo>
-                  <Image 
-                    src="/Veteran-Owned-Certified.png" 
-                    alt="VOSB Certified" 
-                    width={150}
-                    height={100}
-                    style={{
-                      objectFit: 'contain',
-                      maxHeight: '10rem',
-                      maxWidth: '15rem'
-                    }}
-                  />
+                  <TrustBadgeIcon style={{ fontSize: '4rem' }}>🏛️</TrustBadgeIcon>
                 </CertLogo>
-                <CertTitle>Veteran-Owned Small Business</CertTitle>
+                <CertTitle>GSA Schedule Holder</CertTitle>
                 <CertDescription>
-                  SBA certified VOSB with extensive federal contracting experience and security clearance capabilities.
+                  Active GSA Schedule contract enabling streamlined procurement for federal agencies.
                 </CertDescription>
                 <CertFeatures>
-                  <li>Federal contracting experience</li>
-                  <li>Security clearance projects</li>
-                  <li>GSA Schedule holder</li>
-                  <li>NAICS compliance</li>
+                  <li>Simplified federal procurement</li>
+                  <li>Pre-negotiated rates</li>
+                  <li>Contract-ready on day one</li>
+                  <li>Full NAICS compliance</li>
                 </CertFeatures>
-                <CertLink 
-                  href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <CertLink
+                  href="/capabilities-statement"
                 >
-                  View SBA Certification
+                  View Capabilities Statement
                 </CertLink>
               </CertCard>
-              
+
               <CertCard>
                 <CertLogo>
-                  <Image 
-                    src="/SWAM_LOGO.jpg" 
-                    alt="SWaM Certified" 
-                    width={150}
-                    height={100}
-                    style={{
-                      objectFit: 'contain',
-                      maxHeight: '10rem',
-                      maxWidth: '15rem'
-                    }}
-                  />
+                  <TrustBadgeIcon style={{ fontSize: '4rem' }}>🔐</TrustBadgeIcon>
                 </CertLogo>
-                <CertTitle>SWaM Certified</CertTitle>
+                <CertTitle>Security Clearance Ready</CertTitle>
                 <CertDescription>
-                  Virginia Small, Women-owned, and Minority-owned business certification for state and local projects.
+                  Team members with active clearances and experience on sensitive government programs.
                 </CertDescription>
                 <CertFeatures>
-                  <li>Virginia state certification</li>
-                  <li>Local government projects</li>
-                  <li>Minority-owned business</li>
-                  <li>SWAM compliance</li>
+                  <li>Federal security protocols</li>
+                  <li>HIPAA & FISMA compliance</li>
+                  <li>FedRAMP-aligned architecture</li>
+                  <li>Data residency controls</li>
                 </CertFeatures>
-                <CertLink 
-                  href="https://directory.sbsd.virginia.gov/#/directory"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <CertLink
+                  href="/schedule-consult"
                 >
-                  View SWaM Directory
+                  Discuss Your Requirements
                 </CertLink>
               </CertCard>
             </CertGrid>

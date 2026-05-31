@@ -11,7 +11,7 @@ export default function AboutUsPage() {
   return (
     <>
       <Head>
-        <title>{`About Precise Analytics | Veteran-Owned Data Firm`}</title>
+        <title>{`About Precise Analytics | Data Engineering & AI`}</title>
         <meta
           name="description"
           content="Learn about Precise Analytics, our mission, values, team, and our commitment to transforming data into strategic insights for businesses."
@@ -27,11 +27,10 @@ export default function AboutUsPage() {
         <WhyChooseUs />
         <AboutIntro>
           <p>
-            Founded by a U.S. Army veteran, Precise Analytics has grown from a small consulting practice into a
-            full-service data and AI firm serving federal agencies, healthcare organizations, financial institutions,
-            and commercial enterprises. We are certified as a Service-Disabled Veteran-Owned Small Business (SDVOSB)
-            and a Virginia Small, Women-owned, and Minority-owned Business (SWaM). Our team holds active security
-            clearances and brings hands-on experience across NIST, HIPAA, FedRAMP, and CMMI compliance frameworks.
+            Precise Analytics is a full-service data engineering and AI firm serving federal agencies, healthcare
+            organizations, financial institutions, and commercial enterprises. We hold an active GSA Schedule and
+            maintain clearance-ready staff with hands-on experience across NIST, HIPAA, FedRAMP, and CMMI
+            compliance frameworks.
           </p>
         </AboutIntro>
         <RelatedLinks>

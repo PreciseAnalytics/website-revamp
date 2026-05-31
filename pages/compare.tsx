@@ -15,10 +15,10 @@ const rows = [
     inhouse: '6–12 months to hire',
   },
   {
-    label: 'VOSB Certified',
+    label: 'GSA Schedule Holder',
     pa: 'Yes ✓',
-    big4: 'No ✗',
-    boutique: 'Sometimes',
+    big4: 'Varies',
+    boutique: 'Rarely',
     inhouse: 'N/A',
   },
   {
@@ -65,7 +65,7 @@ export default function ComparePage() {
         <title>How We Compare | Precise Analytics vs Big 4 vs Boutique vs In-House</title>
         <meta
           name="description"
-          content="An honest comparison of Precise Analytics against Big 4 consultancies, boutique analytics firms, and building in-house. VOSB certified, veteran-led, production focused."
+          content="An honest comparison of Precise Analytics against Big 4 consultancies, boutique analytics firms, and building in-house. GSA Schedule holder. Production focused."
         />
         <meta property="og:title" content="How We Compare | Precise Analytics" />
         <meta property="og:description" content="Precise Analytics vs Big 4 vs boutique vs in-house — an honest breakdown for data engineering buyers." />

@@ -41,7 +41,7 @@ export default function InsightsIndex() {
   return (
     <>
       <Head>
-        <title>Insights from the Deployment Floor | Precise Analytics | VOSB Data Engineering & AI</title>
+        <title>Insights from the Deployment Floor | Precise Analytics | Data Engineering & AI</title>
         <meta
           name="description"
           content="Practical guides, case studies, and hard-won lessons from putting data infrastructure into production. By the team at Precise Analytics."

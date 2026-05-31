@@ -43,7 +43,7 @@ export default function WorkIndex() {
   return (
     <>
       <Head>
-        <title>Case Studies & Deployed Work | Precise Analytics | VOSB Data Engineering & AI</title>
+        <title>Case Studies & Deployed Work | Precise Analytics | Data Engineering & AI</title>
         <meta
           name="description"
           content="Production results Precise Analytics has shipped for government and commercial clients. Federal healthcare, financial services, and AI training case studies."

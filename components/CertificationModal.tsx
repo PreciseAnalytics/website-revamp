@@ -15,11 +15,11 @@ export interface CertificationModalProps {
 
 const modalContent = {
   VOSB: {
-    title: 'Veteran-Owned Small Business (VOSB)',
-    content: `At Precise Analytics, we specialize in transforming raw data into actionable insights that help government agencies and businesses make smarter, faster decisions. As Veteran-Owned Small Business (VOSB), we bring both technical precision and mission-driven values to every engagement.
+    title: 'GSA Schedule Contractor',
+    content: `At Precise Analytics, we specialize in transforming raw data into actionable insights that help government agencies and businesses make smarter, faster decisions. We hold an active GSA Schedule and bring both technical precision and a results-driven approach to every engagement.
 
 • Get expert advice on data analytics, dashboards, and automation
-• Explore how our tailored solutions can support your goals  
+• Explore how our tailored solutions can support your goals
 • No pressure, no obligation—just valuable insight
 • Let's talk about your data challenges and how we can help.
 

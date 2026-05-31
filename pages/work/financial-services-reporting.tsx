@@ -10,7 +10,7 @@ export default function FinancialServicesReporting() {
   return (
     <>
       <Head>
-        <title>Financial Services Reporting Automation | Precise Analytics | VOSB BI Solutions</title>
+        <title>Financial Services Reporting Automation | Precise Analytics | BI Solutions</title>
         <meta
           name="description"
           content="Precise Analytics delivered a 3x faster regulatory reporting cycle for a financial services client using Power BI automation. 15 days to 5 days."

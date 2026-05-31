@@ -10,11 +10,11 @@ import { media } from 'utils/media';
 const faqs = [
   {
     q: 'What makes Precise Analytics different from other data consultancies?',
-    a: "We don't just recommend — we deploy. Every engagement is built around getting your data infrastructure, dashboards, or AI models into production. We're veteran-owned, security-clearance ready, and we price against deployment milestones, not billable hours.",
+    a: "We don't just recommend — we deploy. Every engagement is built around getting your data infrastructure, dashboards, or AI models into production. We're security-clearance ready, and we price against deployment milestones, not billable hours.",
   },
   {
     q: 'Do you work with classified or sensitive government data?',
-    a: 'Yes. We are a VOSB-certified contractor with experience on federal projects requiring security clearances. We maintain full compliance with HIPAA, FISMA, and other regulatory frameworks as required.',
+    a: 'Yes. We are a GSA Schedule contractor with experience on federal projects requiring security clearances. We maintain full compliance with HIPAA, FISMA, and other regulatory frameworks as required.',
   },
   {
     q: 'What does your AI training labor service include?',
@@ -29,8 +29,8 @@ const faqs = [
     a: 'Government and federal agencies, healthcare and life sciences, financial services, and manufacturing. We also serve AI platform companies through our AI training labor services.',
   },
   {
-    q: 'Are you a certified small business?',
-    a: 'Yes. We are SBA-certified as a Veteran-Owned Small Business (VOSB) and Virginia SWaM certified. We hold a GSA Schedule and maintain NAICS compliance for federal contracting.',
+    q: 'What contract vehicles do you hold?',
+    a: 'We hold an active GSA Schedule and maintain NAICS compliance for federal contracting. We have active federal contract experience and can provide contract vehicle details on request.',
   },
 ];
 
@@ -53,10 +53,10 @@ export default function FaqPage() {
   return (
     <>
       <Head>
-        <title>FAQ | Precise Analytics | VOSB Data Engineering & AI Firm</title>
+        <title>FAQ | Precise Analytics | Data Engineering & AI</title>
         <meta
           name="description"
-          content="Frequently asked questions about Precise Analytics — VOSB certified data engineering, BI, AI training labor, federal contracting, and deployment timelines."
+          content="Frequently asked questions about Precise Analytics — data engineering, BI, AI training labor, federal contracting, and deployment timelines."
         />
         <meta property="og:title" content="FAQ | Precise Analytics" />
         <meta property="og:description" content="Answers to the most common questions about our data engineering, BI, and AI training services." />

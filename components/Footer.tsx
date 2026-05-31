@@ -20,27 +20,7 @@ export default function Footer() {
               <Tagline>
                 End-to-end data engineering, BI, and AI delivery for government and commercial clients — from raw pipeline to production.
               </Tagline>
-              <CertBadges>
-                <CertBadge>
-                  <Image
-                    src="/Veteran-Owned-Certified.png"
-                    alt="VOSB Certified"
-                    width={70}
-                    height={46}
-                    style={{ objectFit: 'contain' }}
-                  />
-                </CertBadge>
-                <CertBadge>
-                  <Image
-                    src="/SWAM_LOGO.jpg"
-                    alt="SWaM Certified"
-                    width={70}
-                    height={46}
-                    style={{ objectFit: 'contain' }}
-                  />
-                </CertBadge>
-              </CertBadges>
-              <CertText>GSA Schedule Holder &nbsp;·&nbsp; NAICS Compliance</CertText>
+              <CertText>GSA Schedule Holder &nbsp;·&nbsp; NAICS Compliant &nbsp;·&nbsp; Security Clearance Ready</CertText>
             </LogoArea>
             <ContactInfo>
               <ContactItem>
@@ -129,7 +109,7 @@ export default function Footer() {
 
         <BottomBar>
           <Copyright>
-            © {new Date().getFullYear()} Precise Analytics. Veteran-Owned Small Business. &nbsp;·&nbsp; GSA Schedule Holder &nbsp;·&nbsp; NAICS Compliant &nbsp;·&nbsp; Security Clearance Ready
+            © {new Date().getFullYear()} Precise Analytics. GSA Schedule Holder &nbsp;·&nbsp; NAICS Compliant &nbsp;·&nbsp; Security Clearance Ready
           </Copyright>
         </BottomBar>
       </Container>

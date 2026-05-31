@@ -10,7 +10,7 @@ export default function FederalHealthcarePipeline() {
   return (
     <>
       <Head>
-        <title>Federal Healthcare Pipeline Modernization | Precise Analytics | VOSB Data Engineering</title>
+        <title>Federal Healthcare Pipeline Modernization | Precise Analytics | Data Engineering</title>
         <meta
           name="description"
           content="How Precise Analytics rebuilt a federal health agency's ETL pipeline, reducing latency by 40% while maintaining full HIPAA compliance. Cloud-native, AWS, production deployed."

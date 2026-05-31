@@ -9,13 +9,13 @@ export default function ContactPage() {
   return (
     <>
       <Head>
-        <title>Contact Precise Analytics | VOSB Data Engineering & AI | Federal & Commercial</title>
+        <title>Contact Precise Analytics | Data Engineering & AI | Federal & Commercial</title>
         <meta
           name="description"
-          content="Contact Precise Analytics to discuss data engineering, BI, AI/ML solutions, or AI training labor. VOSB certified. We respond within 4 business hours."
+          content="Contact Precise Analytics to discuss data engineering, BI, AI/ML solutions, or AI training labor. We respond within 4 business hours."
         />
-        <meta property="og:title" content="Contact Precise Analytics | VOSB Data Engineering & AI" />
-        <meta property="og:description" content="Contact a VOSB-certified data engineering and AI delivery firm. Schedule a free consultation today." />
+        <meta property="og:title" content="Contact Precise Analytics | Data Engineering & AI" />
+        <meta property="og:description" content="Contact a data engineering and AI delivery firm. Schedule a free consultation today." />
         <meta property="og:type" content="website" />
       </Head>
       <AnimatedHeader />
@@ -31,7 +31,7 @@ export default function ContactPage() {
 
         <ContactIntro>
           <p>
-            Precise Analytics is a veteran-owned data engineering firm serving federal agencies, financial institutions, and AI platform companies. Whether you need to modernize your data infrastructure, build live dashboards, deploy AI/ML, or scale your annotation team — we build it, surface it, and automate it. Reach out to schedule a free consultation. We respond to all inquiries within 4 business hours.
+            Precise Analytics is a data engineering and AI firm serving federal agencies, financial institutions, and AI platform companies. Whether you need to modernize your data infrastructure, build live dashboards, deploy AI/ML, or scale your annotation team — we build it, surface it, and automate it. Reach out to schedule a free consultation. We respond to all inquiries within 4 business hours.
           </p>
         </ContactIntro>
 

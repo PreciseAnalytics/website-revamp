@@ -10,12 +10,11 @@ export default function WhyChooseUs() {
       <Container>
         <Content>
           <SectionTitle>Why Choose Precise Analytics?</SectionTitle>
-          <Subtitle>Mission-Driven. Data-Focused. Results-Oriented.</Subtitle>
+          <Subtitle>Precise. Focused. Results-Oriented.</Subtitle>
           
           <Description>
             At Precise Analytics, we combine deep technical expertise with a commitment to delivering
-            measurable outcomes. As a Veteran-Owned Small Business (VOSB), we bring discipline,
-            precision, and a sense of mission to every project.
+            measurable outcomes. We bring discipline, precision, and a sense of purpose to every project.
           </Description>
           
           <FeaturesTitle>What Sets Us Apart:</FeaturesTitle>
@@ -91,9 +90,9 @@ export default function WhyChooseUs() {
             >
               <FeatureIcon>✓</FeatureIcon>
               <FeatureContent>
-                <FeatureTitle>Veteran-Owned Values</FeatureTitle>
+                <FeatureTitle>Results-Driven Culture</FeatureTitle>
                 <FeatureDescription>
-                  Integrity, accountability, and mission-focus are at the heart of everything we do.
+                  Integrity, accountability, and client focus are at the heart of everything we do.
                 </FeatureDescription>
               </FeatureContent>
             </FeatureCard>

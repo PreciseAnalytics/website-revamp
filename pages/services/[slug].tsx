@@ -36,7 +36,7 @@ const SERVICES: Record<string, ServiceData> = {
 
 Our engagements emphasize clarity around priorities, ownership, and outcomes, ensuring data initiatives are grounded in measurable business value rather than disconnected experimentation. We help organizations move beyond ad-hoc analytics projects toward a sustainable, enterprise-wide approach to data management and utilization.
 
-By aligning analytics investments with mission goals and operational realities, organizations gain a clear path from strategy to execution while managing risk and complexity effectively. Our consultants bring decades of combined experience across government, healthcare, financial services, and manufacturing sectors.`,
+By aligning analytics investments with business goals and operational realities, organizations gain a clear path from strategy to execution while managing risk and complexity effectively. Our consultants bring decades of combined experience across government, healthcare, financial services, and manufacturing sectors.`,
     keyBenefits: [
       'Establish a unified data vision aligned with organizational goals',
       'Reduce redundant analytics initiatives and technology sprawl',
@@ -361,7 +361,7 @@ This methodology protects decision integrity and builds long-term confidence in 
   'custom-solutions': {
     title: 'Custom Analytics Solutions',
     image: '/images/services/custom-solutions.jpg',
-    description: 'Custom Analytics Solutions address mission-critical needs that off-the-shelf tools cannot support.',
+    description: 'Custom Analytics Solutions address business-critical needs that off-the-shelf tools cannot support.',
     overview: `Sometimes standard analytics tools simply cannot address specialized business requirements, unique data structures, or stringent security and compliance needs. Precise Analytics designs and builds secure, scalable analytics applications tailored to specific workflows, users, and regulatory environments.
 
 Our solutions integrate seamlessly with existing systems, ensuring insights are delivered where and when they are needed most. We build applications that users actually want to use, combining powerful analytics with intuitive interfaces.
@@ -400,7 +400,7 @@ By focusing on real operational requirements, custom solutions provide targeted 
       { step: '04', title: 'Deployment & Support', description: 'Production deployment, training, documentation, and ongoing support and enhancement.' }
     ],
     useCases: [
-      'Government agencies with unique mission requirements and security constraints',
+      'Government agencies with unique operational requirements and security constraints',
       'Healthcare organizations needing HIPAA-compliant analytics portals',
       'Financial institutions with proprietary risk models',
       'Manufacturing companies with specialized production analytics needs'
@@ -627,7 +627,7 @@ Real-time analytics empowers organizations to act decisively and mitigate risk b
     ],
     whyChooseUs: [
       'Deep expertise in streaming technologies and architectures',
-      'Experience with high-volume, mission-critical environments',
+      'Experience with high-volume, production-grade environments',
       'Focus on operational sustainability, not just initial implementation',
       'Understanding of the organizational aspects of real-time operations'
     ]

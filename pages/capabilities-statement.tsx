@@ -116,11 +116,11 @@ export default function CapabilitiesStatementPage() {
         <title>{`Capabilities Statement - ${EnvVars.SITE_NAME}`}</title>
         <meta
           name="description"
-          content="Precise Analytics capabilities statement — data engineering and analytics for federal, state, and local agencies. VOSB and SWaM certified."
+          content="Precise Analytics capabilities statement — data engineering and analytics for federal, state, and local agencies. GSA Schedule holder."
         />
         <meta
           name="keywords"
-          content="capabilities statement, data engineering, business intelligence, software development, machine learning, AI, healthcare compliance, VOSB, SWaM"
+          content="capabilities statement, data engineering, business intelligence, software development, machine learning, AI, healthcare compliance, GSA Schedule, NAICS"
         />
       </Head>
 
@@ -145,38 +145,24 @@ export default function CapabilitiesStatementPage() {
           >
             <HeroSection>
               <HeroTitle>Capabilities Statement</HeroTitle>
-              <HeroSubtitle>Precision-Driven Insights for Mission Success</HeroSubtitle>
+              <HeroSubtitle>Production-Ready Data & AI Solutions for Government and Commercial Clients</HeroSubtitle>
               <CertificationSection>
                 <CertificationLogos>
                   <LogoContainer>
-                    <CertificationLogoLink
-                      href="https://search.certifications.sba.gov/profile/ZRCYVLWCXL57/9YR68?page=1"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="SBA Veteran-Owned Small Business Certified — View verification"
-                    >
-                      <CertificationLogo
-                        src="/sba-logo.png"
-                        alt="SBA Veteran-Owned Small Business Certified"
-                        width={120} height={80}
-                      />
-                      <LogoLabel>VETERAN-OWNED CERTIFIED</LogoLabel>
-                    </CertificationLogoLink>
+                    <CertificationLogo
+                      src="/fedramp-logo-vert.svg"
+                      alt="FedRAMP Aligned"
+                      width={80} height={80}
+                    />
+                    <LogoLabel>FedRAMP ALIGNED</LogoLabel>
                   </LogoContainer>
                   <LogoContainer>
-                    <CertificationLogoLink
-                      href="https://directory.sbsd.virginia.gov/#/executiveExport"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="SWaM Certified Small Business — View Virginia directory"
-                    >
-                      <EnlargedSwamLogo
-                        src="/SWAM_LOGO.jpg"
-                        alt="SWaM Certified - Small, Women-owned, and Minority-owned Business"
-                        width={120} height={80}
-                      />
-                      <LogoLabel>SWaM CERTIFIED</LogoLabel>
-                    </CertificationLogoLink>
+                    <CertificationLogo
+                      src="/CMMI_LOGO.png"
+                      alt="CMMI"
+                      width={120} height={80}
+                    />
+                    <LogoLabel>CMMI</LogoLabel>
                   </LogoContainer>
                 </CertificationLogos>
                 <ComplianceBadge>
@@ -201,7 +187,7 @@ export default function CapabilitiesStatementPage() {
                 committed to delivering precision-driven insights and cutting-edge solutions to federal,
                 state, and local agencies. By combining expertise in data analytics, software development,
                 and AI/ML integration, we empower organizations with actionable intelligence to enhance
-                decision-making, operational efficiency, and mission success.
+                decision-making, operational efficiency, and business success.
               </OverviewText>
             </Section>
           </motion.div>
@@ -408,7 +394,7 @@ export default function CapabilitiesStatementPage() {
               <CTATitle>Ready to Partner with Us?</CTATitle>
               <CTADescription>
                 Contact Precise Analytics today to discuss how our proven capabilities can support your
-                mission.
+                objectives.
               </CTADescription>
               <Link href="/contact" passHref legacyBehavior>
                 <a>

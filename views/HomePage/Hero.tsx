@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -9,27 +9,11 @@ import Container from 'components/Container';
 import HeroIllustration from 'components/HeroIllustation';
 import AnimatedBackground from 'components/AnimatedBackground';
 import AnimatedReveal from 'components/AnimatedReveal';
-import CertificationModal from 'components/CertificationModal';
 import { useNewsletterModalContext } from 'contexts/newsletter-modal.context';
 import { media } from 'utils/media';
 
 export default function Hero() {
   const { setIsModalOpened } = useNewsletterModalContext();
-  const [certificationModal, setCertificationModal] = useState<{
-    isOpen: boolean;
-    type: 'VOSB' | 'DSBSD' | null;
-  }>({
-    isOpen: false,
-    type: null
-  });
-
-  const openCertificationModal = (type: 'VOSB' | 'DSBSD') => {
-    setCertificationModal({ isOpen: true, type });
-  };
-
-  const closeCertificationModal = () => {
-    setCertificationModal({ isOpen: false, type: null });
-  };
   
   return (
     <HeroWrapper>
@@ -77,19 +61,17 @@ export default function Hero() {
         
         <AnimatedReveal direction="up" delay={1.0}>
           <CertificationsContainer>
-            <CertificationBadge 
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              onClick={() => openCertificationModal('VOSB')}
+            <CertificationBadge
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
-              VOSB
+              GSA Schedule
             </CertificationBadge>
-            <CertificationBadge 
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              onClick={() => openCertificationModal('DSBSD')}
+            <CertificationBadge
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
-              DSBSD
+              Clearance Ready
             </CertificationBadge>
           </CertificationsContainer>
         </AnimatedReveal>
@@ -104,14 +86,6 @@ export default function Hero() {
         </motion.div>
       </ImageContainer>
       
-      {/* Certification Modal */}
-      {certificationModal.type && (
-        <CertificationModal
-          isOpen={certificationModal.isOpen}
-          onClose={closeCertificationModal}
-          type={certificationModal.type}
-        />
-      )}
     </HeroWrapper>
   );
 }

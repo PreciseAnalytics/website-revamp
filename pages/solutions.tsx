@@ -86,7 +86,7 @@ const solutions = [
 const industries = [
   {
     name: 'Government & Federal',
-    description: 'Specialized analytics solutions for government agencies with VOSB and SWaM certifications',
+    description: 'Specialized analytics solutions for government agencies with active federal contract vehicles',
     expertise: ['Federal compliance', 'Security clearance projects', 'Grant management analytics', 'Policy impact analysis'],
   },
   {
@@ -208,7 +208,7 @@ export default function SolutionsPage() {
         <Container>
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <PageTitle>Analytics Solutions</PageTitle>
-            <PageSubtitle>Transforming data into actionable insights that drive mission success.</PageSubtitle>
+            <PageSubtitle>Transforming data into actionable insights that drive operational outcomes.</PageSubtitle>
           </motion.div>
 
           <SolutionsSection>

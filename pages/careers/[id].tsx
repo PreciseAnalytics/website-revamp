@@ -159,12 +159,11 @@ export default function JobDetailPage({ job }: Props) {
               <Section>
                 <SectionTitle>Why {job.title} at Precise Analytics</SectionTitle>
                 <SectionParagraph>
-                  Precise Analytics is a veteran-owned data analytics and AI workforce company
-                  headquartered in Richmond, VA. We deliver data engineering, business intelligence,
-                  and machine learning solutions to government and commercial clients — and we operate
-                  a specialized AI Workforce Solutions division that supplies skilled human contributors
-                  to leading AI training platforms. We are a SWAM-certified, SBA-recognized small business
-                  committed to building a diverse and technically excellent team.
+                  Precise Analytics is a data engineering and AI firm headquartered in Richmond, VA.
+                  We deliver data engineering, business intelligence, and machine learning solutions to
+                  government and commercial clients — and we operate a specialized AI Workforce Solutions
+                  division that supplies skilled human contributors to leading AI training platforms.
+                  We are committed to building a technically excellent team.
                 </SectionParagraph>
                 <SectionParagraph>
                   Precise Analytics is an equal opportunity employer. We do not discriminate on the basis

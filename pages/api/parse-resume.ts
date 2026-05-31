@@ -2,13 +2,15 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import fs from 'fs';
 import os from 'os';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const config = { api: { bodyParser: false } };
 
-const PROMPT = `Extract the following fields from this resume and return ONLY a valid JSON object with no markdown, no explanation, no code fences — just raw JSON.
+// Update this to the current non-deprecated Gemini model ID from aistudio.google.com
+const GEMINI_MODEL = 'gemini-2.5-flash-preview-05-20';
 
-Fields to extract (use null for anything not found):
+const PROMPT = `Extract the following fields from this resume and return ONLY a valid JSON object — no markdown, no explanation, no code fences.
+
 {
   "firstName": string | null,
   "lastName": string | null,
@@ -23,14 +25,16 @@ Fields to extract (use null for anything not found):
   "graduationYear": string | null
 }
 
-For "degree", normalize to one of: "High School / GED", "Associate's", "Bachelor's", "Master's", "MBA", "PhD / Doctorate", "Professional Degree (JD/MD)", "Bootcamp / Certificate", "Other".
-For "graduationYear", return a 4-digit year string (e.g. "2021") for the most recent degree, or null.
-For "phone", return just the raw digits and common formatting chars only.`;
+Rules:
+- "degree": normalize to one of: "High School / GED", "Associate's", "Bachelor's", "Master's", "MBA", "PhD / Doctorate", "Professional Degree (JD/MD)", "Bootcamp / Certificate", "Other"
+- "graduationYear": 4-digit string (e.g. "2021") for the most recent degree, or null
+- "phone": digits and common formatting chars only
+- Use null for any field not found`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return res.status(500).json({ error: 'Resume parsing is not configured.' });
   }
 
@@ -60,34 +64,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try { fs.unlinkSync(f.filepath); } catch {}
 
   try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
 
-    let messageContent: Anthropic.MessageParam['content'];
+    let result;
 
     if (ext === 'pdf') {
-      const base64 = fileBytes.toString('base64');
-      messageContent = [
+      result = await model.generateContent([
         {
-          type: 'document' as const,
-          source: { type: 'base64' as const, media_type: 'application/pdf' as const, data: base64 },
+          inlineData: {
+            mimeType: 'application/pdf',
+            data: fileBytes.toString('base64'),
+          },
         },
-        { type: 'text' as const, text: PROMPT },
-      ];
+        PROMPT,
+      ]);
     } else {
-      // DOC/DOCX: send raw bytes as text best-effort — Claude may still extract content
-      const base64 = fileBytes.toString('base64');
-      messageContent = [
-        { type: 'text' as const, text: `${PROMPT}\n\nThe resume is a Word document encoded in base64 below. Parse what you can:\n${base64.slice(0, 8000)}` },
-      ];
+      // DOC/DOCX: send base64 as plain text best-effort
+      result = await model.generateContent([
+        PROMPT + `\n\nThe resume is a Word document. Extract text content from this base64 data:\n${fileBytes.toString('base64').slice(0, 8000)}`,
+      ]);
     }
 
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      messages: [{ role: 'user', content: messageContent }],
-    });
-
-    const raw = response.content[0].type === 'text' ? response.content[0].text.trim() : '{}';
+    const raw = result.response.text().trim();
     const jsonStr = raw.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
     const data = JSON.parse(jsonStr);
 

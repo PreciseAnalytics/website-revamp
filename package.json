@@ -13,6 +13,7 @@
     "@accessible/drawer": "^3.0.2",
     "@anthropic-ai/sdk": "^0.100.1",
     "@fontsource/inter": "^5.0.18",
+    "@google/generative-ai": "^0.24.1",
     "@n8tb1t/use-scroll-position": "^2.0.3",
     "@next/third-parties": "^16.1.1",
     "@sendgrid/mail": "^8.1.3",

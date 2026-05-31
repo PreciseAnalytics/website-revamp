@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -12,13 +12,14 @@ import { getAtsApiBaseUrl } from 'lib/ats';
 
 const ATS_API = getAtsApiBaseUrl();
 
-type NavSection = 'overview' | 'personal' | 'work' | 'education' | 'applications' | 'account';
+type NavSection = 'overview' | 'personal' | 'work' | 'education' | 'documents' | 'applications' | 'account';
 
 const NAV_ITEMS: { id: NavSection; label: string; icon: string }[] = [
   { id: 'overview',      label: 'Overview',          icon: '⊞' },
   { id: 'personal',      label: 'Personal Info',     icon: '👤' },
   { id: 'work',          label: 'Work History',       icon: '💼' },
   { id: 'education',     label: 'Education',          icon: '🎓' },
+  { id: 'documents',     label: 'Documents',          icon: '📎' },
   { id: 'applications',  label: 'My Applications',   icon: '📋' },
   { id: 'account',       label: 'Account',            icon: '🔒' },
 ];
@@ -48,6 +49,27 @@ const US_STATES = [
   'Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont',
   'Virginia','Washington','West Virginia','Wisconsin','Wyoming','Washington D.C.',
 ];
+
+type CertEntry = {
+  id: string;
+  label: string;
+  url: string;
+  filename: string;
+  uploadedAt: string;
+};
+
+type ParsedResume = {
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  state?: string | null;
+  linkedinUrl?: string | null;
+  school?: string | null;
+  degree?: string | null;
+  fieldOfStudy?: string | null;
+  graduationYear?: string | null;
+};
 
 type WorkEntry = {
   id: string;
@@ -80,6 +102,9 @@ type ProfileData = {
   headline: string;
   workHistory: WorkEntry[];
   educationHistory: EducationEntry[];
+  resumeUrl: string;
+  coverLetterUrl: string;
+  certifications: CertEntry[];
 };
 
 type Application = {
@@ -147,6 +172,19 @@ export default function ProfilePage() {
   const [eduSaving, setEduSaving] = useState(false);
   const [eduMsg, setEduMsg] = useState('');
 
+  // Documents
+  const [docMsg, setDocMsg] = useState('');
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [coverLetterUploading, setCoverLetterUploading] = useState(false);
+  const [certUploading, setCertUploading] = useState(false);
+  const [newCertLabel, setNewCertLabel] = useState('');
+  const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
+  const [parsedApplied, setParsedApplied] = useState<Set<string>>(new Set());
+
+  const resumeInputRef = useRef<HTMLInputElement>(null);
+  const coverLetterInputRef = useRef<HTMLInputElement>(null);
+  const certInputRef = useRef<HTMLInputElement>(null);
+
   // Account / password
   const [currentPw, setCurrentPw] = useState('');
   const [newPw, setNewPw] = useState('');
@@ -179,6 +217,9 @@ export default function ProfilePage() {
           headline: data.profile.headline || '',
           workHistory: Array.isArray(data.profile.work_history) ? data.profile.work_history : [],
           educationHistory: Array.isArray(data.profile.education_history) ? data.profile.education_history : [],
+          resumeUrl: data.profile.resume_url || '',
+          coverLetterUrl: data.profile.cover_letter_url || '',
+          certifications: Array.isArray(data.profile.certifications) ? data.profile.certifications : [],
         };
         setProfile(p);
         setPersonalDraft(p);
@@ -345,6 +386,161 @@ export default function ProfilePage() {
     }
   }
 
+  async function uploadToATS(file: File, type: string): Promise<string> {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('type', type);
+    const res = await fetch(`${ATS_API}/upload`, { method: 'POST', body: fd });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Upload failed (${res.status})`);
+    }
+    const data = await res.json();
+    if (!data.success || !data.url) throw new Error(data.error || 'Upload failed');
+    return data.url as string;
+  }
+
+  async function saveDocUrls(updates: { resumeUrl?: string; coverLetterUrl?: string; certifications?: CertEntry[] }) {
+    if (!profile) return;
+    const merged = { ...profile, ...updates };
+    try {
+      await fetch(`${ATS_API}/applicant/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          first_name: merged.firstName,
+          last_name: merged.lastName,
+          phone: merged.phone,
+          city: merged.city,
+          state_region: merged.stateRegion,
+          country: merged.country,
+          linkedin_url: merged.linkedinUrl,
+          portfolio_url: merged.portfolioUrl,
+          headline: merged.headline,
+          work_history: workDraft,
+          education_history: eduDraft,
+          resume_url: merged.resumeUrl,
+          cover_letter_url: merged.coverLetterUrl,
+          certifications: merged.certifications,
+        }),
+      });
+      setProfile(merged);
+    } catch {}
+  }
+
+  async function handleResumeUpload(file: File) {
+    setResumeUploading(true);
+    setDocMsg('');
+    try {
+      const url = await uploadToATS(file, 'resume');
+      await saveDocUrls({ resumeUrl: url });
+
+      const fd = new FormData();
+      fd.append('resume', file);
+      const parseRes = await fetch('/api/parse-resume', { method: 'POST', body: fd });
+      const parseData = await parseRes.json();
+
+      if (parseData.success && parseData.data) {
+        const d = parseData.data;
+        const found: ParsedResume = {};
+        if (d.firstName) found.firstName = d.firstName;
+        if (d.lastName) found.lastName = d.lastName;
+        if (d.phone) found.phone = d.phone;
+        if (d.city) found.city = d.city;
+        if (d.state) found.state = d.state;
+        if (d.linkedinUrl) found.linkedinUrl = d.linkedinUrl;
+        if (d.school) found.school = d.school;
+        if (d.degree) found.degree = d.degree;
+        if (d.fieldOfStudy) found.fieldOfStudy = d.fieldOfStudy;
+        if (d.graduationYear) found.graduationYear = d.graduationYear;
+        if (Object.keys(found).length > 0) {
+          setParsedResume(found);
+          setParsedApplied(new Set(Object.keys(found)));
+        }
+      }
+      setDocMsg('✓ Resume uploaded');
+    } catch (err: any) {
+      setDocMsg(err.message || 'Upload failed');
+    } finally {
+      setResumeUploading(false);
+    }
+  }
+
+  async function handleCoverLetterUpload(file: File) {
+    setCoverLetterUploading(true);
+    setDocMsg('');
+    try {
+      const url = await uploadToATS(file, 'cover_letter');
+      await saveDocUrls({ coverLetterUrl: url });
+      setDocMsg('✓ Cover letter uploaded');
+    } catch (err: any) {
+      setDocMsg(err.message || 'Upload failed');
+    } finally {
+      setCoverLetterUploading(false);
+    }
+  }
+
+  async function handleCertUpload(file: File, label: string) {
+    setCertUploading(true);
+    setDocMsg('');
+    try {
+      const url = await uploadToATS(file, 'certification');
+      const newCert: CertEntry = {
+        id: genId(),
+        label: label.trim() || file.name.replace(/\.[^.]+$/, ''),
+        url,
+        filename: file.name,
+        uploadedAt: new Date().toISOString(),
+      };
+      const updated = [...(profile?.certifications || []), newCert];
+      await saveDocUrls({ certifications: updated });
+      setNewCertLabel('');
+      setDocMsg('✓ Document uploaded');
+    } catch (err: any) {
+      setDocMsg(err.message || 'Upload failed');
+    } finally {
+      setCertUploading(false);
+    }
+  }
+
+  function applyParsedResume() {
+    if (!parsedResume || !profile) return;
+    const draft: Partial<ProfileData> = {};
+    if (parsedApplied.has('firstName') && parsedResume.firstName) draft.firstName = parsedResume.firstName;
+    if (parsedApplied.has('lastName') && parsedResume.lastName) draft.lastName = parsedResume.lastName;
+    if (parsedApplied.has('phone') && parsedResume.phone) draft.phone = parsedResume.phone;
+    if (parsedApplied.has('city') && parsedResume.city) draft.city = parsedResume.city;
+    if (parsedApplied.has('state') && parsedResume.state) draft.stateRegion = parsedResume.state;
+    if (parsedApplied.has('linkedinUrl') && parsedResume.linkedinUrl) draft.linkedinUrl = parsedResume.linkedinUrl;
+
+    const hasEduFields = parsedResume.school && (parsedApplied.has('school') || parsedApplied.has('degree'));
+    if (hasEduFields) {
+      const newEdu: EducationEntry = {
+        id: genId(),
+        school: parsedResume.school || '',
+        degree: parsedApplied.has('degree') ? (parsedResume.degree || '') : '',
+        fieldOfStudy: parsedApplied.has('fieldOfStudy') ? (parsedResume.fieldOfStudy || '') : '',
+        graduationYear: parsedApplied.has('graduationYear') ? (parsedResume.graduationYear || '') : '',
+      };
+      const alreadyExists = eduDraft.some(e => e.school.toLowerCase().trim() === newEdu.school.toLowerCase().trim());
+      if (!alreadyExists) {
+        const newEduDraft = [...eduDraft, newEdu];
+        setEduDraft(newEduDraft);
+        saveEducation(newEduDraft);
+      }
+    }
+
+    setPersonalDraft(d => ({ ...d, ...draft }));
+    setProfile(p => p ? { ...p, ...draft } : p);
+    setParsedResume(null);
+    if (Object.keys(draft).length > 0) {
+      setPersonalMsg('Fields applied — click Save Changes to confirm');
+      setTimeout(() => setPersonalMsg(''), 5000);
+      setSection('personal');
+    }
+  }
+
   if (!user) return null;
 
   const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`.toUpperCase();
@@ -353,7 +549,7 @@ export default function ProfilePage() {
 
   function completionPct() {
     if (!profile) return 0;
-    const fields = [profile.headline, profile.phone, profile.city, profile.linkedinUrl, profile.workHistory.length > 0, profile.educationHistory.length > 0];
+    const fields = [profile.headline, profile.phone, profile.city, profile.linkedinUrl, profile.workHistory.length > 0, profile.educationHistory.length > 0, !!profile.resumeUrl];
     return Math.round((fields.filter(Boolean).length / fields.length) * 100);
   }
 
@@ -730,6 +926,169 @@ export default function ProfilePage() {
                         ))
                       )}
                       {eduMsg && <SaveMsg $ok={eduMsg.startsWith('✓')} style={{ marginTop: '1rem' }}>{eduMsg}</SaveMsg>}
+                    </>
+                  )}
+
+                  {/* ── DOCUMENTS ── */}
+                  {section === 'documents' && (
+                    <>
+                      {/* Hidden file inputs */}
+                      <input ref={resumeInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleResumeUpload(f); e.target.value = ''; }} />
+                      <input ref={coverLetterInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleCoverLetterUpload(f); e.target.value = ''; }} />
+                      <input ref={certInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleCertUpload(f, newCertLabel); e.target.value = ''; }} />
+
+                      <PanelTitle>Documents</PanelTitle>
+
+                      {/* Resume */}
+                      <SubSectionTitle>Resume</SubSectionTitle>
+                      {profile?.resumeUrl ? (
+                        <DocFileCard>
+                          <DocFileIcon>📄</DocFileIcon>
+                          <DocFileInfo>
+                            <DocFileName>Resume on file</DocFileName>
+                            <DocFileMeta>Stored securely · auto-parsed on upload</DocFileMeta>
+                          </DocFileInfo>
+                          <DocFileActions>
+                            <DocViewLink href={profile.resumeUrl} target="_blank" rel="noopener noreferrer">View ↗</DocViewLink>
+                            <DocReplaceBtn type="button" disabled={resumeUploading} onClick={() => resumeInputRef.current?.click()}>
+                              {resumeUploading ? 'Uploading…' : 'Replace'}
+                            </DocReplaceBtn>
+                          </DocFileActions>
+                        </DocFileCard>
+                      ) : (
+                        <UploadZone $active={resumeUploading}
+                          onClick={() => !resumeUploading && resumeInputRef.current?.click()}
+                          onDragOver={e => e.preventDefault()}
+                          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !resumeUploading) handleResumeUpload(f); }}>
+                          {resumeUploading ? (
+                            <><UploadZoneIcon>⏳</UploadZoneIcon><UploadZoneText>Uploading &amp; parsing resume…</UploadZoneText></>
+                          ) : (
+                            <><UploadZoneIcon>📤</UploadZoneIcon>
+                              <UploadZoneText>Drop resume here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
+                              <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB · Fields auto-filled after upload</UploadZoneHint></>
+                          )}
+                        </UploadZone>
+                      )}
+
+                      {/* Cover Letter */}
+                      <SubSectionTitle style={{ marginTop: '2.8rem' }}>Cover Letter</SubSectionTitle>
+                      {profile?.coverLetterUrl ? (
+                        <DocFileCard>
+                          <DocFileIcon>✉️</DocFileIcon>
+                          <DocFileInfo>
+                            <DocFileName>Cover letter on file</DocFileName>
+                            <DocFileMeta>Stored securely</DocFileMeta>
+                          </DocFileInfo>
+                          <DocFileActions>
+                            <DocViewLink href={profile.coverLetterUrl} target="_blank" rel="noopener noreferrer">View ↗</DocViewLink>
+                            <DocReplaceBtn type="button" disabled={coverLetterUploading} onClick={() => coverLetterInputRef.current?.click()}>
+                              {coverLetterUploading ? 'Uploading…' : 'Replace'}
+                            </DocReplaceBtn>
+                          </DocFileActions>
+                        </DocFileCard>
+                      ) : (
+                        <UploadZone $active={coverLetterUploading}
+                          onClick={() => !coverLetterUploading && coverLetterInputRef.current?.click()}
+                          onDragOver={e => e.preventDefault()}
+                          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !coverLetterUploading) handleCoverLetterUpload(f); }}>
+                          {coverLetterUploading ? (
+                            <><UploadZoneIcon>⏳</UploadZoneIcon><UploadZoneText>Uploading…</UploadZoneText></>
+                          ) : (
+                            <><UploadZoneIcon>✉️</UploadZoneIcon>
+                              <UploadZoneText>Drop cover letter here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
+                              <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB</UploadZoneHint></>
+                          )}
+                        </UploadZone>
+                      )}
+
+                      {/* Certifications */}
+                      <SubSectionTitle style={{ marginTop: '2.8rem' }}>Certifications &amp; Other Documents</SubSectionTitle>
+                      {(profile?.certifications || []).map(cert => (
+                        <DocFileCard key={cert.id}>
+                          <DocFileIcon>🏅</DocFileIcon>
+                          <DocFileInfo>
+                            <DocFileName>{cert.label}</DocFileName>
+                            <DocFileMeta>{cert.filename} · {new Date(cert.uploadedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</DocFileMeta>
+                          </DocFileInfo>
+                          <DocFileActions>
+                            <DocViewLink href={cert.url} target="_blank" rel="noopener noreferrer">View ↗</DocViewLink>
+                            <DocDeleteBtn type="button" onClick={async () => {
+                              const updated = (profile?.certifications || []).filter(c => c.id !== cert.id);
+                              await saveDocUrls({ certifications: updated });
+                            }}>Remove</DocDeleteBtn>
+                          </DocFileActions>
+                        </DocFileCard>
+                      ))}
+
+                      <CertUploadBox>
+                        <FieldGroup $full>
+                          <FieldLabel>Document Label <Optional>(e.g. AWS Certification, PMP Credential)</Optional></FieldLabel>
+                          <FieldInput placeholder="Certification or document name" value={newCertLabel} onChange={e => setNewCertLabel(e.target.value)} />
+                        </FieldGroup>
+                        <UploadZone style={{ marginTop: '1.2rem' }} $active={certUploading}
+                          onClick={() => !certUploading && certInputRef.current?.click()}
+                          onDragOver={e => e.preventDefault()}
+                          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !certUploading) handleCertUpload(f, newCertLabel); }}>
+                          {certUploading ? (
+                            <><UploadZoneIcon>⏳</UploadZoneIcon><UploadZoneText>Uploading…</UploadZoneText></>
+                          ) : (
+                            <><UploadZoneIcon>🏅</UploadZoneIcon>
+                              <UploadZoneText>Drop file here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
+                              <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB</UploadZoneHint></>
+                          )}
+                        </UploadZone>
+                      </CertUploadBox>
+
+                      {docMsg && (
+                        <SaveMsg $ok={docMsg.startsWith('✓')} style={{ display: 'block', marginTop: '1.4rem', textAlign: 'center' }}>
+                          {docMsg}
+                        </SaveMsg>
+                      )}
+
+                      {/* Parsed resume modal */}
+                      {parsedResume && (
+                        <ParseModalOverlay onClick={() => setParsedResume(null)}>
+                          <ParseModalBox onClick={e => e.stopPropagation()}>
+                            <ParseModalTitle>Fields Found in Resume</ParseModalTitle>
+                            <ParseModalDesc>Select which fields to apply to your profile. Education entries will be added automatically.</ParseModalDesc>
+                            <ParseFieldList>
+                              {(Object.entries(parsedResume) as [string, string | null][]).filter(([, v]) => v).map(([key, val]) => {
+                                const labels: Record<string, string> = {
+                                  firstName: 'First Name', lastName: 'Last Name', phone: 'Phone',
+                                  city: 'City', state: 'State', linkedinUrl: 'LinkedIn URL',
+                                  school: 'School', degree: 'Degree', fieldOfStudy: 'Field of Study',
+                                  graduationYear: 'Graduation Year',
+                                };
+                                return (
+                                  <ParseFieldRow key={key}>
+                                    <input type="checkbox" id={`pf-${key}`} checked={parsedApplied.has(key)}
+                                      onChange={e => {
+                                        const next = new Set(parsedApplied);
+                                        e.target.checked ? next.add(key) : next.delete(key);
+                                        setParsedApplied(next);
+                                      }}
+                                      style={{ width: '1.6rem', height: '1.6rem', flexShrink: 0, cursor: 'pointer', accentColor: 'rgb(255,125,0)' }}
+                                    />
+                                    <ParseFieldLabel htmlFor={`pf-${key}`}>
+                                      <ParseFieldName>{labels[key] || key}</ParseFieldName>
+                                      <ParseFieldValue>{String(val)}</ParseFieldValue>
+                                    </ParseFieldLabel>
+                                  </ParseFieldRow>
+                                );
+                              })}
+                            </ParseFieldList>
+                            <ParseModalActions>
+                              <SaveBtn type="button" onClick={applyParsedResume} disabled={parsedApplied.size === 0}>
+                                Apply {parsedApplied.size} Field{parsedApplied.size !== 1 ? 's' : ''}
+                              </SaveBtn>
+                              <CancelBtn type="button" onClick={() => setParsedResume(null)}>Skip</CancelBtn>
+                            </ParseModalActions>
+                          </ParseModalBox>
+                        </ParseModalOverlay>
+                      )}
                     </>
                   )}
 
@@ -1171,6 +1530,76 @@ const StatusBadge = styled.span<{ $color: string; $bg: string }>`
   white-space: nowrap;
   flex-shrink: 0;
 `;
+
+// Documents
+const UploadZone = styled.div<{ $active?: boolean }>`
+  border: 2px dashed ${p => p.$active ? 'rgb(255,125,0)' : '#cbd5e1'};
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: ${p => p.$active ? 'default' : 'pointer'};
+  background: ${p => p.$active ? 'rgba(255,125,0,0.04)' : '#f8fafc'};
+  transition: border-color 0.2s, background 0.2s;
+  &:hover { border-color: rgb(255,125,0); background: rgba(255,125,0,0.04); }
+`;
+const UploadZoneIcon = styled.div`font-size: 3rem; margin-bottom: 0.8rem;`;
+const UploadZoneText = styled.div`font-size: 1.5rem; color: #475569; font-weight: 500;`;
+const UploadZoneEmphasis = styled.span`color: rgb(255,125,0); text-decoration: underline;`;
+const UploadZoneHint = styled.div`font-size: 1.2rem; color: #94a3b8; margin-top: 0.4rem;`;
+
+const DocFileCard = styled.div`
+  display: flex; align-items: center; gap: 1.4rem;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 0.8rem; padding: 1.4rem 1.6rem; margin-bottom: 1rem;
+`;
+const DocFileIcon = styled.div`font-size: 2.2rem; flex-shrink: 0;`;
+const DocFileInfo = styled.div`flex: 1; min-width: 0;`;
+const DocFileName = styled.div`font-size: 1.5rem; font-weight: 700; color: #0f172a;`;
+const DocFileMeta = styled.div`font-size: 1.2rem; color: #94a3b8;`;
+const DocFileActions = styled.div`display: flex; gap: 1rem; align-items: center; flex-shrink: 0;`;
+const DocViewLink = styled.a`
+  font-size: 1.3rem; color: rgb(255,125,0); text-decoration: none;
+  font-weight: 600; &:hover { text-decoration: underline; }
+`;
+const DocReplaceBtn = styled.button`
+  font-size: 1.3rem; color: #64748b; background: none;
+  border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.3rem 0.9rem;
+  cursor: pointer; &:hover { border-color: #94a3b8; }
+  &:disabled { opacity: 0.5; cursor: default; }
+`;
+const DocDeleteBtn = styled.button`
+  font-size: 1.3rem; color: #ef4444; background: none; border: none;
+  cursor: pointer; &:hover { text-decoration: underline; }
+`;
+
+const CertUploadBox = styled.div`
+  margin-top: 1.6rem; padding: 2rem;
+  border: 1px solid #e2e8f0; border-radius: 1rem; background: #f8fafc;
+`;
+
+// Parse modal
+const ParseModalOverlay = styled.div`
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 2rem;
+`;
+const ParseModalBox = styled.div`
+  background: #fff; border-radius: 1.2rem; padding: 2.8rem;
+  max-width: 52rem; width: 100%; max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+`;
+const ParseModalTitle = styled.h2`font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.6rem;`;
+const ParseModalDesc = styled.p`font-size: 1.4rem; color: #64748b; margin-bottom: 2rem; line-height: 1.6;`;
+const ParseFieldList = styled.div`display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2.4rem;`;
+const ParseFieldRow = styled.div`
+  display: flex; align-items: flex-start; gap: 1.2rem;
+  padding: 1rem 1.2rem; background: #f8fafc; border-radius: 0.6rem;
+`;
+const ParseFieldLabel = styled.label`flex: 1; cursor: pointer;`;
+const ParseFieldName = styled.div`font-size: 1.15rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em;`;
+const ParseFieldValue = styled.div`font-size: 1.5rem; color: #0f172a; font-weight: 500; margin-top: 0.1rem; word-break: break-word;`;
+const ParseModalActions = styled.div`display: flex; gap: 1rem; justify-content: flex-end;`;
 
 // Account
 const DangerZone = styled.div`

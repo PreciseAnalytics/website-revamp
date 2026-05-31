@@ -174,16 +174,15 @@ export default function ProfilePage() {
 
   // Documents
   const [docMsg, setDocMsg] = useState('');
-  const [resumeUploading, setResumeUploading] = useState(false);
-  const [coverLetterUploading, setCoverLetterUploading] = useState(false);
-  const [certUploading, setCertUploading] = useState(false);
-  const [newCertLabel, setNewCertLabel] = useState('');
+  const [docUploading, setDocUploading] = useState(false);
+  const [uploadType, setUploadType] = useState('resume');
+  const [uploadLabel, setUploadLabel] = useState('Resume');
+  const [replacing, setReplacing] = useState<string | null>(null);
   const [parsedResume, setParsedResume] = useState<ParsedResume | null>(null);
   const [parsedApplied, setParsedApplied] = useState<Set<string>>(new Set());
 
-  const resumeInputRef = useRef<HTMLInputElement>(null);
-  const coverLetterInputRef = useRef<HTMLInputElement>(null);
-  const certInputRef = useRef<HTMLInputElement>(null);
+  const mainUploadRef = useRef<HTMLInputElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
 
   // Account / password
   const [currentPw, setCurrentPw] = useState('');
@@ -386,6 +385,16 @@ export default function ProfilePage() {
     }
   }
 
+  const DOC_TYPES = [
+    { value: 'resume',        label: 'Resume' },
+    { value: 'cover_letter',  label: 'Cover Letter' },
+    { value: 'certification', label: 'Certification' },
+    { value: 'diploma',       label: 'Diploma / Transcript' },
+    { value: 'license',       label: 'Professional License' },
+    { value: 'portfolio',     label: 'Portfolio / Work Sample' },
+    { value: 'other',         label: 'Other' },
+  ];
+
   async function uploadToATS(file: File, type: string): Promise<string> {
     const fd = new FormData();
     fd.append('file', file);
@@ -403,104 +412,126 @@ export default function ProfilePage() {
   async function saveDocUrls(updates: { resumeUrl?: string; coverLetterUrl?: string; certifications?: CertEntry[] }) {
     if (!profile) return;
     const merged = { ...profile, ...updates };
-    try {
-      await fetch(`${ATS_API}/applicant/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          first_name: merged.firstName,
-          last_name: merged.lastName,
-          phone: merged.phone,
-          city: merged.city,
-          state_region: merged.stateRegion,
-          country: merged.country,
-          linkedin_url: merged.linkedinUrl,
-          portfolio_url: merged.portfolioUrl,
-          headline: merged.headline,
-          work_history: workDraft,
-          education_history: eduDraft,
-          resume_url: merged.resumeUrl,
-          cover_letter_url: merged.coverLetterUrl,
-          certifications: merged.certifications,
-        }),
-      });
-      setProfile(merged);
-    } catch {}
+    const res = await fetch(`${ATS_API}/applicant/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        first_name: merged.firstName,
+        last_name: merged.lastName,
+        phone: merged.phone,
+        city: merged.city,
+        state_region: merged.stateRegion,
+        country: merged.country,
+        linkedin_url: merged.linkedinUrl,
+        portfolio_url: merged.portfolioUrl,
+        headline: merged.headline,
+        work_history: workDraft,
+        education_history: eduDraft,
+        resume_url: merged.resumeUrl,
+        cover_letter_url: merged.coverLetterUrl,
+        certifications: merged.certifications,
+      }),
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Save failed (${res.status})`);
+    }
+    setProfile(merged);
   }
 
-  async function handleResumeUpload(file: File) {
-    setResumeUploading(true);
+  async function downloadFile(url: string, filename: string) {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename || 'document';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    } catch {
+      window.open(url, '_blank');
+    }
+  }
+
+  async function handleDocUpload(file: File, type: string, label: string, replacingId?: string | null) {
+    setDocUploading(true);
     setDocMsg('');
     try {
-      const url = await uploadToATS(file, 'resume');
-      await saveDocUrls({ resumeUrl: url });
+      const url = await uploadToATS(file, type);
 
-      const fd = new FormData();
-      fd.append('resume', file);
-      const parseRes = await fetch('/api/parse-resume', { method: 'POST', body: fd });
-      const parseData = await parseRes.json();
-
-      if (parseData.success && parseData.data) {
-        const d = parseData.data;
-        const found: ParsedResume = {};
-        if (d.firstName) found.firstName = d.firstName;
-        if (d.lastName) found.lastName = d.lastName;
-        if (d.phone) found.phone = d.phone;
-        if (d.city) found.city = d.city;
-        if (d.state) found.state = d.state;
-        if (d.linkedinUrl) found.linkedinUrl = d.linkedinUrl;
-        if (d.school) found.school = d.school;
-        if (d.degree) found.degree = d.degree;
-        if (d.fieldOfStudy) found.fieldOfStudy = d.fieldOfStudy;
-        if (d.graduationYear) found.graduationYear = d.graduationYear;
-        if (Object.keys(found).length > 0) {
-          setParsedResume(found);
-          setParsedApplied(new Set(Object.keys(found)));
+      if (type === 'resume') {
+        await saveDocUrls({ resumeUrl: url });
+        // Attempt parse (non-blocking — errors are swallowed gracefully)
+        try {
+          const fd = new FormData();
+          fd.append('resume', file);
+          const parseRes = await fetch('/api/parse-resume', { method: 'POST', body: fd });
+          const parseData = await parseRes.json();
+          if (parseData.success && parseData.data) {
+            const d = parseData.data;
+            const found: ParsedResume = {};
+            if (d.firstName) found.firstName = d.firstName;
+            if (d.lastName) found.lastName = d.lastName;
+            if (d.phone) found.phone = d.phone;
+            if (d.city) found.city = d.city;
+            if (d.state) found.state = d.state;
+            if (d.linkedinUrl) found.linkedinUrl = d.linkedinUrl;
+            if (d.school) found.school = d.school;
+            if (d.degree) found.degree = d.degree;
+            if (d.fieldOfStudy) found.fieldOfStudy = d.fieldOfStudy;
+            if (d.graduationYear) found.graduationYear = d.graduationYear;
+            if (Object.keys(found).length > 0) {
+              setParsedResume(found);
+              setParsedApplied(new Set(Object.keys(found)));
+            }
+          }
+        } catch {}
+      } else if (type === 'cover_letter') {
+        await saveDocUrls({ coverLetterUrl: url });
+      } else {
+        const currentCerts = profile?.certifications || [];
+        let updatedCerts: CertEntry[];
+        if (replacingId) {
+          updatedCerts = currentCerts.map(c =>
+            c.id === replacingId ? { ...c, url, filename: file.name, uploadedAt: new Date().toISOString() } : c
+          );
+        } else {
+          updatedCerts = [...currentCerts, {
+            id: genId(),
+            label: label.trim() || file.name.replace(/\.[^.]+$/, ''),
+            url,
+            filename: file.name,
+            uploadedAt: new Date().toISOString(),
+          }];
         }
+        await saveDocUrls({ certifications: updatedCerts });
       }
-      setDocMsg('✓ Resume uploaded');
+
+      // Refresh from DB to guarantee the list is in sync
+      await fetchProfile();
+      setUploadType('resume');
+      setUploadLabel('Resume');
+      setReplacing(null);
+      setDocMsg('✓ Document saved');
+      setTimeout(() => setDocMsg(''), 4000);
     } catch (err: any) {
       setDocMsg(err.message || 'Upload failed');
     } finally {
-      setResumeUploading(false);
+      setDocUploading(false);
     }
   }
 
-  async function handleCoverLetterUpload(file: File) {
-    setCoverLetterUploading(true);
-    setDocMsg('');
+  async function handleRemoveDoc(id: string) {
+    if (!profile) return;
+    const updated = (profile.certifications || []).filter(c => c.id !== id);
     try {
-      const url = await uploadToATS(file, 'cover_letter');
-      await saveDocUrls({ coverLetterUrl: url });
-      setDocMsg('✓ Cover letter uploaded');
-    } catch (err: any) {
-      setDocMsg(err.message || 'Upload failed');
-    } finally {
-      setCoverLetterUploading(false);
-    }
-  }
-
-  async function handleCertUpload(file: File, label: string) {
-    setCertUploading(true);
-    setDocMsg('');
-    try {
-      const url = await uploadToATS(file, 'certification');
-      const newCert: CertEntry = {
-        id: genId(),
-        label: label.trim() || file.name.replace(/\.[^.]+$/, ''),
-        url,
-        filename: file.name,
-        uploadedAt: new Date().toISOString(),
-      };
-      const updated = [...(profile?.certifications || []), newCert];
       await saveDocUrls({ certifications: updated });
-      setNewCertLabel('');
-      setDocMsg('✓ Document uploaded');
+      await fetchProfile();
     } catch (err: any) {
-      setDocMsg(err.message || 'Upload failed');
-    } finally {
-      setCertUploading(false);
+      setDocMsg(err.message || 'Remove failed');
     }
   }
 
@@ -933,114 +964,102 @@ export default function ProfilePage() {
                   {section === 'documents' && (
                     <>
                       {/* Hidden file inputs */}
-                      <input ref={resumeInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
-                        onChange={e => { const f = e.target.files?.[0]; if (f) handleResumeUpload(f); e.target.value = ''; }} />
-                      <input ref={coverLetterInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
-                        onChange={e => { const f = e.target.files?.[0]; if (f) handleCoverLetterUpload(f); e.target.value = ''; }} />
-                      <input ref={certInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
-                        onChange={e => { const f = e.target.files?.[0]; if (f) handleCertUpload(f, newCertLabel); e.target.value = ''; }} />
+                      <input ref={mainUploadRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleDocUpload(f, uploadType, uploadLabel); e.target.value = ''; }} />
+                      <input ref={replaceInputRef} type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                        onChange={e => {
+                          const f = e.target.files?.[0];
+                          if (f && replacing) {
+                            const isResume = replacing === 'resume';
+                            const isCL = replacing === 'cover_letter';
+                            const type = isResume ? 'resume' : isCL ? 'cover_letter' : 'certification';
+                            handleDocUpload(f, type, '', isResume || isCL ? null : replacing);
+                          }
+                          e.target.value = '';
+                        }} />
 
-                      <PanelTitle>Documents</PanelTitle>
+                      {/* ── MY DOCUMENTS list ── */}
+                      <PanelTitleRow>
+                        <PanelTitle>My Documents</PanelTitle>
+                      </PanelTitleRow>
 
-                      {/* Resume */}
-                      <SubSectionTitle>Resume</SubSectionTitle>
-                      {profile?.resumeUrl ? (
-                        <DocFileCard>
-                          <DocFileIcon>📄</DocFileIcon>
-                          <DocFileInfo>
-                            <DocFileName>Resume on file</DocFileName>
-                            <DocFileMeta>Stored securely · auto-parsed on upload</DocFileMeta>
-                          </DocFileInfo>
-                          <DocFileActions>
-                            <DocViewLink href={profile.resumeUrl} target="_blank" rel="noopener noreferrer">View ↗</DocViewLink>
-                            <DocReplaceBtn type="button" disabled={resumeUploading} onClick={() => resumeInputRef.current?.click()}>
-                              {resumeUploading ? 'Uploading…' : 'Replace'}
-                            </DocReplaceBtn>
-                          </DocFileActions>
-                        </DocFileCard>
-                      ) : (
-                        <UploadZone $active={resumeUploading}
-                          onClick={() => !resumeUploading && resumeInputRef.current?.click()}
-                          onDragOver={e => e.preventDefault()}
-                          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !resumeUploading) handleResumeUpload(f); }}>
-                          {resumeUploading ? (
-                            <><UploadZoneIcon>⏳</UploadZoneIcon><UploadZoneText>Uploading &amp; parsing resume…</UploadZoneText></>
-                          ) : (
-                            <><UploadZoneIcon>📤</UploadZoneIcon>
-                              <UploadZoneText>Drop resume here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
-                              <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB · Fields auto-filled after upload</UploadZoneHint></>
-                          )}
-                        </UploadZone>
-                      )}
+                      {(() => {
+                        const docTypeIcon: Record<string, string> = {
+                          resume: '📄', cover_letter: '✉️', certification: '🏅',
+                          diploma: '🎓', license: '📋', portfolio: '🌐', other: '📎',
+                        };
+                        const allDocs = [
+                          ...(profile?.resumeUrl ? [{ id: 'resume', label: 'Resume', type: 'resume', url: profile.resumeUrl, filename: 'resume', date: '', removable: false }] : []),
+                          ...(profile?.coverLetterUrl ? [{ id: 'cover_letter', label: 'Cover Letter', type: 'cover_letter', url: profile.coverLetterUrl, filename: 'cover-letter', date: '', removable: false }] : []),
+                          ...(profile?.certifications || []).map(c => ({ id: c.id, label: c.label, type: 'certification', url: c.url, filename: c.filename, date: c.uploadedAt, removable: true })),
+                        ];
+                        if (allDocs.length === 0) return (
+                          <EmptySection>
+                            <EmptyIcon>📁</EmptyIcon>
+                            <EmptyText>No documents yet. Upload your first document below.</EmptyText>
+                          </EmptySection>
+                        );
+                        return allDocs.map(doc => (
+                          <DocFileCard key={doc.id}>
+                            <DocFileIcon>{docTypeIcon[doc.type] || '📎'}</DocFileIcon>
+                            <DocFileInfo>
+                              <DocFileName>{doc.label}</DocFileName>
+                              <DocFileMeta>
+                                {doc.date ? new Date(doc.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Uploaded'}
+                              </DocFileMeta>
+                            </DocFileInfo>
+                            <DocFileActions>
+                              <DocActionBtn as="a" href={doc.url} target="_blank" rel="noopener noreferrer">View ↗</DocActionBtn>
+                              <DocActionBtn type="button" onClick={() => downloadFile(doc.url, doc.filename)}>Download</DocActionBtn>
+                              <DocActionBtn type="button" onClick={() => { setReplacing(doc.id); replaceInputRef.current?.click(); }}>Replace</DocActionBtn>
+                              {doc.removable && <DocDeleteBtn type="button" onClick={() => handleRemoveDoc(doc.id)}>Remove</DocDeleteBtn>}
+                            </DocFileActions>
+                          </DocFileCard>
+                        ));
+                      })()}
 
-                      {/* Cover Letter */}
-                      <SubSectionTitle style={{ marginTop: '2.8rem' }}>Cover Letter</SubSectionTitle>
-                      {profile?.coverLetterUrl ? (
-                        <DocFileCard>
-                          <DocFileIcon>✉️</DocFileIcon>
-                          <DocFileInfo>
-                            <DocFileName>Cover letter on file</DocFileName>
-                            <DocFileMeta>Stored securely</DocFileMeta>
-                          </DocFileInfo>
-                          <DocFileActions>
-                            <DocViewLink href={profile.coverLetterUrl} target="_blank" rel="noopener noreferrer">View ↗</DocViewLink>
-                            <DocReplaceBtn type="button" disabled={coverLetterUploading} onClick={() => coverLetterInputRef.current?.click()}>
-                              {coverLetterUploading ? 'Uploading…' : 'Replace'}
-                            </DocReplaceBtn>
-                          </DocFileActions>
-                        </DocFileCard>
-                      ) : (
-                        <UploadZone $active={coverLetterUploading}
-                          onClick={() => !coverLetterUploading && coverLetterInputRef.current?.click()}
-                          onDragOver={e => e.preventDefault()}
-                          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !coverLetterUploading) handleCoverLetterUpload(f); }}>
-                          {coverLetterUploading ? (
-                            <><UploadZoneIcon>⏳</UploadZoneIcon><UploadZoneText>Uploading…</UploadZoneText></>
-                          ) : (
-                            <><UploadZoneIcon>✉️</UploadZoneIcon>
-                              <UploadZoneText>Drop cover letter here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
-                              <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB</UploadZoneHint></>
-                          )}
-                        </UploadZone>
-                      )}
+                      <DocDivider />
 
-                      {/* Certifications */}
-                      <SubSectionTitle style={{ marginTop: '2.8rem' }}>Certifications &amp; Other Documents</SubSectionTitle>
-                      {(profile?.certifications || []).map(cert => (
-                        <DocFileCard key={cert.id}>
-                          <DocFileIcon>🏅</DocFileIcon>
-                          <DocFileInfo>
-                            <DocFileName>{cert.label}</DocFileName>
-                            <DocFileMeta>{cert.filename} · {new Date(cert.uploadedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</DocFileMeta>
-                          </DocFileInfo>
-                          <DocFileActions>
-                            <DocViewLink href={cert.url} target="_blank" rel="noopener noreferrer">View ↗</DocViewLink>
-                            <DocDeleteBtn type="button" onClick={async () => {
-                              const updated = (profile?.certifications || []).filter(c => c.id !== cert.id);
-                              await saveDocUrls({ certifications: updated });
-                            }}>Remove</DocDeleteBtn>
-                          </DocFileActions>
-                        </DocFileCard>
-                      ))}
-
-                      <CertUploadBox>
-                        <FieldGroup $full>
-                          <FieldLabel>Document Label <Optional>(e.g. AWS Certification, PMP Credential)</Optional></FieldLabel>
-                          <FieldInput placeholder="Certification or document name" value={newCertLabel} onChange={e => setNewCertLabel(e.target.value)} />
+                      {/* ── UPLOAD FORM ── */}
+                      <SubSectionTitle>Upload a Document</SubSectionTitle>
+                      <FieldGrid>
+                        <FieldGroup>
+                          <FieldLabel>Document Type</FieldLabel>
+                          <FieldSelect value={uploadType} onChange={e => {
+                            const t = e.target.value;
+                            setUploadType(t);
+                            const found = DOC_TYPES.find(d => d.value === t);
+                            setUploadLabel(found ? found.label : '');
+                          }}>
+                            {DOC_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                          </FieldSelect>
                         </FieldGroup>
-                        <UploadZone style={{ marginTop: '1.2rem' }} $active={certUploading}
-                          onClick={() => !certUploading && certInputRef.current?.click()}
-                          onDragOver={e => e.preventDefault()}
-                          onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !certUploading) handleCertUpload(f, newCertLabel); }}>
-                          {certUploading ? (
-                            <><UploadZoneIcon>⏳</UploadZoneIcon><UploadZoneText>Uploading…</UploadZoneText></>
-                          ) : (
-                            <><UploadZoneIcon>🏅</UploadZoneIcon>
-                              <UploadZoneText>Drop file here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
-                              <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB</UploadZoneHint></>
-                          )}
-                        </UploadZone>
-                      </CertUploadBox>
+                        <FieldGroup>
+                          <FieldLabel>Label <Optional>(editable)</Optional></FieldLabel>
+                          <FieldInput
+                            placeholder="Document name"
+                            value={uploadLabel}
+                            onChange={e => setUploadLabel(e.target.value)}
+                          />
+                        </FieldGroup>
+                      </FieldGrid>
+
+                      <UploadZone
+                        style={{ marginTop: '1.4rem' }}
+                        $active={docUploading}
+                        onClick={() => !docUploading && mainUploadRef.current?.click()}
+                        onDragOver={e => e.preventDefault()}
+                        onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !docUploading) handleDocUpload(f, uploadType, uploadLabel); }}
+                      >
+                        {docUploading ? (
+                          <><UploadZoneIcon>⏳</UploadZoneIcon>
+                            <UploadZoneText>{uploadType === 'resume' ? 'Uploading & parsing…' : 'Uploading…'}</UploadZoneText></>
+                        ) : (
+                          <><UploadZoneIcon>📤</UploadZoneIcon>
+                            <UploadZoneText>Drop file here or <UploadZoneEmphasis>browse</UploadZoneEmphasis></UploadZoneText>
+                            <UploadZoneHint>PDF, DOC or DOCX · Max 5 MB{uploadType === 'resume' ? ' · Profile fields auto-filled' : ''}</UploadZoneHint></>
+                        )}
+                      </UploadZone>
 
                       {docMsg && (
                         <SaveMsg $ok={docMsg.startsWith('✓')} style={{ display: 'block', marginTop: '1.4rem', textAlign: 'center' }}>
@@ -1048,7 +1067,7 @@ export default function ProfilePage() {
                         </SaveMsg>
                       )}
 
-                      {/* Parsed resume modal */}
+                      {/* Parse modal */}
                       {parsedResume && (
                         <ParseModalOverlay onClick={() => setParsedResume(null)}>
                           <ParseModalBox onClick={e => e.stopPropagation()}>
@@ -1561,20 +1580,18 @@ const DocViewLink = styled.a`
   font-size: 1.3rem; color: rgb(255,125,0); text-decoration: none;
   font-weight: 600; &:hover { text-decoration: underline; }
 `;
-const DocReplaceBtn = styled.button`
-  font-size: 1.3rem; color: #64748b; background: none;
+const DocActionBtn = styled.button`
+  font-size: 1.25rem; color: #334155; background: #ffffff;
   border: 1px solid #e2e8f0; border-radius: 0.4rem; padding: 0.3rem 0.9rem;
-  cursor: pointer; &:hover { border-color: #94a3b8; }
-  &:disabled { opacity: 0.5; cursor: default; }
+  cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+  &:hover { border-color: rgb(255,125,0); color: rgb(255,125,0); }
 `;
 const DocDeleteBtn = styled.button`
-  font-size: 1.3rem; color: #ef4444; background: none; border: none;
+  font-size: 1.25rem; color: #ef4444; background: none; border: none;
   cursor: pointer; &:hover { text-decoration: underline; }
 `;
-
-const CertUploadBox = styled.div`
-  margin-top: 1.6rem; padding: 2rem;
-  border: 1px solid #e2e8f0; border-radius: 1rem; background: #f8fafc;
+const DocDivider = styled.hr`
+  border: none; border-top: 1px solid #f1f5f9; margin: 2.4rem 0;
 `;
 
 // Parse modal

@@ -1,4 +1,4 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -7,7 +7,8 @@ import { AnimatePresence } from 'framer-motion';
 import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { media } from 'utils/media';
-import { JOBS, getJobById, Job } from 'lib/jobsData';
+import { Job } from 'lib/jobsData';
+import { fetchWebsiteJobById } from 'lib/ats';
 import { useAuth } from 'contexts/auth.context';
 import AuthModal from 'components/AuthModals';
 import { truncateForMeta } from 'utils/seo';
@@ -201,13 +202,8 @@ export default function JobDetailPage({ job }: Props) {
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: JOBS.map((j) => ({ params: { id: j.id } })),
-  fallback: false,
-});
-
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-  const job = getJobById(params?.id as string);
+export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) => {
+  const job = await fetchWebsiteJobById(params?.id as string);
   if (!job) return { notFound: true };
   return { props: { job } };
 };
@@ -370,4 +366,3 @@ const ApplyCTARight = styled.div`
   flex-shrink: 0;
   ${media.tablet(`align-items: flex-start;`)}
 `;
-

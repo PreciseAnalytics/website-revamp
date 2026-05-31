@@ -1,10 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { EnvVars } from 'env';
+import { getAtsOrigin } from 'lib/ats';
 
-const ATS_BASE_URL =
-  process.env.ATS_API_URL ||
-  process.env.NEXT_PUBLIC_ATS_API_URL ||
-  'https://precise-analytics-ats.vercel.app';
+const ATS_BASE_URL = getAtsOrigin();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

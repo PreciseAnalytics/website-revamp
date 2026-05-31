@@ -134,7 +134,7 @@ export default function ContactHero() {
               <CalendlyWrap>
                 <div
                   className="calendly-inline-widget"
-                  data-url="https://calendly.com/contact-preciseanalytics/initial-consultation?back=1&month=2025-06"
+                  data-url="https://calendly.com/contact-preciseanalytics/initial-consultation?back=1"
                   style={{ minWidth: '320px', height: '700px' }}
                 />
               </CalendlyWrap>

@@ -16,7 +16,7 @@ import { Loader2, AlertCircle, CheckCircle, Link, User, ArrowLeft } from 'lucide
 
 
 // ATS API Configuration
-const ATS_BASE_URL = process.env.NEXT_PUBLIC_ATS_API_URL || 'https://precise-analytics-ats.vercel.app';
+const ATS_BASE_URL = (process.env.NEXT_PUBLIC_ATS_API_URL || 'https://ats.preciseanalytics.io').replace(/\/+$/, '').replace(/\/api$/, '');
 
 interface Position {
   id: string;

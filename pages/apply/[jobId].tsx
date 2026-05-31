@@ -8,8 +8,9 @@ import AnimatedHeader from 'components/AnimatedHeader';
 import Container from 'components/Container';
 import { useAuth } from 'contexts/auth.context';
 import { media } from 'utils/media';
+import { fetchWebsiteJobById, getAtsApiBaseUrl } from 'lib/ats';
 
-const ATS_API = 'https://precise-analytics-ats.vercel.app/api';
+const ATS_API = getAtsApiBaseUrl();
 
 interface Props {
   job: {
@@ -582,33 +583,24 @@ export default function ApplyPage({ job }: Props) {
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ params }) => {
   const jobId = params?.jobId as string;
-  try {
-    const res = await fetch(`${ATS_API}/jobs/${jobId}`);
-    if (res.ok) {
-      const data = await res.json();
-      const j = data.job || data;
-      if (j && j.id) {
-        return {
-          props: {
-            job: {
-              id: j.id,
-              jobNumber: j.job_number || `PA-${String(j.id).slice(0, 6).toUpperCase()}`,
-              title: j.title,
-              departmentLabel: j.department || 'General',
-              locationLabel: j.location || 'Richmond, VA',
-              employmentTypeLabel: (j.employment_type || j.type || 'Full Time')
-                .replace(/_/g, ' ')
-                .replace(/\b\w/g, (c: string) => c.toUpperCase()),
-              salaryRange: j.salary_range || null,
-              description: j.description || '',
-            },
-          },
-        };
-      }
-    }
-  } catch (e) {
-    console.error('Failed to fetch job from ATS:', e);
+  const job = await fetchWebsiteJobById(jobId);
+  if (job) {
+    return {
+      props: {
+        job: {
+          id: job.id,
+          jobNumber: job.jobNumber,
+          title: job.title,
+          departmentLabel: job.departmentLabel,
+          locationLabel: job.locationLabel,
+          employmentTypeLabel: job.employmentTypeLabel,
+          salaryRange: job.salaryRange || null,
+          description: job.description,
+        },
+      },
+    };
   }
+
   return { notFound: true };
 };
 

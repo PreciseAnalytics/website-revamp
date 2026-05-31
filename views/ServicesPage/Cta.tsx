@@ -1,222 +1,263 @@
 import NextLink from 'next/link';
-import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import Button from 'components/Button';
-import ButtonGroup from 'components/ButtonGroup';
 import Container from 'components/Container';
 import AnimatedReveal from 'components/AnimatedReveal';
-import SectionTitle from 'components/SectionTitle';
 import { media } from 'utils/media';
+
+const INDUSTRIES = [
+  'Federal Government',
+  'Defense & Intel',
+  'Healthcare',
+  'Financial Services',
+  'State & Local Gov',
+  'Manufacturing',
+];
+
+const TRUST_POINTS = [
+  { icon: '✓', text: 'VOSB Certified' },
+  { icon: '✓', text: 'DSBSD Certified' },
+  { icon: '✓', text: 'Industry Expertise' },
+  { icon: '✓', text: 'Proven Outcomes' },
+];
 
 export default function Cta() {
   return (
-    <CtaWrapper>
-      <DarkOverlay />
+    <CtaSection>
+      <GradientOrb $x="15%" $y="20%" $color="rgba(57,255,20,0.12)" />
+      <GradientOrb $x="75%" $y="60%" $color="rgba(255,140,43,0.12)" />
+
       <Container>
-        <ContentStack>
-          <AnimatedReveal>
-            <StyledSectionTitle>Ready to Get Started?</StyledSectionTitle>
+        <Inner>
+          <AnimatedReveal direction="up" delay={0.1}>
+            <Eyebrow>Let&apos;s Build Something</Eyebrow>
           </AnimatedReveal>
-          
-          <AnimatedReveal direction="up" delay={0.2}>
-            <Description>
-              At Precise Analytics, we are committed to helping you turn your data into a strategic asset. 
-              Contact us today to explore how our data analytics consultancy services can propel your business to new heights.
-            </Description>
+
+          <AnimatedReveal direction="up" delay={0.22}>
+            <Headline>
+              Ready to Turn Data Into <AccentText>Strategic Advantage?</AccentText>
+            </Headline>
           </AnimatedReveal>
-          
-          <AnimatedReveal direction="up" delay={0.4}>
-            <ButtonGroup>
-              <NextLink href="/contact" passHref>
-                <PrimaryButton>
-                  Contact Us Today <Arrow>&rarr;</Arrow>
-                </PrimaryButton>
+
+          <AnimatedReveal direction="up" delay={0.35}>
+            <Body>
+              Precise Analytics helps government agencies and commercial organizations build the data
+              foundations, intelligence systems, and AI capabilities that drive measurable outcomes —
+              not just reports.
+            </Body>
+          </AnimatedReveal>
+
+          <AnimatedReveal direction="up" delay={0.48}>
+            <Actions>
+              <NextLink href="/contact" passHref legacyBehavior>
+                <PrimaryBtn>Contact Us Today →</PrimaryBtn>
               </NextLink>
-              <NextLink href="/schedule-consult" passHref>
-                <SecondaryButton>
-                  Schedule a Consult <Arrow>&rarr;</Arrow>
-                </SecondaryButton>
+              <NextLink href="/schedule-consult" passHref legacyBehavior>
+                <SecondaryBtn>Schedule a Consult</SecondaryBtn>
               </NextLink>
-            </ButtonGroup>
+            </Actions>
           </AnimatedReveal>
-          
-          <AnimatedReveal direction="up" delay={0.6}>
-            <TrustBadges>
-              {['Industry Expertise', 'Tailored Solutions', 'Proven Results'].map((badge) => (
-                <TrustBadge
-                  key={badge}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Checkmark viewBox="0 0 24 24">
-                    <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </Checkmark>
-                  <BadgeText>{badge}</BadgeText>
-                </TrustBadge>
+
+          <AnimatedReveal direction="up" delay={0.58}>
+            <TrustRow>
+              {TRUST_POINTS.map((t) => (
+                <TrustChip key={t.text}>
+                  <TrustMark>{t.icon}</TrustMark>
+                  {t.text}
+                </TrustChip>
               ))}
-            </TrustBadges>
+            </TrustRow>
           </AnimatedReveal>
-        </ContentStack>
+
+          <Divider />
+
+          <AnimatedReveal direction="up" delay={0.65}>
+            <IndustryLabel>Industries We Serve</IndustryLabel>
+            <IndustryRow>
+              {INDUSTRIES.map((ind, i) => (
+                <IndustryTag
+                  key={ind}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.07 }}
+                >
+                  {ind}
+                </IndustryTag>
+              ))}
+            </IndustryRow>
+          </AnimatedReveal>
+        </Inner>
       </Container>
-    </CtaWrapper>
+    </CtaSection>
   );
 }
 
-// Styled Components
-const CtaWrapper = styled.section`
+const CtaSection = styled.section`
   position: relative;
-  background: 
-    linear-gradient(135deg, rgba(8, 20, 40, 0.95) 0%, rgba(15, 35, 75, 0.95) 100%),
-    url('/images/subtle-grid.png');
-  background-size: cover;
   overflow: hidden;
-  padding: 10rem 0;
+  padding: 12rem 0;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--background), 1) 0%,
+    rgba(15, 25, 50, 0.98) 100%
+  );
+  border-top: 1px solid rgba(var(--text), 0.07);
 `;
 
-const DarkOverlay = styled.div`
+const GradientOrb = styled.div<{ $x: string; $y: string; $color: string }>`
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 0;
+  width: 50rem;
+  height: 50rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, ${(p) => p.$color} 0%, transparent 70%);
+  left: ${(p) => p.$x};
+  top: ${(p) => p.$y};
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 `;
 
-const ContentStack = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+const Inner = styled.div`
   text-align: center;
-  position: relative;
-  z-index: 1;
-  color: white;
-
-  & > *:not(:first-child) {
-    margin-top: 3rem;
-  }
-
-  ${media.tablet(`
-    & > *:not(:first-child) {
-      margin-top: 2rem;
-    }
-  `)}
-`;
-
-const StyledSectionTitle = styled(SectionTitle)`
-  color: rgb(255, 125, 0);
-  margin-bottom: 2rem;
-  font-size: 3.2rem;
-  font-weight: 700;
-  
-  ${media.tablet(`
-    font-size: 2.4rem;
-  `)}
-`;
-
-const Description = styled.p`
-  font-size: 1.8rem;
-  line-height: 1.6;
-  max-width: 70rem;
-  color: rgba(255, 255, 255, 0.9);
+  max-width: 80rem;
   margin: 0 auto;
-
-  ${media.tablet(`
-    font-size: 1.6rem;
-  `)}
 `;
 
-const PrimaryButton = styled(Button)`
-  background: rgb(255, 125, 0);
-  color: white;
-  padding: 1.2rem 2.4rem;
-  font-size: 1.6rem;
-  border: none;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgb(230, 110, 0);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 125, 0, 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
+const Eyebrow = styled.p`
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #ff8c2b;
+  margin-bottom: 1.8rem;
 `;
 
-const SecondaryButton = styled(Button)`
-  background: transparent;
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 1.2rem 2.4rem;
-  font-size: 1.6rem;
-  transition: all 0.3s ease;
+const Headline = styled.h2`
+  font-size: 4.8rem;
+  font-weight: 800;
+  line-height: 1.12;
+  color: rgb(var(--text));
+  margin-bottom: 2.4rem;
+  letter-spacing: -0.02em;
 
-  &:hover {
-    border-color: white;
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
+  ${media.tablet(`font-size: 3.4rem;`)}
+  ${media.phone(`font-size: 2.8rem;`)}
 `;
 
-const Arrow = styled.span`
-  margin-left: 0.8rem;
-  transition: transform 0.2s ease;
-  
-  ${PrimaryButton}:hover &, ${SecondaryButton}:hover & {
-    transform: translateX(3px);
-  }
+const AccentText = styled.span`
+  color: rgb(var(--accent));
 `;
 
-const TrustBadges = styled.div`
+const Body = styled.p`
+  font-size: 1.85rem;
+  line-height: 1.75;
+  color: rgba(var(--text), 0.72);
+  margin-bottom: 4rem;
+  max-width: 66rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  ${media.tablet(`font-size: 1.7rem;`)}
+`;
+
+const Actions = styled.div`
   display: flex;
-  gap: 2rem;
-  margin-top: 4rem;
-  flex-wrap: wrap;
+  gap: 1.4rem;
   justify-content: center;
-
-  ${media.tablet(`
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-top: 3rem;
-  `)}
+  flex-wrap: wrap;
+  margin-bottom: 3.6rem;
 `;
 
-const TrustBadge = styled(motion.div)`
+const PrimaryBtn = styled.a`
+  display: inline-block;
+  background: #ff8c2b;
+  color: #fff;
+  font-size: 1.65rem;
+  font-weight: 700;
+  padding: 1.5rem 3.4rem;
+  border-radius: 0.9rem;
+  text-decoration: none;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: #e67a1e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(255, 140, 43, 0.4);
+  }
+`;
+
+const SecondaryBtn = styled.a`
+  display: inline-block;
+  background: rgba(57, 255, 20, 0.12);
+  color: #39ff14;
+  font-size: 1.65rem;
+  font-weight: 700;
+  padding: 1.5rem 3.4rem;
+  border-radius: 0.9rem;
+  text-decoration: none;
+  border: 1.5px solid rgba(57, 255, 20, 0.35);
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: rgba(57, 255, 20, 0.2);
+    border-color: rgba(57, 255, 20, 0.6);
+    transform: translateY(-2px);
+  }
+`;
+
+const TrustRow = styled.div`
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
+const TrustChip = styled.div`
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
-  padding: 1rem 2rem;
-  border-radius: 3rem;
+  gap: 0.7rem;
+  background: rgba(var(--cardBackground), 0.5);
+  border: 1px solid rgba(var(--text), 0.1);
+  padding: 0.8rem 1.8rem;
+  border-radius: 10rem;
   font-size: 1.4rem;
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  ${media.tablet(`
-    padding: 0.8rem 1.8rem;
-    font-size: 1.3rem;
-  `)}
-`;
-
-const Checkmark = styled.svg`
-  width: 1.6rem;
-  height: 1.6rem;
-  color: white;
-  margin-right: 0.8rem;
-`;
-
-const BadgeText = styled.span`
-  color: white;
   font-weight: 600;
+  color: rgba(var(--text), 0.85);
+`;
+
+const TrustMark = styled.span`
+  color: rgb(var(--accent));
+  font-weight: 800;
+`;
+
+const Divider = styled.hr`
+  border: none;
+  border-top: 1px solid rgba(var(--text), 0.08);
+  margin: 4.5rem 0;
+`;
+
+const IndustryLabel = styled.p`
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgba(var(--text), 0.45);
+  margin-bottom: 2rem;
+`;
+
+const IndustryRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
+const IndustryTag = styled(motion.span)`
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: rgba(var(--text), 0.65);
+  background: rgba(var(--cardBackground), 0.4);
+  border: 1px solid rgba(var(--text), 0.08);
+  padding: 0.6rem 1.4rem;
+  border-radius: 0.6rem;
 `;

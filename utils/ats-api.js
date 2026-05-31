@@ -1,4 +1,5 @@
-const ATS_API_BASE = 'https://precise-analytics-ats.vercel.app/api';
+const configuredAtsUrl = (process.env.NEXT_PUBLIC_ATS_API_URL || 'https://ats.preciseanalytics.io').replace(/\/+$/, '');
+const ATS_API_BASE = configuredAtsUrl.endsWith('/api') ? configuredAtsUrl : `${configuredAtsUrl}/api`;
 
 class ATSApiService {
   async fetchJobs() {

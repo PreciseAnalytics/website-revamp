@@ -181,7 +181,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 <td style="padding-bottom:10px">
                   <a href="mailto:${email}" style="display:inline-block;padding:10px 20px;background:#FF7D00;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:6px;margin-right:10px">&#9993; Reply to Applicant</a>
                   <a href="https://preciseanalytics.io/admin/ats" style="display:inline-block;padding:10px 20px;background:#111827;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:6px;margin-right:10px">&#128196; Internal ATS</a>
-                  <a href="https://precise-analytics-ats.vercel.app/" style="display:inline-block;padding:10px 20px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:6px">&#128279; ATS Platform</a>
+                  <a href="https://ats.preciseanalytics.io/" style="display:inline-block;padding:10px 20px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border-radius:6px">&#128279; ATS Platform</a>
                 </td>
               </tr>
             </table>

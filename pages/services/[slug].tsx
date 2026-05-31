@@ -693,6 +693,8 @@ export default function ServiceDetailPage() {
   const router = useRouter();
   const { slug } = router.query;
 
+  if (!router.isReady) return null;
+
   if (!slug || typeof slug !== 'string' || !SERVICES[slug]) {
     return (
       <>
@@ -722,362 +724,289 @@ export default function ServiceDetailPage() {
 
       <AnimatedHeader />
 
-      {/* Back Navigation */}
-      <TopNav>
-        <Container>
-          <BackNavigation
-            href="/services"
-          >
-            <BackIcon>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="m12 19-7-7 7-7"/>
-                <path d="M19 12H5"/>
+      {/* ── Compact hero ── */}
+      <HeroSection>
+        <Image src={service.image} alt="" fill priority sizes="100vw" style={{ objectFit: 'cover' }} />
+        <HeroOverlay />
+        <HeroBody>
+          <Container>
+            <HeroBack href="/services">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
               </svg>
-            </BackIcon>
-            <BackText>
-              <BackLabel>Back to</BackLabel>
-              <BackDestination>All Services</BackDestination>
-            </BackText>
-          </BackNavigation>
-        </Container>
-      </TopNav>
+              All Services
+            </HeroBack>
+            <HeroTag>Service</HeroTag>
+            <HeroTitle>{service.title}</HeroTitle>
+            <HeroDesc>{service.description}</HeroDesc>
+            <HeroCtaRow>
+              <Link href="/schedule-consult">Schedule a Consultation →</Link>
+            </HeroCtaRow>
+          </Container>
+        </HeroBody>
+      </HeroSection>
 
-      {/* Hero Section */}
-      <Hero>
-        <Image
-          src={service.image}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          style={{ objectFit: 'cover' }}
-        />
-        <Overlay />
-        <HeroContent>
-          <HeroInner>
-            <h1>{service.title}</h1>
-            <p>{service.description}</p>
-          </HeroInner>
-        </HeroContent>
-      </Hero>
-
-      {/* Overview Section */}
-      <Section>
+      {/* ── Key outcomes — 3 large cards ── */}
+      <OutcomesSection>
         <Container>
-          <SectionHeader>
-            <SectionLabel>Overview</SectionLabel>
-            <SectionHeading>What We Deliver</SectionHeading>
-          </SectionHeader>
-          <OverviewText>
-            {service.overview.split('\n\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
+          <SectionHdr>
+            <Eyebrow>What You Get</Eyebrow>
+            <SectionH2>Key Outcomes</SectionH2>
+          </SectionHdr>
+          <OutcomesGrid>
+            {service.keyBenefits.slice(0, 3).map((benefit, i) => (
+              <OutcomeCard key={i}>
+                <OutcomeNum>0{i + 1}</OutcomeNum>
+                <OutcomeText>{benefit}</OutcomeText>
+              </OutcomeCard>
             ))}
-          </OverviewText>
+          </OutcomesGrid>
         </Container>
-      </Section>
+      </OutcomesSection>
 
-      {/* Key Benefits Section */}
-      <Section $alternate>
+      {/* ── Capabilities — compact 2×2 ── */}
+      <AltSection>
         <Container>
-          <SectionHeader>
-            <SectionLabel>Benefits</SectionLabel>
-            <SectionHeading>Key Benefits</SectionHeading>
-          </SectionHeader>
-          <BenefitsGrid>
-            {service.keyBenefits.map((benefit, index) => (
-              <BenefitCard key={index}>
-                <BenefitIcon>✓</BenefitIcon>
-                <BenefitText>{benefit}</BenefitText>
-              </BenefitCard>
+          <SectionHdr>
+            <Eyebrow>Capabilities</Eyebrow>
+            <SectionH2>How We Help</SectionH2>
+          </SectionHdr>
+          <CapGrid>
+            {service.capabilities.map((cap, i) => (
+              <CapCard key={i}>
+                <CapNum>0{i + 1}</CapNum>
+                <CapTitle>{cap.title}</CapTitle>
+                <CapDesc>{cap.description}</CapDesc>
+              </CapCard>
             ))}
-          </BenefitsGrid>
+          </CapGrid>
         </Container>
-      </Section>
+      </AltSection>
 
-      {/* Capabilities Section */}
-      <Section>
+      {/* ── Process — horizontal, titles only ── */}
+      <ContentSection>
         <Container>
-          <SectionHeader>
-            <SectionLabel>Capabilities</SectionLabel>
-            <SectionHeading>Our Capabilities</SectionHeading>
-          </SectionHeader>
-          <CapabilitiesGrid>
-            {service.capabilities.map((capability, index) => (
-              <CapabilityCard key={index}>
-                <CapabilityNumber>{String(index + 1).padStart(2, '0')}</CapabilityNumber>
-                <CapabilityTitle>{capability.title}</CapabilityTitle>
-                <CapabilityDescription>{capability.description}</CapabilityDescription>
-              </CapabilityCard>
+          <SectionHdr>
+            <Eyebrow>Process</Eyebrow>
+            <SectionH2>How We Work</SectionH2>
+          </SectionHdr>
+          <ProcessTrack>
+            {service.process.map((step, i) => (
+              <ProcessNode key={i} $last={i === service.process.length - 1}>
+                <StepBubble>{step.step}</StepBubble>
+                <StepTitle>{step.title}</StepTitle>
+              </ProcessNode>
             ))}
-          </CapabilitiesGrid>
+          </ProcessTrack>
         </Container>
-      </Section>
+      </ContentSection>
 
-      {/* Process Section */}
-      <Section $alternate>
+      {/* ── Use cases as tag pills ── */}
+      <AltSection>
         <Container>
-          <SectionHeader>
-            <SectionLabel>Process</SectionLabel>
-            <SectionHeading>Our Approach</SectionHeading>
-          </SectionHeader>
-          <ProcessSteps>
-            {service.process.map((step, index) => (
-              <ProcessStep key={index}>
-                <ProcessNumber>{step.step}</ProcessNumber>
-                <ProcessContent>
-                  <ProcessTitle>{step.title}</ProcessTitle>
-                  <ProcessDescription>{step.description}</ProcessDescription>
-                </ProcessContent>
-              </ProcessStep>
+          <SectionHdr>
+            <Eyebrow>Applications</Eyebrow>
+            <SectionH2>Who This Is For</SectionH2>
+          </SectionHdr>
+          <UseCasePills>
+            {service.useCases.map((uc, i) => (
+              <UseCasePill key={i}>{uc}</UseCasePill>
             ))}
-          </ProcessSteps>
+          </UseCasePills>
         </Container>
-      </Section>
+      </AltSection>
 
-      {/* Use Cases Section */}
-      <Section>
+      {/* ── CTA ── */}
+      <CtaBanner>
         <Container>
-          <SectionHeader>
-            <SectionLabel>Applications</SectionLabel>
-            <SectionHeading>Common Use Cases</SectionHeading>
-          </SectionHeader>
-          <UseCasesList>
-            {service.useCases.map((useCase, index) => (
-              <UseCaseItem key={index}>
-                <UseCaseBullet>→</UseCaseBullet>
-                <UseCaseText>{useCase}</UseCaseText>
-              </UseCaseItem>
-            ))}
-          </UseCasesList>
-        </Container>
-      </Section>
-
-      {/* Why Choose Us Section */}
-      <Section $alternate>
-        <Container>
-          <SectionHeader>
-            <SectionLabel>Why Precise Analytics</SectionLabel>
-            <SectionHeading>Why Choose Us</SectionHeading>
-          </SectionHeader>
-          <WhyChooseGrid>
-            {service.whyChooseUs.map((reason, index) => (
-              <WhyChooseCard key={index}>
-                <WhyChooseIcon>★</WhyChooseIcon>
-                <WhyChooseText>{reason}</WhyChooseText>
-              </WhyChooseCard>
-            ))}
-          </WhyChooseGrid>
-        </Container>
-      </Section>
-
-      {/* CTA Section */}
-      <CtaSection>
-        <Container>
-          <CtaContent>
+          <CtaInner>
             <CtaTitle>Ready to Get Started?</CtaTitle>
-            <CtaDescription>
-              Let&apos;s discuss how {service.title.toLowerCase()} can transform your organization&apos;s data capabilities.
-            </CtaDescription>
-            <CtaActions>
-              <CtaButtonPrimary href="/schedule-consult">
-                Schedule a Consultation
-              </CtaButtonPrimary>
-              <CtaButtonSecondary href="/services">
-                Back to Services
-              </CtaButtonSecondary>
-            </CtaActions>
-          </CtaContent>
+            <CtaDesc>
+              Let&apos;s talk about how {service.title} fits your organization.
+            </CtaDesc>
+            <CtaButtons>
+              <CtaPrimary href="/schedule-consult">Schedule a Consultation</CtaPrimary>
+              <CtaSecondary href="/services">Browse All Services</CtaSecondary>
+            </CtaButtons>
+          </CtaInner>
         </Container>
-      </CtaSection>
+      </CtaBanner>
     </>
   );
 }
 
 /* ================= STYLES ================= */
 
-const TopNav = styled.div`
-  background: rgb(var(--background));
-  padding: 2rem 0 1rem;
-  border-bottom: 1px solid rgba(var(--text), 0.1);
-`;
-
-const BackNavigation = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  gap: 1.6rem;
-  padding: 1.8rem 3rem;
-  background: rgba(255, 165, 0, 0.1);
-  border: 2px solid rgba(255, 165, 0, 0.3);
-  border-radius: 1.6rem;
-  color: rgb(255, 140, 0);
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-weight: 600;
-  backdrop-filter: blur(10px);
-  font-size: 1.1rem;
-  box-shadow: 0 4px 15px rgba(255, 165, 0, 0.2);
-
-  &:hover {
-    background: rgba(255, 165, 0, 0.15);
-    border-color: rgba(255, 165, 0, 0.5);
-    box-shadow: 0 8px 25px rgba(255, 165, 0, 0.3);
-    transform: translateX(-8px) translateY(-2px);
-  }
-
-  ${media.phone(`
-    padding: 1.4rem 2rem;
-    font-size: 1rem;
-  `)}
-`;
-
-const BackIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.6rem;
-  height: 3.6rem;
-  border-radius: 1rem;
-  background: rgba(255, 165, 0, 0.2);
-  transition: all 0.3s ease;
-  
-  svg {
-    width: 2.2rem;
-    height: 2.2rem;
-    transition: transform 0.3s ease;
-  }
-
-  ${BackNavigation}:hover & {
-    background: rgba(255, 165, 0, 0.3);
-    
-    svg {
-      transform: translateX(-3px);
-    }
-  }
-`;
-
-const BackText = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-`;
-
-const BackLabel = styled.span`
-  font-size: 1.4rem;
-  opacity: 0.8;
-  line-height: 1;
-  font-weight: 500;
-`;
-
-const BackDestination = styled.span`
-  font-size: 1.9rem;
-  font-weight: 700;
-  line-height: 1.1;
-
-  ${media.phone(`
-    font-size: 1.6rem;
-  `)}
-`;
-
-const Hero = styled.section`
+/* Hero */
+const HeroSection = styled.section`
   position: relative;
-  min-height: 60vh;
+  min-height: 36rem;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
 `;
 
-const Overlay = styled.div`
+const HeroOverlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.55),
-    rgba(0, 0, 0, 0.85)
-  );
+  background: linear-gradient(to top, rgba(0,0,0,0.93) 0%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.25) 100%);
 `;
 
-const HeroContent = styled.div`
+const HeroBody = styled.div`
   position: relative;
   z-index: 1;
   width: 100%;
-  display: flex;
+  padding: 3.5rem 0;
+`;
+
+const HeroBack = styled(Link)`
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  gap: 0.6rem;
+  color: rgba(255,255,255,0.55);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 1.4rem;
+  transition: color 0.2s;
+
+  &:hover { color: #ff8c2b; }
 `;
 
-const HeroInner = styled.div`
-  max-width: 90rem;
-  padding: 0 3rem;
-  color: white;
-
-  h1 {
-    font-size: 4.5rem;
-    margin-bottom: 2rem;
-    color: #39ff14;
-    font-weight: 800;
-  }
-
-  p {
-    font-size: 2rem;
-    line-height: 1.7;
-    max-width: 72rem;
-    margin: 0 auto;
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  ${media.tablet(`
-    h1 { font-size: 3.2rem; }
-    p { font-size: 1.8rem; }
-  `)}
-`;
-
-const Section = styled.section<{ $alternate?: boolean }>`
-  padding: 8rem 0;
-  background: ${props => props.$alternate ? 'rgba(var(--cardBackground), 0.5)' : 'transparent'};
-`;
-
-const SectionHeader = styled.div`
-  text-align: center;
-  margin-bottom: 5rem;
-`;
-
-const SectionLabel = styled.span`
-  display: inline-block;
-  font-size: 1.4rem;
+const HeroTag = styled.p`
+  font-size: 1.2rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.22em;
   color: #ff8c2b;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 `;
 
-const SectionHeading = styled.h2`
-  font-size: 3.6rem;
+const HeroTitle = styled.h1`
+  font-size: 3.8rem;
   font-weight: 800;
-  color: rgb(var(--text));
-  margin: 0;
+  color: #39ff14;
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+  max-width: 68rem;
 
   ${media.tablet(`font-size: 2.8rem;`)}
 `;
 
-const OverviewText = styled.div`
-  max-width: 90rem;
-  margin: 0 auto;
+const HeroDesc = styled.p`
+  font-size: 1.7rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.78);
+  max-width: 58rem;
+  margin-bottom: 2.2rem;
 
-  p {
-    font-size: 1.8rem;
-    line-height: 1.9;
-    color: rgba(var(--text), 0.85);
-    margin-bottom: 2.5rem;
+  ${media.tablet(`font-size: 1.55rem;`)}
+`;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+const HeroCtaRow = styled.div`
+  a {
+    display: inline-block;
+    background: #ff8c2b;
+    color: #fff;
+    font-size: 1.45rem;
+    font-weight: 700;
+    padding: 1.1rem 2.6rem;
+    border-radius: 0.8rem;
+    text-decoration: none;
+    transition: background 0.2s;
+
+    &:hover { background: #e67a1e; }
   }
 `;
 
-const BenefitsGrid = styled.div`
+/* Shared */
+const ContentSection = styled.section`
+  padding: 6rem 0;
+`;
+
+const AltSection = styled.section`
+  padding: 6rem 0;
+  background: rgba(var(--cardBackground), 0.4);
+`;
+
+const SectionHdr = styled.div`
+  text-align: center;
+  margin-bottom: 4rem;
+`;
+
+const Eyebrow = styled.p`
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #ff8c2b;
+  margin-bottom: 0.7rem;
+`;
+
+const SectionH2 = styled.h2`
+  font-size: 3rem;
+  font-weight: 800;
+  color: rgb(var(--text));
+  margin: 0;
+
+  ${media.tablet(`font-size: 2.4rem;`)}
+`;
+
+/* Outcomes */
+const OutcomesSection = styled.section`
+  padding: 6rem 0;
+`;
+
+const OutcomesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 100rem;
+  margin: 0 auto;
+
+  ${media.tablet(`grid-template-columns: 1fr;`)}
+`;
+
+const OutcomeCard = styled.div`
+  padding: 3rem 2.8rem;
+  background: rgba(var(--cardBackground), 0.6);
+  border: 1px solid rgba(57,255,20,0.18);
+  border-radius: 1.4rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #39ff14, rgba(57,255,20,0.2));
+  }
+`;
+
+const OutcomeNum = styled.div`
+  font-size: 4rem;
+  font-weight: 900;
+  color: rgba(57,255,20,0.2);
+  line-height: 1;
+  margin-bottom: 1.2rem;
+  font-variant-numeric: tabular-nums;
+`;
+
+const OutcomeText = styled.p`
+  font-size: 1.65rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: rgb(var(--text));
+  margin: 0;
+`;
+
+/* Capabilities */
+const CapGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
@@ -1087,246 +1016,172 @@ const BenefitsGrid = styled.div`
   ${media.tablet(`grid-template-columns: 1fr;`)}
 `;
 
-const BenefitCard = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: rgba(var(--cardBackground), 0.8);
-  border-radius: 1rem;
-  border: 1px solid rgba(var(--text), 0.1);
+const CapCard = styled.div`
+  padding: 2.4rem;
+  background: rgba(var(--cardBackground), 0.55);
+  border-radius: 1.2rem;
+  border: 1px solid rgba(var(--text), 0.09);
 `;
 
-const BenefitIcon = styled.span`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  background: #39ff14;
-  color: #000;
-  border-radius: 50%;
-  font-weight: 700;
-  flex-shrink: 0;
-`;
-
-const BenefitText = styled.p`
-  font-size: 1.6rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.9);
-  margin: 0;
-`;
-
-const CapabilitiesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3rem;
-  max-width: 100rem;
-  margin: 0 auto;
-
-  ${media.tablet(`grid-template-columns: 1fr;`)}
-`;
-
-const CapabilityCard = styled.div`
-  padding: 3rem;
-  background: rgba(var(--cardBackground), 0.6);
-  border-radius: 1.5rem;
-  border: 1px solid rgba(var(--text), 0.1);
-`;
-
-const CapabilityNumber = styled.span`
-  font-size: 1.4rem;
+const CapNum = styled.span`
+  font-size: 1.15rem;
   font-weight: 700;
   color: #ff8c2b;
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 `;
 
-const CapabilityTitle = styled.h3`
-  font-size: 2.2rem;
+const CapTitle = styled.h3`
+  font-size: 1.85rem;
   font-weight: 700;
   color: #39ff14;
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1rem;
 `;
 
-const CapabilityDescription = styled.p`
-  font-size: 1.6rem;
-  line-height: 1.7;
-  color: rgba(var(--text), 0.85);
+const CapDesc = styled.p`
+  font-size: 1.5rem;
+  line-height: 1.65;
+  color: rgba(var(--text), 0.78);
   margin: 0;
 `;
 
-const ProcessSteps = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 3rem;
-  max-width: 80rem;
-  margin: 0 auto;
-`;
-
-const ProcessStep = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 3rem;
-
-  ${media.phone(`
-    flex-direction: column;
-    gap: 1.5rem;
-  `)}
-`;
-
-const ProcessNumber = styled.span`
-  font-size: 4rem;
-  font-weight: 800;
-  color: rgba(57, 255, 20, 0.3);
-  line-height: 1;
-  flex-shrink: 0;
-  width: 8rem;
-`;
-
-const ProcessContent = styled.div`
-  flex: 1;
-`;
-
-const ProcessTitle = styled.h3`
-  font-size: 2rem;
-  font-weight: 700;
-  color: rgb(var(--text));
-  margin: 0 0 1rem 0;
-`;
-
-const ProcessDescription = styled.p`
-  font-size: 1.6rem;
-  line-height: 1.7;
-  color: rgba(var(--text), 0.8);
-  margin: 0;
-`;
-
-const UseCasesList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  max-width: 80rem;
-  margin: 0 auto;
-`;
-
-const UseCaseItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-`;
-
-const UseCaseBullet = styled.span`
-  color: #ff8c2b;
-  font-size: 2rem;
-  font-weight: 700;
-  flex-shrink: 0;
-`;
-
-const UseCaseText = styled.p`
-  font-size: 1.7rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.85);
-  margin: 0;
-`;
-
-const WhyChooseGrid = styled.div`
+/* Process — horizontal, titles only */
+const ProcessTrack = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr);
   max-width: 100rem;
   margin: 0 auto;
 
-  ${media.tablet(`grid-template-columns: 1fr;`)}
+  ${media.tablet(`
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+  `)}
+  ${media.phone(`grid-template-columns: 1fr;`)}
 `;
 
-const WhyChooseCard = styled.div`
+const ProcessNode = styled.div<{ $last: boolean }>`
+  position: relative;
+  padding-right: 2rem;
+
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 2.3rem;
+    left: 4.8rem;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, rgba(57,255,20,0.3), rgba(57,255,20,0.05));
+  }
+
+  ${media.tablet(`padding-right: 0; &::after { display: none; }`)}
+`;
+
+const StepBubble = styled.div`
+  width: 4.6rem;
+  height: 4.6rem;
+  border-radius: 50%;
+  background: rgba(57,255,20,0.1);
+  border: 2px solid rgba(57,255,20,0.3);
+  color: #39ff14;
+  font-size: 1.35rem;
+  font-weight: 800;
   display: flex;
-  align-items: flex-start;
-  gap: 1.5rem;
-  padding: 2rem;
-  background: rgba(var(--cardBackground), 0.8);
-  border-radius: 1rem;
-  border: 1px solid rgba(var(--text), 0.1);
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.4rem;
 `;
 
-const WhyChooseIcon = styled.span`
-  color: #ff8c2b;
-  font-size: 2rem;
-  flex-shrink: 0;
-`;
-
-const WhyChooseText = styled.p`
+const StepTitle = styled.h4`
   font-size: 1.6rem;
-  line-height: 1.6;
-  color: rgba(var(--text), 0.9);
+  font-weight: 700;
+  color: rgb(var(--text));
   margin: 0;
+  line-height: 1.3;
 `;
 
-const CtaSection = styled.section`
-  padding: 10rem 0;
-  background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), rgba(255, 140, 43, 0.1));
+/* Use case pills */
+const UseCasePills = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  justify-content: center;
+  max-width: 90rem;
+  margin: 0 auto;
 `;
 
-const CtaContent = styled.div`
+const UseCasePill = styled.span`
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: rgba(var(--text), 0.8);
+  background: rgba(var(--cardBackground), 0.7);
+  border: 1px solid rgba(var(--text), 0.12);
+  padding: 0.9rem 1.8rem;
+  border-radius: 10rem;
+  line-height: 1;
+`;
+
+/* CTA */
+const CtaBanner = styled.section`
+  padding: 8rem 0;
+  background: linear-gradient(135deg, rgba(57,255,20,0.07), rgba(255,140,43,0.07));
+  border-top: 1px solid rgba(var(--text), 0.07);
+`;
+
+const CtaInner = styled.div`
   text-align: center;
-  max-width: 70rem;
+  max-width: 60rem;
   margin: 0 auto;
 `;
 
 const CtaTitle = styled.h2`
-  font-size: 3.6rem;
+  font-size: 3.2rem;
   font-weight: 800;
   color: rgb(var(--text));
-  margin: 0 0 2rem 0;
+  margin: 0 0 1.4rem;
 
-  ${media.tablet(`font-size: 2.8rem;`)}
+  ${media.tablet(`font-size: 2.6rem;`)}
 `;
 
-const CtaDescription = styled.p`
-  font-size: 1.8rem;
-  line-height: 1.7;
-  color: rgba(var(--text), 0.8);
-  margin: 0 0 4rem 0;
+const CtaDesc = styled.p`
+  font-size: 1.75rem;
+  line-height: 1.65;
+  color: rgba(var(--text), 0.7);
+  margin: 0 0 3.2rem;
 `;
 
-const CtaActions = styled.div`
+const CtaButtons = styled.div`
   display: flex;
-  gap: 2rem;
+  gap: 1.2rem;
   justify-content: center;
   flex-wrap: wrap;
 `;
 
-const CtaButtonPrimary = styled(Link)`
+const CtaPrimary = styled(Link)`
   display: inline-block;
   background: #39ff14;
   color: #000;
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   font-weight: 700;
-  padding: 1.6rem 3.5rem;
-  border-radius: 1rem;
+  padding: 1.3rem 3rem;
+  border-radius: 0.8rem;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: opacity 0.2s;
 
-  &:hover {
-    background: #2dd10d;
-    transform: translateY(-2px);
-  }
+  &:hover { opacity: 0.88; }
 `;
 
-const CtaButtonSecondary = styled(Link)`
+const CtaSecondary = styled(Link)`
   display: inline-block;
   background: #ff8c2b;
   color: #fff;
-  font-size: 1.6rem;
+  font-size: 1.55rem;
   font-weight: 700;
-  padding: 1.6rem 3.5rem;
-  border-radius: 1rem;
+  padding: 1.3rem 3rem;
+  border-radius: 0.8rem;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: background 0.2s;
 
-  &:hover {
-    background: #ff7a00;
-    transform: translateY(-2px);
-  }
+  &:hover { background: #e67a1e; }
 `;
